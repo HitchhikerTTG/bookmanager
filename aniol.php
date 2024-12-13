@@ -1,5 +1,6 @@
 
 <?php
+session_start();
 class BookManager {
     private $booksData;
     private $listsData;
@@ -152,12 +153,13 @@ if (isset($_POST['generate_html'])) {
 }
 
 if (isset($_POST['save_metadata'])) {
+    $series = !empty($_POST['new_series']) ? $_POST['new_series'] : $_POST['series'];
     $success = $manager->saveMetadata(
         $_POST['file_name'],
         $_POST['title'],
         $_POST['authors'],
         $_POST['genres'],
-        $_POST['series'],
+        $series,
         $_POST['series_position']
     );
     $_SESSION['message'] = $success ? 'Metadata saved successfully!' : 'Error saving metadata';
