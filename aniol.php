@@ -288,8 +288,8 @@ $stats = $manager->getStats();
                                     'last_name' => $_POST['author_last_name']
                                 ]];
                                 $existingBook['genres'] = array_map('trim', explode(',', $_POST['genres']));
-                                $existingBook['series'] = $_POST['series'];
-                                $existingBook['series_position'] = $_POST['series_position'];
+                                $existingBook['series'] = !empty($_POST['series']) ? $_POST['series'] : null;
+                                $existingBook['series_position'] = !empty($_POST['series_position']) ? $_POST['series_position'] : null;
                                 $bookFound = true;
                                 break;
                             }
@@ -304,8 +304,8 @@ $stats = $manager->getStats();
                                     'last_name' => $_POST['author_last_name']
                                 ]],
                                 'genres' => array_map('trim', explode(',', $_POST['genres'])),
-                                'series' => $_POST['series'],
-                                'series_position' => $_POST['series_position'],
+                                'series' => !empty($_POST['series']) ? $_POST['series'] : null,
+                                'series_position' => !empty($_POST['series_position']) ? $_POST['series_position'] : null,
                                 'upload_date' => filemtime('_ksiazki/' . $_POST['file_name'])
                             ];
                         }
@@ -437,11 +437,11 @@ $stats = $manager->getStats();
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Series</label>
-                            <input type="text" class="form-control" name="series" id="edit_series">
+                            <input type="text" class="form-control" name="series" id="edit_series" placeholder="Optional">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Series Position</label>
-                            <input type="number" class="form-control" name="series_position" id="edit_series_position">
+                            <input type="number" class="form-control" name="series_position" id="edit_series_position" placeholder="Optional">
                         </div>
                     </div>
                     <div class="modal-footer">
