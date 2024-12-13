@@ -3,6 +3,7 @@
 class BookManager {
     private $booksData;
     private $listsData;
+    private $itemsPerPage = 10;
     
     public function __construct() {
         $this->ensureDataFilesExist();
@@ -37,10 +38,18 @@ class BookManager {
     public function getStats() {
         $filesInFolder = is_dir('_ksiazki') ? count(glob('_ksiazki/*')) : 0;
         $booksWithMetadata = count($this->booksData['books']);
+        $lastUpdate = file_exists('ksiazki.html') ? date('Y-m-d H:i:s', filemtime('ksiazki.html')) : 'Never';
         return [
             'files' => $filesInFolder,
-            'metadata' => $booksWithMetadata
+            'metadata' => $booksWithMetadata,
+            'lastUpdate' => $lastUpdate
         ];
+    }
+
+    public function getUnprocessedBooks() {
+        $allFiles = is_dir('_ksiazki') ? array_map('basename', glob('_ksiazki/*')) : [];
+        $processedFiles = array_column($this->booksData['books'], 'file_name');
+        return array_diff($allFiles, $processedFiles);
     }
 
     public function addBook($file, $title, $authors, $genres, $series = null, $seriesPosition = null) {
@@ -121,6 +130,26 @@ class BookManager {
 $manager = new BookManager();
 $stats = $manager->getStats();
 
+if (isset($_POST['generate_html'])) {
+    $manager->generateHtml();
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+$currentTab = $_GET['tab'] ?? 'unprocessed';
+$page = max(1, intval($_GET['page'] ?? 1));
+$unprocessedBooks = $manager->getUnprocessedBooks();
+$processedBooks = $manager->booksData['books'];
+
+$totalPages = [
+    'unprocessed' => ceil(count($unprocessedBooks) / 10),
+    'processed' => ceil(count($processedBooks) / 10)
+];
+
+$startIndex = ($page - 1) * 10;
+$currentBooks = $currentTab === 'unprocessed' 
+    ? array_slice($unprocessedBooks, $startIndex, 10)
+    : array_slice($processedBooks, $startIndex, 10);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -133,10 +162,59 @@ $stats = $manager->getStats();
 <body>
     <div class="container mt-4">
         <div class="alert alert-info">
-            Books in folder: <?= $stats['files'] ?>, Books with metadata: <?= $stats['metadata'] ?>
+            Books in folder: <?= $stats['files'] ?>, Books with metadata: <?= $stats['metadata'] ?><br>
+            Last HTML update: <?= $stats['lastUpdate'] ?>
+            <form method="POST" class="d-inline ms-3">
+                <button type="submit" name="generate_html" class="btn btn-primary btn-sm">Generate HTML</button>
+            </form>
         </div>
 
-        <div class="card">
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link <?= $currentTab === 'unprocessed' ? 'active' : '' ?>" 
+                   href="?tab=unprocessed">Nieopisane</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= $currentTab === 'processed' ? 'active' : '' ?>" 
+                   href="?tab=processed">Gotowe</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active">
+                <?php if ($currentTab === 'unprocessed'): ?>
+                    <div class="list-group">
+                        <?php foreach ($currentBooks as $file): ?>
+                            <div class="list-group-item"><?= htmlspecialchars($file) ?></div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="list-group">
+                        <?php foreach ($currentBooks as $book): ?>
+                            <div class="list-group-item">
+                                <h5><?= htmlspecialchars($book['title']) ?></h5>
+                                <p class="mb-1">Authors: <?= htmlspecialchars(implode(', ', $book['authors'])) ?></p>
+                                <small>File: <?= htmlspecialchars($book['file_name']) ?></small>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($totalPages[$currentTab] > 1): ?>
+                    <nav class="mt-3">
+                        <ul class="pagination">
+                            <?php for ($i = 1; $i <= $totalPages[$currentTab]; $i++): ?>
+                                <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+                                    <a class="page-link" href="?tab=<?= $currentTab ?>&page=<?= $i ?>"><?= $i ?></a>
+                                </li>
+                            <?php endfor; ?>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="card mt-4">
             <div class="card-body">
                 <h2 class="card-title">Add New Book</h2>
                 <form method="POST" enctype="multipart/form-data">
