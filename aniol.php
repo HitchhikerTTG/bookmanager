@@ -273,6 +273,50 @@ $stats = $manager->getStats();
                 <button type="submit" name="generate_html" class="btn btn-primary">Generate HTML</button>
             </form>
         </div>
+
+        <h2>Metadata Validation Status</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Has Metadata</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $allFiles = is_dir('_ksiazki') ? array_map('basename', glob('_ksiazki/*')) : [];
+                foreach ($allFiles as $file) {
+                    $bookData = null;
+                    foreach ($manager->getProcessedBooks() as $book) {
+                        if ($book['file_name'] === $file) {
+                            $bookData = $book;
+                            break;
+                        }
+                    }
+                    $hasMetadata = $bookData !== null && $manager->validateBookMetadata($bookData);
+                    ?>
+                    <tr>
+                        <td><?= htmlspecialchars($file) ?></td>
+                        <td>
+                            <?php if ($hasMetadata): ?>
+                                <span class="badge bg-success">Yes</span>
+                            <?php else: ?>
+                                <span class="badge bg-danger">No</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($bookData): ?>
+                                Title: <?= htmlspecialchars($bookData['title']) ?><br>
+                                Authors: <?= count($bookData['authors']) ?>
+                            <?php else: ?>
+                                No metadata found
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
         <?php 
         if (isset($_POST['generate_html'])) {
             $manager->generateHtml();
