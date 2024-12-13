@@ -258,6 +258,90 @@ $stats = $manager->getStats();
                 ?>
             </tbody>
         </table>
+
+        <h2 class="mt-4">Authors</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $authors = [];
+                foreach ($books as $book) {
+                    if (isset($book['authors']) && is_array($book['authors'])) {
+                        foreach ($book['authors'] as $author) {
+                            if (is_array($author)) {
+                                $authorKey = $author['first_name'] . '|' . $author['last_name'];
+                                $authors[$authorKey] = $author;
+                            }
+                        }
+                    }
+                }
+                ksort($authors);
+                foreach ($authors as $author) {
+                    echo '<tr>';
+                    echo '<td>' . htmlspecialchars($author['first_name']) . '</td>';
+                    echo '<td>' . htmlspecialchars($author['last_name']) . '</td>';
+                    echo '</tr>';
+                }
+                ?>
+            </tbody>
+        </table>
+
+        <h2 class="mt-4">Genres</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Genre</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $genres = [];
+                foreach ($books as $book) {
+                    if (isset($book['genres']) && is_array($book['genres'])) {
+                        foreach ($book['genres'] as $genre) {
+                            $genres[$genre] = true;
+                        }
+                    }
+                }
+                ksort($genres);
+                foreach (array_keys($genres) as $genre) {
+                    echo '<tr>';
+                    echo '<td>' . htmlspecialchars($genre) . '</td>';
+                    echo '</tr>';
+                }
+                ?>
+            </tbody>
+        </table>
+
+        <h2 class="mt-4">Series</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Series Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $series = [];
+                foreach ($books as $book) {
+                    if (isset($book['series']) && !empty($book['series'])) {
+                        $series[$book['series']] = true;
+                    }
+                }
+                ksort($series);
+                foreach (array_keys($series) as $seriesName) {
+                    echo '<tr>';
+                    echo '<td>' . htmlspecialchars($seriesName) . '</td>';
+                    echo '</tr>';
+                }
+                ?>
+            </tbody>
+        </table>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
