@@ -201,6 +201,7 @@ $stats = $manager->getStats();
                     <th>Genres</th>
                     <th>Series</th>
                     <th>Upload Date</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -253,7 +254,55 @@ $stats = $manager->getStats();
                     echo '<td>' . (isset($book['series']) ? htmlspecialchars($book['series']) . 
                          (isset($book['series_position']) ? ' #' . htmlspecialchars($book['series_position']) : '') : 'No series') . '</td>';
                     echo '<td>' . date('Y-m-d H:i:s', $book['upload_date']) . '</td>';
+                    echo '<td><button type="button" class="btn btn-sm btn-primary" onclick="editBook(' . 
+                        "'" . htmlspecialchars($book['file_name'], ENT_QUOTES) . "', " .
+                        "'" . htmlspecialchars($book['title'] ?? '', ENT_QUOTES) . "', " .
+                        "'" . htmlspecialchars($book['authors'][0]['first_name'] ?? '', ENT_QUOTES) . "', " .
+                        "'" . htmlspecialchars($book['authors'][0]['last_name'] ?? '', ENT_QUOTES) . "', " .
+                        "'" . htmlspecialchars(isset($book['genres']) ? implode(', ', $book['genres']) : '', ENT_QUOTES) . "', " .
+                        "'" . htmlspecialchars($book['series'] ?? '', ENT_QUOTES) . "', " .
+                        "'" . htmlspecialchars($book['series_position'] ?? '', ENT_QUOTES) . "'" .
+                        ')">Edit</button></td>';
                     echo '</tr>';
+
+                    if (isset($_POST['save_book']) && $_POST['file_name'] === $book['file_name']) {
+                        $bookData = $manager->loadJson('data/books.json');
+                        $bookFound = false;
+                        
+                        foreach ($bookData['books'] as &$existingBook) {
+                            if ($existingBook['file_name'] === $_POST['file_name']) {
+                                $existingBook['title'] = $_POST['title'];
+                                $existingBook['authors'] = [[
+                                    'first_name' => $_POST['author_first_name'],
+                                    'last_name' => $_POST['author_last_name']
+                                ]];
+                                $existingBook['genres'] = array_map('trim', explode(',', $_POST['genres']));
+                                $existingBook['series'] = $_POST['series'];
+                                $existingBook['series_position'] = $_POST['series_position'];
+                                $bookFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!$bookFound) {
+                            $bookData['books'][] = [
+                                'file_name' => $_POST['file_name'],
+                                'title' => $_POST['title'],
+                                'authors' => [[
+                                    'first_name' => $_POST['author_first_name'],
+                                    'last_name' => $_POST['author_last_name']
+                                ]],
+                                'genres' => array_map('trim', explode(',', $_POST['genres'])),
+                                'series' => $_POST['series'],
+                                'series_position' => $_POST['series_position'],
+                                'upload_date' => filemtime('_ksiazki/' . $_POST['file_name'])
+                            ];
+                        }
+
+                        file_put_contents('data/books.json', json_encode($bookData, JSON_PRETTY_PRINT));
+                        header('Location: ' . $_SERVER['PHP_SELF']);
+                        exit;
+                    }
                 }
                 ?>
             </tbody>
@@ -344,6 +393,63 @@ $stats = $manager->getStats();
         </table>
     </div>
 
+    <!-- Edit Book Modal -->
+    <div class="modal fade" id="editBookModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Book</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editBookForm" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="file_name" id="edit_file_name">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" name="title" id="edit_title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Author First Name</label>
+                            <input type="text" class="form-control" name="author_first_name" id="edit_author_first_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Author Last Name</label>
+                            <input type="text" class="form-control" name="author_last_name" id="edit_author_last_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Genres (comma-separated)</label>
+                            <input type="text" class="form-control" name="genres" id="edit_genres">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Series</label>
+                            <input type="text" class="form-control" name="series" id="edit_series">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Series Position</label>
+                            <input type="number" class="form-control" name="series_position" id="edit_series_position">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="save_book" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
+            document.getElementById('edit_file_name').value = fileName;
+            document.getElementById('edit_title').value = title || '';
+            document.getElementById('edit_author_first_name').value = authorFirstName || '';
+            document.getElementById('edit_author_last_name').value = authorLastName || '';
+            document.getElementById('edit_genres').value = genres || '';
+            document.getElementById('edit_series').value = series || '';
+            document.getElementById('edit_series_position').value = seriesPosition || '';
+            new bootstrap.Modal(document.getElementById('editBookModal')).show();
+        }
+    </script>
 </body>
 </html>
