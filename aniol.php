@@ -274,10 +274,7 @@ $stats = $manager->getStats();
                             <?= htmlspecialchars($author['last_name'] . ', ' . $author['first_name']) ?>;
                         <?php endforeach; ?>
                         </span>
-                       <button class="btn btn-primary btn-sm" 
-    onclick="editMetadata('<?= htmlspecialchars($book['file_name']) ?>', <?= json_encode($book) ?>, <?= filemtime('_ksiazki/'.$book['file_name']) ?>)">
-    Edit
-</button>
+                        <button class="btn btn-primary btn-sm" onclick='editMetadata("<?= htmlspecialchars($book['file_name']) ?>", <?= json_encode($book) ?>)'>Edit</button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -394,7 +391,7 @@ $stats = $manager->getStats();
             const form = document.getElementById('metadataForm');
             form.reset();
             document.getElementById('file_name').value = fileName;
-            document.getElementById('upload_date').value = new Date(fileTime * 1000).toLocaleString();
+            document.getElementById('upload_date').value = new Date(filemtime('_ksiazki/' + fileName) * 1000).toLocaleString();
             
             if (existingData) {
                 form.querySelector('[name="title"]').value = existingData.title;
