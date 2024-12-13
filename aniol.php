@@ -86,6 +86,8 @@ class BookManager {
         $this->saveJson('data/lists.json', $this->listsData);
     }
 
+    public $booksData;
+    
     public function generateHtml() {
         $html = '<!DOCTYPE html>
 <html lang="en">
@@ -97,8 +99,12 @@ class BookManager {
 </head>
 <body>
     <div class="container mt-4">
-        <h1>E-Book Library</h1>
-        <div class="row">';
+        <h1>E-Book Library</h1>';
+        
+        if (empty($this->booksData['books'])) {
+            $html .= '<div class="alert alert-info">No books available yet.</div>';
+        } else {
+            $html .= '<div class="row">';
 
         foreach ($this->booksData['books'] as $book) {
             $html .= '<div class="col-md-6 mb-4">
@@ -118,8 +124,10 @@ class BookManager {
             </div>';
         }
 
+        $html .= '</div>';
+        }
+        
         $html .= '</div>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>';
