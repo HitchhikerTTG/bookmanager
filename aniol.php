@@ -196,7 +196,8 @@ $stats = $manager->getStats();
                 <tr>
                     <th>File Name</th>
                     <th>Title</th>
-                    <th>Authors</th>
+                    <th>Author First Name</th>
+                    <th>Author Last Name</th>
                     <th>Genres</th>
                     <th>Series</th>
                     <th>Upload Date</th>
@@ -229,16 +230,23 @@ $stats = $manager->getStats();
                     echo '<td>' . htmlspecialchars($book['file_name']) . '</td>';
                     echo '<td>' . htmlspecialchars($book['title'] ?? 'No title') . '</td>';
                     echo '<td>';
-                    if (isset($book['authors']) && is_array($book['authors'])) {
-                        foreach ($book['authors'] as $author) {
-                            if (is_array($author)) {
-                                echo htmlspecialchars($author['first_name'] . ' ' . $author['last_name']) . '<br>';
-                            } else {
-                                echo htmlspecialchars($author) . '<br>';
-                            }
+                    if (isset($book['authors']) && is_array($book['authors']) && !empty($book['authors'])) {
+                        $author = $book['authors'][0];
+                        if (is_array($author)) {
+                            echo htmlspecialchars($author['first_name'] ?? 'No first name');
                         }
                     } else {
-                        echo 'No authors';
+                        echo 'No first name';
+                    }
+                    echo '</td>';
+                    echo '<td>';
+                    if (isset($book['authors']) && is_array($book['authors']) && !empty($book['authors'])) {
+                        $author = $book['authors'][0];
+                        if (is_array($author)) {
+                            echo htmlspecialchars($author['last_name'] ?? 'No last name');
+                        }
+                    } else {
+                        echo 'No last name';
                     }
                     echo '</td>';
                     echo '<td>' . (isset($book['genres']) ? htmlspecialchars(implode(', ', $book['genres'])) : 'No genres') . '</td>';
