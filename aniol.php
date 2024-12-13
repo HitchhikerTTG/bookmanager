@@ -1,7 +1,8 @@
 
 <?php
 session_start();
-$root_url = (isset($_SERVER['HTTPS']) ? "https://" : "http://") . $_SERVER['HTTP_HOST'];
+$rootUrl = "http://" . $_SERVER['HTTP_HOST'];
+$rootsUrl = "https://" . $_SERVER['HTTP_HOST'];
 class BookManager {
     private $booksData;
     private $listsData;
@@ -139,8 +140,10 @@ class BookManager {
             }, $book['authors']);
 
             $html .= sprintf(
-                '<li class="book-item"><a href="http://_ksiazki/%s">[🔗http]</a> <a href="https://_ksiazki/%s">%s</a> [%s]</li>',
+                '<li class="book-item"><a href="%s/_ksiazki/%s">[🔗http]</a> <a href="%s/_ksiazki/%s">%s</a> [%s]</li>',
+                $rootUrl,
                 urlencode($book['file_name']),
+                $rootsUrl,
                 urlencode($book['file_name']),
                 htmlspecialchars($book['title']),
                 htmlspecialchars(implode('; ', $authors))
