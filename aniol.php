@@ -72,24 +72,24 @@ class BookManager {
     }
 
     private function validateBookMetadata($book) {
-        // Check required fields exist and are not empty
+        // Check if required fields exist and contain non-empty strings
         $required = ['file_name', 'title', 'upload_date'];
         foreach ($required as $field) {
-            if (!isset($book[$field]) || empty($book[$field])) {
-                return false;
-            }
+            if (!isset($book[$field])) return false;
+            if ($field !== 'upload_date' && (!is_string($book[$field]) || trim($book[$field]) === '')) return false;
         }
 
-        // Verify authors array exists and has at least one valid author
-        if (!isset($book['authors']) || !is_array($book['authors']) || empty($book['authors'])) {
+        // Verify authors array exists and is not empty
+        if (!isset($book['authors']) || !is_array($book['authors']) || count($book['authors']) === 0) {
             return false;
         }
 
-        // Check if at least one author has both first and last name
+        // Check if at least one author has both first and last name as non-empty strings
         $hasValidAuthor = false;
         foreach ($book['authors'] as $author) {
-            if (isset($author['first_name']) && isset($author['last_name']) && 
-                !empty($author['first_name']) && !empty($author['last_name'])) {
+            if (isset($author['first_name']) && isset($author['last_name']) &&
+                is_string($author['first_name']) && is_string($author['last_name']) &&
+                trim($author['first_name']) !== '' && trim($author['last_name']) !== '') {
                 $hasValidAuthor = true;
                 break;
             }
