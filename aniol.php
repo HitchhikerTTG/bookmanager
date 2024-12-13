@@ -130,10 +130,28 @@ class BookManager {
 $manager = new BookManager();
 $stats = $manager->getStats();
 
-if (isset($_POST['generate_html'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_FILES['book_file']) && isset($_POST['title'])) {
+        $file = $_FILES['book_file'];
+        $title = $_POST['title'];
+        $authors = array_map('trim', explode(',', $_POST['authors']));
+        $genres = array_map('trim', explode(',', $_POST['genres']));
+        $series = !empty($_POST['series']) ? $_POST['series'] : null;
+        $seriesPosition = !empty($_POST['series_position']) ? $_POST['series_position'] : null;
+        
+        if ($file['error'] === UPLOAD_ERR_OK) {
+            $uploadPath = '_ksiazki/' . basename($file['name']);
+            if (!is_dir('_ksiazki')) {
+                mkdir('_ksiazki');
+            }
+            move_uploaded_file($file['tmp_name'], $uploadPath);
+            $manager->addBook($file['name'], $title, $authors, $genres, $series, $seriesPosition);
+        }
+    } elseif (isset($_POST['generate_html'])) {
     $manager->generateHtml();
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
+    }
 }
 
 $currentTab = $_GET['tab'] ?? 'unprocessed';
