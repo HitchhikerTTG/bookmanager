@@ -26,7 +26,7 @@ class BookManager {
         }
     }
 
-    private function loadJson($path) {
+    public function loadJson($path) {
         return json_decode(file_get_contents($path), true);
     }
 
@@ -181,6 +181,31 @@ if (isset($_POST['generate_html'])) {
                     </div>
                 </div>
             <?php endforeach; ?>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">books.json</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="mb-0"><?= json_encode($manager->loadJson('data/books.json'), JSON_PRETTY_PRINT) ?></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">lists.json</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="mb-0"><?= json_encode($manager->loadJson('data/lists.json'), JSON_PRETTY_PRINT) ?></pre>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
