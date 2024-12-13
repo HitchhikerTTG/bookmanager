@@ -249,16 +249,48 @@ if (isset($_POST['generate_html'])) {
                             <input type="text" class="form-control" name="title" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Authors (Name Surname, separated by comma)</label>
-                            <input type="text" class="form-control" name="authors" required placeholder="Jan Kowalski, Anna Nowak">
+                            <label class="form-label">Authors</label>
+                            <div id="authorsContainer">
+                                <div class="input-group mb-2">
+                                    <select class="form-select existing-author">
+                                        <option value="">Select existing author...</option>
+                                        <?php foreach ($manager->listsData['authors'] as $author): ?>
+                                            <option value="<?= htmlspecialchars($author) ?>"><?= htmlspecialchars($author) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <input type="text" class="form-control new-author" placeholder="Or type new (Name Surname)">
+                                    <button type="button" class="btn btn-success add-author">+</button>
+                                </div>
+                            </div>
+                            <input type="hidden" name="authors" id="authorsList" required>
+                            <div id="selectedAuthors" class="mt-2"></div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Genres (comma-separated)</label>
-                            <input type="text" class="form-control" name="genres" required placeholder="Fantasy, Science Fiction">
+                            <label class="form-label">Genres</label>
+                            <div id="genresContainer">
+                                <div class="input-group mb-2">
+                                    <select class="form-select existing-genre">
+                                        <option value="">Select existing genre...</option>
+                                        <?php foreach ($manager->listsData['genres'] as $genre): ?>
+                                            <option value="<?= htmlspecialchars($genre) ?>"><?= htmlspecialchars($genre) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <input type="text" class="form-control new-genre" placeholder="Or type new genre">
+                                    <button type="button" class="btn btn-success add-genre">+</button>
+                                </div>
+                            </div>
+                            <input type="hidden" name="genres" id="genresList" required>
+                            <div id="selectedGenres" class="mt-2"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Series (optional)</label>
-                            <input type="text" class="form-control" name="series">
+                            <select class="form-select mb-2" name="series">
+                                <option value="">Select existing series...</option>
+                                <?php foreach ($manager->listsData['series'] as $series): ?>
+                                    <option value="<?= htmlspecialchars($series) ?>"><?= htmlspecialchars($series) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input type="text" class="form-control" name="new_series" placeholder="Or type new series name">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Position in Series (optional)</label>
@@ -280,6 +312,78 @@ if (isset($_POST['generate_html'])) {
             var button = event.relatedTarget;
             var fileName = button.getAttribute('data-file');
             document.getElementById('modalFileName').value = fileName;
+        });
+
+        // Handle authors
+        const selectedAuthors = new Set();
+        document.querySelector('.add-author').addEventListener('click', function() {
+            const select = this.parentElement.querySelector('.existing-author');
+            const input = this.parentElement.querySelector('.new-author');
+            const author = select.value || input.value;
+            
+            if (author && !selectedAuthors.has(author)) {
+                selectedAuthors.add(author);
+                updateSelectedAuthors();
+            }
+            select.value = '';
+            input.value = '';
+        });
+
+        function updateSelectedAuthors() {
+            const container = document.getElementById('selectedAuthors');
+            container.innerHTML = '';
+            document.getElementById('authorsList').value = Array.from(selectedAuthors).join(',');
+            
+            selectedAuthors.forEach(author => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-primary me-2 mb-2';
+                badge.innerHTML = `${author} <button type="button" class="btn-close btn-close-white" aria-label="Close"></button>`;
+                badge.querySelector('.btn-close').addEventListener('click', () => {
+                    selectedAuthors.delete(author);
+                    updateSelectedAuthors();
+                });
+                container.appendChild(badge);
+            });
+        }
+
+        // Handle genres
+        const selectedGenres = new Set();
+        document.querySelector('.add-genre').addEventListener('click', function() {
+            const select = this.parentElement.querySelector('.existing-genre');
+            const input = this.parentElement.querySelector('.new-genre');
+            const genre = select.value || input.value;
+            
+            if (genre && !selectedGenres.has(genre)) {
+                selectedGenres.add(genre);
+                updateSelectedGenres();
+            }
+            select.value = '';
+            input.value = '';
+        });
+
+        function updateSelectedGenres() {
+            const container = document.getElementById('selectedGenres');
+            container.innerHTML = '';
+            document.getElementById('genresList').value = Array.from(selectedGenres).join(',');
+            
+            selectedGenres.forEach(genre => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-success me-2 mb-2';
+                badge.innerHTML = `${genre} <button type="button" class="btn-close btn-close-white" aria-label="Close"></button>`;
+                badge.querySelector('.btn-close').addEventListener('click', () => {
+                    selectedGenres.delete(genre);
+                    updateSelectedGenres();
+                });
+                container.appendChild(badge);
+            });
+        }
+
+        // Clear form on modal close
+        document.getElementById('addMetadataModal').addEventListener('hidden.bs.modal', function () {
+            selectedAuthors.clear();
+            selectedGenres.clear();
+            updateSelectedAuthors();
+            updateSelectedGenres();
         });
     </script>
 </body>
