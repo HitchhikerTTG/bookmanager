@@ -200,8 +200,19 @@ if (isset($_POST['generate_html'])) {
             <?php foreach ($manager->getProcessedBooks() as $book): ?>
                 <div class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
-                        <span><?= htmlspecialchars($book['title']) ?> by <?= htmlspecialchars(implode(', ', $book['authors'])) ?></span>
-                        <button type="button" class="btn btn-secondary btn-sm" disabled>Edit</button>
+                        <span><?= htmlspecialchars($book['title']) ?> by 
+                        <?php foreach ($book['authors'] as $author): ?>
+                            <?= htmlspecialchars($author['last_name'] . ', ' . $author['first_name']) ?>;
+                        <?php endforeach; ?>
+                        </span>
+                        <button type="button" class="btn btn-primary btn-sm" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#addMetadataModal" 
+                                data-file="<?= htmlspecialchars($book['file_name']) ?>"
+                                data-action="edit"
+                                data-book='<?= htmlspecialchars(json_encode($book)) ?>'>
+                            Edit
+                        </button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -311,7 +322,33 @@ if (isset($_POST['generate_html'])) {
         document.getElementById('addMetadataModal').addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
             var fileName = button.getAttribute('data-file');
+            var action = button.getAttribute('data-action');
             document.getElementById('modalFileName').value = fileName;
+            
+            if (action === 'edit') {
+                var bookData = JSON.parse(button.getAttribute('data-book'));
+                document.querySelector('[name="title"]').value = bookData.title;
+                
+                // Clear previous selections
+                selectedAuthors.clear();
+                selectedGenres.clear();
+                
+                // Add existing authors
+                bookData.authors.forEach(author => {
+                    selectedAuthors.add(author.last_name + ', ' + author.first_name);
+                });
+                updateSelectedAuthors();
+                
+                // Add existing genres
+                bookData.genres.forEach(genre => {
+                    selectedGenres.add(genre);
+                });
+                updateSelectedGenres();
+                
+                // Set series data if exists
+                document.querySelector('[name="series"]').value = bookData.series || '';
+                document.querySelector('[name="series_position"]').value = bookData.series_position || '';
+            }
         });
 
         // Handle authors
