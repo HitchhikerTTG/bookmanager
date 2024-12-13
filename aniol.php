@@ -107,6 +107,50 @@ class BookManager {
         return $books;
     }
 
+    public function generateHtml() {
+        $books = $this->getProcessedBooks();
+        usort($books, function($a, $b) {
+            $timeA = filemtime('_ksiazki/' . $a['file_name']);
+            $timeB = filemtime('_ksiazki/' . $b['file_name']);
+            return $timeB - $timeA;
+        });
+
+        $html = '<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Biblioteka E-booków</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; line-height: 1.6; }
+        .book-list { list-style-type: none; padding: 0; }
+        .book-item { margin: 0.5em 0; }
+        a { text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Biblioteka E-booków</h1>
+    <ul class="book-list">';
+
+        foreach ($books as $book) {
+            $authors = array_map(function($author) {
+                return $author['last_name'] . ', ' . $author['first_name'];
+            }, $book['authors']);
+
+            $html .= sprintf(
+                '<li class="book-item"><a href="http://_ksiazki/%s">🔗</a> <a href="https://_ksiazki/%s">%s</a> [%s]</li>',
+                urlencode($book['file_name']),
+                urlencode($book['file_name']),
+                htmlspecialchars($book['title']),
+                htmlspecialchars(implode('; ', $authors))
+            );
+        }
+
+        $html .= '</ul></body></html>';
+        
+        file_put_contents('ksiazki.html', $html);
+    }
+
     public function getStats() {
         $filesInFolder = is_dir('_ksiazki') ? count(glob('_ksiazki/*')) : 0;
         $booksWithMetadata = count($this->booksData['books']);
@@ -130,9 +174,18 @@ $stats = $manager->getStats();
 </head>
 <body>
     <div class="container mt-4">
-        <div class="alert alert-info">
-            Books in folder: <?= $stats['files'] ?>, Books with metadata: <?= $stats['metadata'] ?>
+        <div class="alert alert-info d-flex justify-content-between align-items-center">
+            <div>Books in folder: <?= $stats['files'] ?>, Books with metadata: <?= $stats['metadata'] ?></div>
+            <form method="post">
+                <button type="submit" name="generate_html" class="btn btn-primary">Generate HTML</button>
+            </form>
         </div>
+        <?php 
+        if (isset($_POST['generate_html'])) {
+            $manager->generateHtml();
+            echo '<div class="alert alert-success">HTML file generated successfully!</div>';
+        }
+        ?>
 
         <h2>Books Without Metadata</h2>
         <div class="list-group mb-4">
