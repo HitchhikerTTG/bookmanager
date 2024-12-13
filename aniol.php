@@ -44,16 +44,26 @@ class BookManager {
         return $this->booksData['books'];
     }
 
-    public function saveMetadata($fileName, $title, $authors) {
+    public function saveMetadata($fileName, $title, $authors, $genres, $series = '', $seriesPosition = '') {
         $bookData = [
             'file_name' => $fileName,
             'title' => $title,
-            'authors' => array_map('trim', explode(',', $authors)),
+            'authors' => array_map(function($author) {
+                $parts = array_map('trim', explode(' ', $author, 2));
+                return [
+                    'first_name' => $parts[0] ?? '',
+                    'last_name' => $parts[1] ?? ''
+                ];
+            }, explode(',', $authors)),
+            'genres' => array_map('trim', explode(',', $genres)),
+            'series' => $series ? trim($series) : null,
+            'series_position' => $seriesPosition ? trim($seriesPosition) : null,
             'date_uploaded' => date('Y-m-d H:i:s')
         ];
 
         $this->booksData['books'][] = $bookData;
         $this->saveJson('data/books.json', $this->booksData);
+        return true;
     }
 
     public function getStats() {
@@ -103,11 +113,22 @@ if (isset($_POST['generate_html'])) {
 }
 
 if (isset($_POST['save_metadata'])) {
-    $manager->saveMetadata(
+    $success = $manager->saveMetadata(
         $_POST['file_name'],
         $_POST['title'],
-        $_POST['authors']
+        $_POST['authors'],
+        $_POST['genres'],
+        $_POST['series'],
+        $_POST['series_position']
     );
+    $_SESSION['message'] = $success ? 'Metadata saved successfully!' : 'Error saving metadata';
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if (isset($_POST['generate_html'])) {
+    $manager->generateHtml();
+    $_SESSION['message'] = 'HTML generated successfully!';
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -122,6 +143,12 @@ if (isset($_POST['save_metadata'])) {
 </head>
 <body>
     <div class="container mt-4">
+        <?php if (isset($_SESSION['message'])): ?>
+            <div class="alert alert-success">
+                <?= htmlspecialchars($_SESSION['message']) ?>
+            </div>
+            <?php unset($_SESSION['message']); ?>
+        <?php endif; ?>
         <div class="alert alert-info">
             Books in folder: <?= $stats['files'] ?>, Books with metadata: <?= $stats['metadata'] ?><br>
             Last HTML update: <?= $stats['lastUpdate'] ?>
@@ -173,8 +200,20 @@ if (isset($_POST['save_metadata'])) {
                             <input type="text" class="form-control" name="title" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Authors (comma-separated)</label>
-                            <input type="text" class="form-control" name="authors" required>
+                            <label class="form-label">Authors (Name Surname, separated by comma)</label>
+                            <input type="text" class="form-control" name="authors" required placeholder="Jan Kowalski, Anna Nowak">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Genres (comma-separated)</label>
+                            <input type="text" class="form-control" name="genres" required placeholder="Fantasy, Science Fiction">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Series (optional)</label>
+                            <input type="text" class="form-control" name="series">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Position in Series (optional)</label>
+                            <input type="text" class="form-control" name="series_position">
                         </div>
                     </div>
                     <div class="modal-footer">
