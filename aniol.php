@@ -346,7 +346,18 @@ if (isset($_POST['generate_html'])) {
                 updateSelectedGenres();
                 
                 // Set series data if exists
-                document.querySelector('[name="series"]').value = bookData.series || '';
+                if (bookData.series) {
+                    const seriesSelect = document.querySelector('[name="series"]');
+                    // If series exists in options, select it, otherwise put it in the new series field
+                    const seriesOption = Array.from(seriesSelect.options).find(opt => opt.value === bookData.series);
+                    if (seriesOption) {
+                        seriesSelect.value = bookData.series;
+                        document.querySelector('[name="new_series"]').value = '';
+                    } else {
+                        seriesSelect.value = '';
+                        document.querySelector('[name="new_series"]').value = bookData.series;
+                    }
+                }
                 document.querySelector('[name="series_position"]').value = bookData.series_position || '';
             }
         });
@@ -417,6 +428,10 @@ if (isset($_POST['generate_html'])) {
 
         // Clear form on modal close
         document.getElementById('addMetadataModal').addEventListener('hidden.bs.modal', function () {
+            document.querySelector('[name="title"]').value = '';
+            document.querySelector('[name="series"]').value = '';
+            document.querySelector('[name="new_series"]').value = '';
+            document.querySelector('[name="series_position"]').value = '';
             selectedAuthors.clear();
             selectedGenres.clear();
             updateSelectedAuthors();
