@@ -3,6 +3,11 @@
 session_start();
 $rootUrl = "http://" . $_SERVER['HTTP_HOST'];
 $rootsUrl = "https://" . $_SERVER['HTTP_HOST'];
+
+if (isset($_SESSION['success_message'])) {
+    $successMessage = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
 class BookManager {
     private $booksData;
     private $listsData;
@@ -177,6 +182,12 @@ $stats = $manager->getStats();
 </head>
 <body>
     <div class="container mt-4">
+        <?php if (isset($successMessage)): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?= htmlspecialchars($successMessage) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
         <div class="alert alert-info d-flex justify-content-between align-items-center">
             <div>Books in folder: <?= $stats['files'] ?></div>
             <form method="post">
@@ -299,7 +310,11 @@ $stats = $manager->getStats();
                             ];
                         }
 
-                        file_put_contents('data/books.json', json_encode($bookData, JSON_PRETTY_PRINT));
+                        if (file_put_contents('data/books.json', json_encode($bookData, JSON_PRETTY_PRINT))) {
+                            $_SESSION['success_message'] = 'Book metadata saved successfully!';
+                        } else {
+                            $_SESSION['success_message'] = 'Error saving book metadata!';
+                        }
                         header('Location: ' . $_SERVER['PHP_SELF']);
                         exit;
                     }
