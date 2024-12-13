@@ -45,6 +45,7 @@ class BookManager {
     }
 
     public function saveMetadata($fileName, $title, $authors, $genres, $series = '', $seriesPosition = '') {
+        // Process book data
         $bookData = [
             'file_name' => $fileName,
             'title' => $title,
@@ -61,8 +62,31 @@ class BookManager {
             'date_uploaded' => date('Y-m-d H:i:s')
         ];
 
+        // Update lists.json
+        foreach ($bookData['authors'] as $author) {
+            $authorKey = $author['last_name'] . ', ' . $author['first_name'];
+            if (!in_array($authorKey, $this->listsData['authors'])) {
+                $this->listsData['authors'][] = $authorKey;
+                sort($this->listsData['authors']);
+            }
+        }
+
+        foreach ($bookData['genres'] as $genre) {
+            if (!in_array($genre, $this->listsData['genres'])) {
+                $this->listsData['genres'][] = $genre;
+                sort($this->listsData['genres']);
+            }
+        }
+
+        if ($bookData['series'] && !in_array($bookData['series'], $this->listsData['series'])) {
+            $this->listsData['series'][] = $bookData['series'];
+            sort($this->listsData['series']);
+        }
+
+        // Save both files
         $this->booksData['books'][] = $bookData;
         $this->saveJson('data/books.json', $this->booksData);
+        $this->saveJson('data/lists.json', $this->listsData);
         return true;
     }
 
