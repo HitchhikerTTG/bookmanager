@@ -384,11 +384,23 @@ if (isset($_POST['generate_html'])) {
         document.querySelector('.add-author').addEventListener('click', function() {
             const select = this.parentElement.querySelector('.existing-author');
             const input = this.parentElement.querySelector('.new-author');
-            const author = select.value || input.value;
+            let author = select.value || input.value;
             
-            if (author && !selectedAuthors.has(author)) {
-                selectedAuthors.add(author);
-                updateSelectedAuthors();
+            if (author) {
+                // Format new author input if it doesn't contain comma
+                if (!select.value && !author.includes(',')) {
+                    const parts = author.split(' ').filter(part => part);
+                    if (parts.length >= 2) {
+                        const lastName = parts.pop();
+                        const firstName = parts.join(' ');
+                        author = `${lastName}, ${firstName}`;
+                    }
+                }
+                
+                if (!selectedAuthors.has(author)) {
+                    selectedAuthors.add(author);
+                    updateSelectedAuthors();
+                }
             }
             select.value = '';
             input.value = '';
@@ -445,10 +457,16 @@ if (isset($_POST['generate_html'])) {
 
         // Clear form on modal close
         document.getElementById('addMetadataModal').addEventListener('hidden.bs.modal', function () {
+            const form = document.querySelector('#addMetadataModal form');
+            form.reset();
             document.querySelector('[name="title"]').value = '';
             document.querySelector('[name="series"]').value = '';
             document.querySelector('[name="new_series"]').value = '';
             document.querySelector('[name="series_position"]').value = '';
+            document.querySelector('.existing-author').value = '';
+            document.querySelector('.new-author').value = '';
+            document.querySelector('.existing-genre').value = '';
+            document.querySelector('.new-genre').value = '';
             selectedAuthors.clear();
             selectedGenres.clear();
             updateSelectedAuthors();
