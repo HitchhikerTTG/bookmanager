@@ -37,8 +37,74 @@ class BookManager {
         return array_diff($allFiles, $processedFiles);
     }
 
+    private function getValidMetadataStructure() {
+        return [
+            'file_name' => '',
+            'title' => '',
+            'authors' => [
+                ['first_name' => '', 'last_name' => '']
+            ],
+            'genres' => [],
+            'series' => null,
+            'series_position' => null
+        ];
+    }
+
+    private function validateBookMetadata($book) {
+        $template = $this->getValidMetadataStructure();
+        $required = ['file_name', 'title', 'authors'];
+        
+        foreach ($required as $field) {
+            if (!isset($book[$field]) || empty($book[$field])) {
+                return false;
+            }
+        }
+
+        if (!is_array($book['authors'])) return false;
+        
+        foreach ($book['authors'] as $author) {
+            if (!isset($author['first_name']) || !isset($author['last_name'])) {
+                return false;
+            }
+        }
+
+        if (!isset($book['genres']) || !is_array($book['genres'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function repairBookMetadata($book) {
+        $template = $this->getValidMetadataStructure();
+        
+        if (!isset($book['genres'])) $book['genres'] = [];
+        if (!isset($book['series'])) $book['series'] = null;
+        if (!isset($book['series_position'])) $book['series_position'] = null;
+
+        if (isset($book['authors']) && is_array($book['authors'])) {
+            foreach ($book['authors'] as &$author) {
+                if (is_string($author)) {
+                    $parts = explode(',', $author);
+                    $author = [
+                        'last_name' => trim($parts[0] ?? ''),
+                        'first_name' => trim($parts[1] ?? '')
+                    ];
+                }
+            }
+        }
+
+        return $book;
+    }
+
     public function getProcessedBooks() {
-        return $this->booksData['books'];
+        $books = $this->booksData['books'];
+        foreach ($books as &$book) {
+            if (!$this->validateBookMetadata($book)) {
+                $book = $this->repairBookMetadata($book);
+            }
+        }
+        return $books;
     }
 
     public function getStats() {
