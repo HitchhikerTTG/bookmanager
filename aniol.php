@@ -189,6 +189,67 @@ $stats = $manager->getStats();
             echo '<div class="alert alert-success">HTML file generated successfully!</div>';
         }
         ?>
+
+        <h2 class="mt-4">Books Metadata</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Title</th>
+                    <th>Authors</th>
+                    <th>Genres</th>
+                    <th>Series</th>
+                    <th>Upload Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $books = [];
+                if (is_dir('_ksiazki')) {
+                    $files = array_map('basename', glob('_ksiazki/*'));
+                    foreach ($files as $file) {
+                        $bookData = [
+                            'file_name' => $file,
+                            'upload_date' => filemtime('_ksiazki/' . $file)
+                        ];
+                        
+                        // Look for metadata in books.json
+                        foreach ($manager->loadJson('data/books.json')['books'] as $book) {
+                            if ($book['file_name'] === $file) {
+                                $bookData = array_merge($bookData, $book);
+                                break;
+                            }
+                        }
+                        $books[] = $bookData;
+                    }
+                }
+
+                foreach ($books as $book) {
+                    echo '<tr>';
+                    echo '<td>' . htmlspecialchars($book['file_name']) . '</td>';
+                    echo '<td>' . htmlspecialchars($book['title'] ?? 'No title') . '</td>';
+                    echo '<td>';
+                    if (isset($book['authors']) && is_array($book['authors'])) {
+                        foreach ($book['authors'] as $author) {
+                            if (is_array($author)) {
+                                echo htmlspecialchars($author['first_name'] . ' ' . $author['last_name']) . '<br>';
+                            } else {
+                                echo htmlspecialchars($author) . '<br>';
+                            }
+                        }
+                    } else {
+                        echo 'No authors';
+                    }
+                    echo '</td>';
+                    echo '<td>' . (isset($book['genres']) ? htmlspecialchars(implode(', ', $book['genres'])) : 'No genres') . '</td>';
+                    echo '<td>' . (isset($book['series']) ? htmlspecialchars($book['series']) . 
+                         (isset($book['series_position']) ? ' #' . htmlspecialchars($book['series_position']) : '') : 'No series') . '</td>';
+                    echo '<td>' . date('Y-m-d H:i:s', $book['upload_date']) . '</td>';
+                    echo '</tr>';
+                }
+                ?>
+            </tbody>
+        </table>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
