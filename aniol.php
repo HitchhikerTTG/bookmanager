@@ -36,7 +36,25 @@ class BookManager {
     public function getUnprocessedBooks() {
         $allFiles = is_dir('_ksiazki') ? array_map('basename', glob('_ksiazki/*')) : [];
         $processedFiles = array_column($this->booksData['books'], 'file_name');
-        return array_diff($allFiles, $processedFiles);
+        $unprocessedFiles = array_diff($allFiles, $processedFiles);
+        
+        // Add unprocessed files to books.json with upload date
+        foreach ($unprocessedFiles as $file) {
+            $uploadTime = filemtime('_ksiazki/' . $file);
+            $this->booksData['books'][] = [
+                'file_name' => $file,
+                'upload_date' => $uploadTime,
+                'title' => '',
+                'authors' => [],
+                'genres' => [],
+                'series' => null,
+                'series_position' => null
+            ];
+        }
+        
+        // Save updated data
+        file_put_contents('data/books.json', json_encode($this->booksData, JSON_PRETTY_PRINT));
+        return $unprocessedFiles;
     }
 
     private function getValidMetadataStructure() {
@@ -48,13 +66,14 @@ class BookManager {
             ],
             'genres' => [],
             'series' => null,
-            'series_position' => null
+            'series_position' => null,
+            'upload_date' => 0
         ];
     }
 
     private function validateBookMetadata($book) {
         $template = $this->getValidMetadataStructure();
-        $required = ['file_name', 'title', 'authors'];
+        $required = ['file_name', 'title', 'authors', 'upload_date'];
         
         foreach ($required as $field) {
             if (!isset($book[$field]) || empty($book[$field])) {
