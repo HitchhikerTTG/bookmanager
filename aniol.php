@@ -103,6 +103,7 @@ class BookManager {
     }
 }
 
+session_start();
 $manager = new BookManager();
 $stats = $manager->getStats();
 
@@ -176,8 +177,20 @@ if (isset($_POST['generate_html'])) {
             <?php foreach ($manager->getProcessedBooks() as $book): ?>
                 <div class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
-                        <span><?= htmlspecialchars($book['title']) ?> by <?= htmlspecialchars(implode(', ', $book['authors'])) ?></span>
-                        <button type="button" class="btn btn-secondary btn-sm" disabled>Edit</button>
+                        <span><?= htmlspecialchars($book['title']) ?> by <?= implode(', ', array_map(function($author) {
+                            return htmlspecialchars($author['first_name'] . ' ' . $author['last_name']);
+                        }, $book['authors'])) ?></span>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addMetadataModal" 
+                                data-file="<?= htmlspecialchars($book['file_name']) ?>" 
+                                data-title="<?= htmlspecialchars($book['title']) ?>"
+                                data-authors="<?= htmlspecialchars(implode(', ', array_map(function($author) {
+                                    return $author['first_name'] . ' ' . $author['last_name'];
+                                }, $book['authors']))) ?>"
+                                data-genres="<?= htmlspecialchars(implode(', ', $book['genres'])) ?>"
+                                data-series="<?= htmlspecialchars($book['series'] ?? '') ?>"
+                                data-series-position="<?= htmlspecialchars($book['series_position'] ?? '') ?>">
+                            Edit
+                        </button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -231,6 +244,24 @@ if (isset($_POST['generate_html'])) {
             var button = event.relatedTarget;
             var fileName = button.getAttribute('data-file');
             document.getElementById('modalFileName').value = fileName;
+            
+            // Fill form with existing data for editing
+            var title = button.getAttribute('data-title');
+            var authors = button.getAttribute('data-authors');
+            var genres = button.getAttribute('data-genres');
+            var series = button.getAttribute('data-series');
+            var seriesPosition = button.getAttribute('data-series-position');
+            
+            if (title) document.querySelector('[name="title"]').value = title;
+            if (authors) document.querySelector('[name="authors"]').value = authors;
+            if (genres) document.querySelector('[name="genres"]').value = genres;
+            if (series) document.querySelector('[name="series"]').value = series;
+            if (seriesPosition) document.querySelector('[name="series_position"]').value = seriesPosition;
+        });
+        
+        document.getElementById('addMetadataModal').addEventListener('hidden.bs.modal', function (event) {
+            // Clear form when modal is closed
+            document.querySelector('form').reset();
         });
     </script>
 </body>
