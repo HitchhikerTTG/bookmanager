@@ -50,6 +50,13 @@ class BookManager {
             'file_name' => $fileName,
             'title' => $title,
             'authors' => array_map(function($author) {
+                $parts = explode(',', $author);
+                if (count($parts) === 2) {
+                    return [
+                        'last_name' => trim($parts[0]),
+                        'first_name' => trim($parts[1])
+                    ];
+                }
                 $parts = array_map('trim', explode(' ', $author, 2));
                 return [
                     'first_name' => $parts[0] ?? '',
@@ -61,6 +68,9 @@ class BookManager {
             'series_position' => $seriesPosition ? trim($seriesPosition) : null,
             'date_uploaded' => date('Y-m-d H:i:s')
         ];
+
+        // Find if book already exists
+        $bookIndex = array_search($fileName, array_column($this->booksData['books'], 'file_name'));
 
         // Update lists.json
         foreach ($bookData['authors'] as $author) {
@@ -83,8 +93,13 @@ class BookManager {
             sort($this->listsData['series']);
         }
 
-        // Save both files
-        $this->booksData['books'][] = $bookData;
+        // Update or insert book data
+        if ($bookIndex !== false) {
+            $this->booksData['books'][$bookIndex] = $bookData;
+        } else {
+            $this->booksData['books'][] = $bookData;
+        }
+        
         $this->saveJson('data/books.json', $this->booksData);
         $this->saveJson('data/lists.json', $this->listsData);
         return true;
