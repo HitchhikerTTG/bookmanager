@@ -72,21 +72,30 @@ class BookManager {
     }
 
     private function validateBookMetadata($book) {
-        $template = $this->getValidMetadataStructure();
-        $required = ['file_name', 'title', 'authors', 'upload_date'];
-        
+        // Check required fields exist and are not empty
+        $required = ['file_name', 'title', 'upload_date'];
         foreach ($required as $field) {
             if (!isset($book[$field]) || empty($book[$field])) {
                 return false;
             }
         }
 
-        if (!is_array($book['authors'])) return false;
-        
+        // Verify authors array exists and has at least one valid author
+        if (!isset($book['authors']) || !is_array($book['authors']) || empty($book['authors'])) {
+            return false;
+        }
+
+        // Check if at least one author has both first and last name
+        $hasValidAuthor = false;
         foreach ($book['authors'] as $author) {
-            if (!isset($author['first_name']) || !isset($author['last_name'])) {
-                return false;
+            if (isset($author['first_name']) && isset($author['last_name']) && 
+                !empty($author['first_name']) && !empty($author['last_name'])) {
+                $hasValidAuthor = true;
+                break;
             }
+        }
+        if (!$hasValidAuthor) {
+            return false;
         }
 
         if (!isset($book['genres']) || !is_array($book['genres'])) {
