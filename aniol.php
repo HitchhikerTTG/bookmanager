@@ -34,6 +34,15 @@ class BookManager {
         file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
     }
 
+    public function getStats() {
+        $filesInFolder = is_dir('_ksiazki') ? count(glob('_ksiazki/*')) : 0;
+        $booksWithMetadata = count($this->booksData['books']);
+        return [
+            'files' => $filesInFolder,
+            'metadata' => $booksWithMetadata
+        ];
+    }
+
     public function addBook($file, $title, $authors, $genres, $series = null, $seriesPosition = null) {
         $book = [
             'file_name' => basename($file),
@@ -73,50 +82,93 @@ class BookManager {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>E-Book Library</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 2em; }
-        .book { border: 1px solid #ddd; padding: 1em; margin: 1em 0; }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>E-Book Library</h1>';
+    <div class="container mt-4">
+        <h1>E-Book Library</h1>
+        <div class="row">';
 
         foreach ($this->booksData['books'] as $book) {
-            $html .= '<div class="book">';
-            $html .= '<h2>' . htmlspecialchars($book['title']) . '</h2>';
-            $html .= '<p>Authors: ' . htmlspecialchars(implode(', ', $book['authors'])) . '</p>';
-            $html .= '<p>Genres: ' . htmlspecialchars(implode(', ', $book['genres'])) . '</p>';
+            $html .= '<div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">' . htmlspecialchars($book['title']) . '</h2>
+                        <p class="card-text">Authors: ' . htmlspecialchars(implode(', ', $book['authors'])) . '</p>
+                        <p class="card-text">Genres: ' . htmlspecialchars(implode(', ', $book['genres'])) . '</p>';
             if ($book['series']) {
-                $html .= '<p>Series: ' . htmlspecialchars($book['series']) . 
+                $html .= '<p class="card-text">Series: ' . htmlspecialchars($book['series']) . 
                         ' (#' . htmlspecialchars($book['series_position']) . ')</p>';
             }
-            $html .= '<p>Uploaded: ' . htmlspecialchars($book['date_uploaded']) . '</p>';
-            $html .= '<p><a href="_ksiazki/' . htmlspecialchars($book['file_name']) . '">Download</a></p>';
-            $html .= '</div>';
+            $html .= '<p class="card-text"><small class="text-muted">Uploaded: ' . htmlspecialchars($book['date_uploaded']) . '</small></p>
+                        <a href="_ksiazki/' . htmlspecialchars($book['file_name']) . '" class="btn btn-primary">Download</a>
+                    </div>
+                </div>
+            </div>';
         }
 
-        $html .= '</body></html>';
+        $html .= '</div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>';
         file_put_contents('ksiazki.html', $html);
     }
 }
 
-// Initialize the book manager
 $manager = new BookManager();
+$stats = $manager->getStats();
 
-// Handle file uploads and form submissions here
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Add your form handling logic here
-}
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="alert alert-info">
+            Books in folder: <?= $stats['files'] ?>, Books with metadata: <?= $stats['metadata'] ?>
+        </div>
 
-<form method="POST" enctype="multipart/form-data">
-    <h2>Add New Book</h2>
-    <p><input type="file" name="book_file" required></p>
-    <p><input type="text" name="title" placeholder="Title" required></p>
-    <p><input type="text" name="authors" placeholder="Authors (comma separated)" required></p>
-    <p><input type="text" name="genres" placeholder="Genres (comma separated)" required></p>
-    <p><input type="text" name="series" placeholder="Series (optional)"></p>
-    <p><input type="number" name="series_position" placeholder="Position in series"></p>
-    <p><input type="submit" value="Add Book"></p>
-</form>
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Add New Book</h2>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Book File</label>
+                        <input type="file" class="form-control" name="book_file" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Authors (comma separated)</label>
+                        <input type="text" class="form-control" name="authors" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Genres (comma separated)</label>
+                        <input type="text" class="form-control" name="genres" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Series (optional)</label>
+                        <input type="text" class="form-control" name="series">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Position in series</label>
+                        <input type="number" class="form-control" name="series_position">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Book</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
