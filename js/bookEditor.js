@@ -34,12 +34,18 @@ function initializeAutocomplete(rowId) {
     if (genresInput && availableGenres.length) {
         $(genresInput).tagsinput({
             typeaheadjs: {
-                source: function(query, process) {
-                    process(availableGenres.filter(genre => 
-                        genre.toLowerCase().includes(query.toLowerCase())
-                    ));
-                }
-            }
+                name: 'genres',
+                source: new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.whitespace,
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    local: availableGenres
+                }),
+                hint: true,
+                highlight: true
+            },
+            confirmKeys: [13, 44, 32], // Enter, comma, space
+            trimValue: true,
+            freeInput: true
         });
     }
 }
