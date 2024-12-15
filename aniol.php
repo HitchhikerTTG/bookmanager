@@ -303,11 +303,20 @@ $stats = $manager->getStats();
                     echo '<td>' . (isset($book['series']) ? htmlspecialchars($book['series']) . 
                          (isset($book['series_position']) ? ' #' . htmlspecialchars($book['series_position']) : '') : 'No series') . '</td>';
                     echo '<td>' . date('Y-m-d H:i:s', $book['upload_date']) . '</td>';
+                    $firstAuthorFirstName = '';
+                    $firstAuthorLastName = '';
+                    if (isset($book['authors']) && is_array($book['authors']) && !empty($book['authors'])) {
+                        $firstAuthor = $book['authors'][0];
+                        if (is_array($firstAuthor)) {
+                            $firstAuthorFirstName = $firstAuthor['first_name'] ?? '';
+                            $firstAuthorLastName = $firstAuthor['last_name'] ?? '';
+                        }
+                    }
                     echo '<td><button type="button" class="btn btn-sm btn-primary" onclick="editBook(' . 
                         "'" . htmlspecialchars($book['file_name'], ENT_QUOTES) . "', " .
                         "'" . htmlspecialchars($book['title'] ?? '', ENT_QUOTES) . "', " .
-                        "'" . htmlspecialchars($book['authors'][0]['first_name'] ?? '', ENT_QUOTES) . "', " .
-                        "'" . htmlspecialchars($book['authors'][0]['last_name'] ?? '', ENT_QUOTES) . "', " .
+                        "'" . htmlspecialchars($firstAuthorFirstName, ENT_QUOTES) . "', " .
+                        "'" . htmlspecialchars($firstAuthorLastName, ENT_QUOTES) . "', " .
                         "'" . htmlspecialchars(isset($book['genres']) ? implode(', ', $book['genres']) : '', ENT_QUOTES) . "', " .
                         "'" . htmlspecialchars($book['series'] ?? '', ENT_QUOTES) . "', " .
                         "'" . htmlspecialchars($book['series_position'] ?? '', ENT_QUOTES) . "'" .
