@@ -519,16 +519,20 @@ $stats = $manager->getStats();
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-let editModal;
+let editModal = null;
 
-function initializeModal() {
-    if (!editModal) {
-        editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+document.addEventListener('DOMContentLoaded', function() {
+    const modalElement = document.getElementById('editBookModal');
+    if (modalElement) {
+        editModal = new bootstrap.Modal(modalElement);
     }
-}
+});
 
 function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
-    initializeModal();
+    if (!editModal) {
+        const modalElement = document.getElementById('editBookModal');
+        editModal = new bootstrap.Modal(modalElement);
+    }
     
     document.getElementById('edit_file_name').value = fileName;
     document.getElementById('edit_title').value = title || '';
