@@ -62,8 +62,6 @@
                     if ($isProcessed): ?>
                         <button class="btn btn-warning btn-sm" onclick="editBook('<?php echo htmlspecialchars($file); ?>', 
                             '<?php echo htmlspecialchars($bookData['title']); ?>', 
-                            '<?php echo htmlspecialchars($bookData['authors'][0]['first_name']); ?>', 
-                            '<?php echo htmlspecialchars($bookData['authors'][0]['last_name']); ?>', 
                             '<?php echo htmlspecialchars(implode(', ', $bookData['genres'])); ?>', 
                             '<?php echo htmlspecialchars($bookData['series'] ?? ''); ?>', 
                             '<?php echo htmlspecialchars($bookData['series_position'] ?? ''); ?>', 
