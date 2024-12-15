@@ -45,8 +45,21 @@ try {
         $manager->addBook($data);
     }
 
-    echo json_encode(['success' => true]);
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        // Ajax request - return JSON
+        echo json_encode(['success' => true]);
+    } else {
+        // Regular form submit - redirect
+        header('Location: aniol.php');
+        exit();
+    }
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    } else {
+        $_SESSION['error'] = $e->getMessage();
+        header('Location: aniol.php');
+        exit();
+    }
 }
