@@ -77,6 +77,8 @@
                 <td colspan="6">
                     <form id="editBookForm-<?php echo $rowId; ?>" onsubmit="return submitBookForm(this)" class="p-3 bg-light">
                         <input type="hidden" name="file_name" value="<?php echo htmlspecialchars($file); ?>">
+                        <input type="hidden" id="available-genres-<?php echo $rowId; ?>" value='<?php echo json_encode($manager->getLists()['genres']); ?>'>
+                        <input type="hidden" id="available-series-<?php echo $rowId; ?>" value='<?php echo json_encode($manager->getLists()['series']); ?>'>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Title</label>
@@ -84,11 +86,35 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Genres</label>
-                                <input type="text" class="form-control" name="genres" value="<?php echo $isProcessed ? htmlspecialchars(implode(', ', $bookData['genres'])) : ''; ?>" required>
+                                <input type="text" class="form-control" name="genres" id="genres-<?php echo $rowId; ?>" 
+                                       value="<?php echo $isProcessed ? htmlspecialchars(implode(', ', $bookData['genres'])) : ''; ?>" 
+                                       data-role="tagsinput" required>
                             </div>
                         </div>
                         <div id="authors-container-<?php echo $rowId; ?>"></div>
                         <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="addAuthor()">Add Author</button>
+                        <div class="row mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Series</label>
+                                <input type="text" class="form-control" name="series" id="series-<?php echo $rowId; ?>" 
+                                       value="<?php echo $isProcessed ? htmlspecialchars($bookData['series'] ?? '') : ''; ?>" 
+                                       list="series-list-<?php echo $rowId; ?>">
+                                <datalist id="series-list-<?php echo $rowId; ?>">
+                                    <?php foreach ($manager->getLists()['series'] as $series): ?>
+                                        <option value="<?php echo htmlspecialchars($series); ?>">
+                                    <?php endforeach; ?>
+                                </datalist>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Series Position</label>
+                                <input type="number" class="form-control" name="series_position" 
+                                       value="<?php echo $isProcessed ? htmlspecialchars($bookData['series_position'] ?? '') : ''; ?>">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comment</label>
+                            <textarea class="form-control" name="comment" rows="3"><?php echo $isProcessed ? htmlspecialchars($bookData['comment'] ?? '') : ''; ?></textarea>
+                        </div>
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <button type="submit" class="btn btn-primary">Save</button>

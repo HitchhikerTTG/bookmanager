@@ -3,6 +3,26 @@ function toggleEditForm(rowId) {
     const form = document.getElementById('edit-form-' + rowId);
     if (form) {
         form.classList.toggle('d-none');
+        if (!form.classList.contains('d-none')) {
+            initializeAutocomplete(rowId);
+        }
+    }
+}
+
+function initializeAutocomplete(rowId) {
+    const genresInput = document.getElementById('genres-' + rowId);
+    const availableGenres = JSON.parse(document.getElementById('available-genres-' + rowId).value || '[]');
+    
+    if (genresInput && availableGenres.length) {
+        $(genresInput).tagsinput({
+            typeaheadjs: {
+                source: function(query, process) {
+                    process(availableGenres.filter(genre => 
+                        genre.toLowerCase().includes(query.toLowerCase())
+                    ));
+                }
+            }
+        });
     }
 }
 
