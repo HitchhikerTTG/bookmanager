@@ -44,37 +44,23 @@ function initializeAutocomplete(rowId) {
     }
 }
 
-function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition, comment) {
+function editBook(fileName, title, genres, series, seriesPosition, comment) {
     const rowId = fileName.replace(/[^a-zA-Z0-9]/g, '');
     toggleEditForm(rowId);
     
-    const fileNameInput = document.getElementById('edit_file_name');
-    const titleInput = document.getElementById('edit_title');
-    
-    if (fileNameInput && titleInput) {
-        fileNameInput.value = fileName;
-        titleInput.value = title || '';
+    const form = document.getElementById('editBookForm-' + rowId);
+    if (form) {
+        const titleInput = form.querySelector('input[name="title"]');
+        const genresInput = document.getElementById('genres-' + rowId);
+        const seriesInput = form.querySelector('input[name="series"]');
+        const seriesPosInput = form.querySelector('input[name="series_position"]');
+        const commentInput = form.querySelector('textarea[name="comment"]');
         
-        // Clear existing authors
-        const authorsContainer = document.getElementById('authors-container');
-        if (authorsContainer) {
-            authorsContainer.innerHTML = '';
-            
-            // Add first author
-            addAuthorEntry(authorFirstName, authorLastName);
-            
-            const genresInput = document.getElementById('edit_genres');
-            const seriesInput = document.getElementById('edit_series');
-            const seriesPosInput = document.getElementById('edit_series_position');
-            const commentInput = document.getElementById('edit_comment');
-            
-            if (genresInput) genresInput.value = genres || '';
-            if (seriesInput) seriesInput.value = series || '';
-            if (seriesPosInput) seriesPosInput.value = seriesPosition || '';
-            if (commentInput) commentInput.value = comment || '';
-            
-            if (editModal) editModal.show();
-        }
+        if (titleInput) titleInput.value = title || '';
+        if (genresInput) $(genresInput).tagsinput('add', genres);
+        if (seriesInput) seriesInput.value = series || '';
+        if (seriesPosInput) seriesPosInput.value = seriesPosition || '';
+        if (commentInput) commentInput.value = comment || '';
     }
 }
 
