@@ -19,7 +19,7 @@ debug_log("Script started");
 <body>
     <div class="container mt-4">
         <h1>Book Manager</h1>
-        <p>System initialization in progress...</p>
+        <?php include 'templates/library.php'; ?>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
