@@ -331,17 +331,19 @@ $stats = $manager->getStats();
                             if ($existingBook['file_name'] === $_POST['file_name']) {
                                 $existingBook['title'] = $_POST['title'];
                                 // Preserve existing authors if present
-                                $existingBook['authors'] = isset($existingBook['authors']) && is_array($existingBook['authors']) ? $existingBook['authors'] : [];
-                                // Update or add first author
-                                $author = [
-                                    'first_name' => $_POST['author_first_name'],
-                                    'last_name' => $_POST['author_last_name']
-                                ];
-                                if (empty($existingBook['authors'])) {
-                                    $existingBook['authors'] = [$author];
-                                } else {
-                                    $existingBook['authors'][0] = $author;
+                                // Update authors
+                                $existingBook['authors'] = [];
+                                foreach ($_POST['authors'] as $author) {
+                                    if (!empty($author['first_name']) && !empty($author['last_name'])) {
+                                        $existingBook['authors'][] = [
+                                            'first_name' => $author['first_name'],
+                                            'last_name' => $author['last_name']
+                                        ];
+                                    }
                                 }
+                                
+                                // Update comment
+                                $existingBook['comment'] = !empty($_POST['comment']) ? $_POST['comment'] : null;
                                 // Ensure upload_date exists
                                 if (!isset($existingBook['upload_date'])) {
                                     $existingBook['upload_date'] = isset($existingBook['date_uploaded']) ? 
@@ -501,21 +503,30 @@ $stats = $manager->getStats();
                             <input type="text" class="form-control" name="title" id="edit_title" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Author</label>
-                            <select class="form-select mb-2" id="author_select" onchange="handleAuthorSelect(this)">
-                                <option value="">Add new author</option>
-                                <?php
-                                $authorsList = $manager->loadJson('data/lists.json')['authors'];
-                                foreach ($authorsList as $author) {
-                                    echo '<option value="' . htmlspecialchars($author['first_name']) . '|' . htmlspecialchars($author['last_name']) . '">' 
-                                        . htmlspecialchars($author['first_name'] . ' ' . $author['last_name']) . '</option>';
-                                }
-                                ?>
-                            </select>
-                            <div id="new_author_inputs">
-                                <input type="text" class="form-control mb-2" name="author_first_name" id="edit_author_first_name" placeholder="First Name" required>
-                                <input type="text" class="form-control" name="author_last_name" id="edit_author_last_name" placeholder="Last Name" required>
+                            <label class="form-label">Authors</label>
+                            <div id="authors-container">
+                                <div class="author-entry mb-2">
+                                    <select class="form-select mb-2 author-select" onchange="handleAuthorSelect(this)">
+                                        <option value="">Add new author</option>
+                                        <?php
+                                        $authorsList = $manager->loadJson('data/lists.json')['authors'];
+                                        foreach ($authorsList as $author) {
+                                            echo '<option value="' . htmlspecialchars($author['first_name']) . '|' . htmlspecialchars($author['last_name']) . '">' 
+                                                . htmlspecialchars($author['first_name'] . ' ' . $author['last_name']) . '</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                    <div class="author-inputs">
+                                        <input type="text" class="form-control mb-2" name="authors[0][first_name]" placeholder="First Name" required>
+                                        <input type="text" class="form-control" name="authors[0][last_name]" placeholder="Last Name" required>
+                                    </div>
+                                </div>
                             </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="addAuthor()">Add Another Author</button>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comment</label>
+                            <textarea class="form-control" name="comment" id="edit_comment" rows="3" placeholder="Optional"></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Genres (comma-separated)</label>
@@ -577,9 +588,30 @@ function editBook(fileName, title, authorFirstName, authorLastName, genres, seri
 }
 
 function handleAuthorSelect(select) {
+    const container = select.closest('.author-entry');
     const [firstName, lastName] = select.value ? select.value.split('|') : ['', ''];
-    document.getElementById('edit_author_first_name').value = firstName;
-    document.getElementById('edit_author_last_name').value = lastName;
+    const inputs = container.querySelector('.author-inputs');
+    inputs.querySelector('input[name$="[first_name]"]').value = firstName;
+    inputs.querySelector('input[name$="[last_name]"]').value = lastName;
+}
+
+function addAuthor() {
+    const container = document.getElementById('authors-container');
+    const index = container.children.length;
+    const authorEntry = document.createElement('div');
+    authorEntry.className = 'author-entry mb-2';
+    authorEntry.innerHTML = `
+        <select class="form-select mb-2 author-select" onchange="handleAuthorSelect(this)">
+            <option value="">Add new author</option>
+            ${document.querySelector('.author-select').innerHTML.split('\n').slice(1).join('\n')}
+        </select>
+        <div class="author-inputs">
+            <input type="text" class="form-control mb-2" name="authors[${index}][first_name]" placeholder="First Name" required>
+            <input type="text" class="form-control" name="authors[${index}][last_name]" placeholder="Last Name" required>
+        </div>
+        <button type="button" class="btn btn-danger btn-sm mt-1" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    container.appendChild(authorEntry);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
