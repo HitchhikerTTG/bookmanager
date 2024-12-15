@@ -1,6 +1,7 @@
+<?php require_once 'includes/version.php'; ?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="#">Book Manager</a>
+        <a class="navbar-brand" href="#">Book Manager v<?php echo SCRIPT_VERSION; ?></a>
         <div class="d-flex text-white">
             <div class="me-3">Total Books: <?php echo $stats['total']; ?></div>
             <div class="me-3">With Metadata: <?php echo $stats['withMetadata']; ?></div>
