@@ -101,13 +101,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Series</label>
                                 <input type="text" class="form-control" name="series" id="series-<?php echo $rowId; ?>" 
-                                       value="<?php echo $isProcessed ? htmlspecialchars($bookData['series'] ?? '') : ''; ?>" 
-                                       list="series-list-<?php echo $rowId; ?>">
-                                <datalist id="series-list-<?php echo $rowId; ?>">
-                                    <?php foreach ($manager->getLists()['series'] as $series): ?>
-                                        <option value="<?php echo htmlspecialchars($series); ?>">
-                                    <?php endforeach; ?>
-                                </datalist>
+                                       value="<?php echo $isProcessed ? htmlspecialchars($bookData['series'] ?? '') : ''; ?>">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Series Position</label>

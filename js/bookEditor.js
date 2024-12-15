@@ -28,8 +28,29 @@ function initializeAuthors(rowId) {
 }
 
 function initializeAutocomplete(rowId) {
+    // Initialize genres typeahead
     const genresInput = document.getElementById('genres-' + rowId);
     const availableGenres = JSON.parse(document.getElementById('available-genres-' + rowId).value || '[]');
+    
+    // Initialize series typeahead
+    const seriesInput = document.getElementById('series-' + rowId);
+    const availableSeries = JSON.parse(document.getElementById('available-series-' + rowId).value || '[]');
+    
+    if (seriesInput && availableSeries) {
+        $(seriesInput).typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'series',
+            source: new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.whitespace,
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                local: availableSeries
+            })
+        });
+    }
     
     if (genresInput && availableGenres.length) {
         $(genresInput).tagsinput({
