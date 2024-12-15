@@ -61,4 +61,52 @@ function addAuthor() {
     addAuthorEntry();
 }
 
-document.addEventListener('DOMContentLoaded', initializeModal);
+function submitBookForm(form) {
+    const formData = new FormData(form);
+    
+    fetch('process_book.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            editModal.hide();
+            location.reload();
+        } else {
+            alert(data.error || 'Error saving book');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error saving book');
+    });
+    
+    return false;
+}
+
+function validateForm(form) {
+    const title = form.querySelector('[name="title"]').value;
+    const authors = form.querySelectorAll('.author-entry');
+    const genres = form.querySelector('[name="genres"]').value;
+    
+    if (!title) return false;
+    if (authors.length === 0) return false;
+    if (!genres) return false;
+    
+    return true;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeModal();
+    
+    const form = document.getElementById('editBookForm');
+    if (form) {
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            if (validateForm(form)) {
+                submitBookForm(form);
+            }
+        };
+    }
+});
