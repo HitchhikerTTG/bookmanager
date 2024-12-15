@@ -19,26 +19,28 @@ function editBook(fileName, title, authorFirstName, authorLastName, genres, seri
     if (fileNameInput && titleInput) {
         fileNameInput.value = fileName;
         titleInput.value = title || '';
-    
-    // Clear existing authors
-    const authorsContainer = document.getElementById('authors-container');
-    authorsContainer.innerHTML = '';
-    
-    // Add first author
-    addAuthorEntry(authorFirstName, authorLastName);
-    
-    const genresInput = document.getElementById('edit_genres');
-    const seriesInput = document.getElementById('edit_series');
-    const seriesPosInput = document.getElementById('edit_series_position');
-    const commentInput = document.getElementById('edit_comment');
-    
-    if (genresInput) genresInput.value = genres || '';
-    if (seriesInput) seriesInput.value = series || '';
-    if (seriesPosInput) seriesPosInput.value = seriesPosition || '';
-    if (commentInput) commentInput.value = comment || '';
-    
-    if (editModal) editModal.show();
-}
+        
+        // Clear existing authors
+        const authorsContainer = document.getElementById('authors-container');
+        if (authorsContainer) {
+            authorsContainer.innerHTML = '';
+            
+            // Add first author
+            addAuthorEntry(authorFirstName, authorLastName);
+            
+            const genresInput = document.getElementById('edit_genres');
+            const seriesInput = document.getElementById('edit_series');
+            const seriesPosInput = document.getElementById('edit_series_position');
+            const commentInput = document.getElementById('edit_comment');
+            
+            if (genresInput) genresInput.value = genres || '';
+            if (seriesInput) seriesInput.value = series || '';
+            if (seriesPosInput) seriesPosInput.value = seriesPosition || '';
+            if (commentInput) commentInput.value = comment || '';
+            
+            if (editModal) editModal.show();
+        }
+    }
 }
 
 function handleAuthorSelect(select) {
