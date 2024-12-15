@@ -92,7 +92,10 @@ function submitBookForm(form) {
     
     fetch('process_book.php', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
     })
     .then(response => {
         if (!response.ok) {
@@ -110,14 +113,6 @@ function submitBookForm(form) {
     .catch(error => {
         console.error('Error:', error);
         alert('Error saving book: ' + error.message);
-    });
-    
-    return false;
-}ML = `
-            Błąd: ${error.message || 'Wystąpił nieznany błąd podczas zapisywania książki'}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
     });
     
     return false;
