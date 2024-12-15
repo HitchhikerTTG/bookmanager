@@ -9,6 +9,7 @@ class SystemCheck {
         $this->checkDirectories();
         $this->checkJsonFiles();
         $this->checkTemplates();
+        $this->checkBooksDirectory();
         $this->displayResults();
     }
     
@@ -43,6 +44,9 @@ class SystemCheck {
             $books = json_decode(file_get_contents('data/books.json'), true);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $this->errors[] = "books.json is not valid JSON";
+            } else {
+                echo "<h3>books.json content:</h3>";
+                echo "<pre>" . htmlspecialchars(json_encode($books, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . "</pre>";
             }
         }
         
@@ -55,6 +59,26 @@ class SystemCheck {
                 if (!isset($lists['authors']) || !isset($lists['genres']) || !isset($lists['series'])) {
                     $this->errors[] = "lists.json missing required keys (authors, genres, series)";
                 }
+                echo "<h3>lists.json content:</h3>";
+                echo "<pre>" . htmlspecialchars(json_encode($lists, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . "</pre>";
+            }
+        }
+    }
+    
+    private function checkBooksDirectory() {
+        if (is_dir('_ksiazki')) {
+            $books = scandir('_ksiazki');
+            $books = array_diff($books, array('.', '..'));
+            
+            echo "<h3>Books directory content:</h3>";
+            echo "<ul>";
+            foreach ($books as $book) {
+                echo "<li>" . htmlspecialchars($book) . "</li>";
+            }
+            echo "</ul>";
+            
+            if (empty($books)) {
+                $this->warnings[] = "Books directory is empty";
             }
         }
     }
@@ -85,6 +109,9 @@ class SystemCheck {
             .error { color: red; font-weight: bold; }
             .warning { color: orange; }
             .success { color: green; }
+            pre { background: #f5f5f5; padding: 10px; border: 1px solid #ddd; }
+            ul { list-style-type: none; padding-left: 20px; }
+            li { padding: 2px 0; }
         </style></head><body>";
         
         echo "<h1>System Check Results</h1>";
