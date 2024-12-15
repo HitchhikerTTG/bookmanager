@@ -46,7 +46,6 @@ function addAuthorEntry(firstName = '', lastName = '') {
     authorEntry.innerHTML = `
         <select class="form-select mb-2 author-select" onchange="handleAuthorSelect(this)">
             <option value="">Add new author</option>
-            ${document.querySelector('.author-select').innerHTML.split('\n').slice(1).join('\n')}
         </select>
         <div class="author-inputs">
             <input type="text" class="form-control mb-2" name="authors[${index}][first_name]" value="${firstName}" placeholder="First Name" required>
