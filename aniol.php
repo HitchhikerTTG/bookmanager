@@ -557,17 +557,16 @@ $stats = $manager->getStats();
 <script>
 let editModal = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+function initializeModal() {
     const modalElement = document.getElementById('editBookModal');
     if (modalElement) {
         editModal = new bootstrap.Modal(modalElement);
     }
-});
+}
 
 function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
     if (!editModal) {
-        const modalElement = document.getElementById('editBookModal');
-        editModal = new bootstrap.Modal(modalElement);
+        initializeModal();
     }
     
     document.getElementById('edit_file_name').value = fileName;
