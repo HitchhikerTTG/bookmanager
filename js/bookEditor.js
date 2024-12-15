@@ -187,8 +187,6 @@ function validateForm(form) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    initializeModal();
-    
     const form = document.getElementById('editBookForm');
     if (form) {
         form.onsubmit = (e) => {
