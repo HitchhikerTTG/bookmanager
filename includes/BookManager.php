@@ -45,7 +45,7 @@ class BookManager {
     }
 
     private function saveJson($file, $data) {
-        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+        $jsonData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if (file_put_contents($file, $jsonData) === false) {
             throw new Exception("Failed to save data to file: $file");
         }
