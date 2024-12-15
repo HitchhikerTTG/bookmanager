@@ -37,14 +37,18 @@ foreach ($required_templates as $template) {
     </style>
 </head>
 <body>
-    <?php include 'templates/header.php'; ?>
-    
-    <div class="container mt-4">
-        <?php include 'templates/alerts.php'; ?>
-        <?php include 'templates/tables.php'; ?>
-    </div>
-
-    <?php include 'templates/modals.php'; ?>
+    <?php 
+    try {
+        include 'templates/header.php';
+        echo '<div class="container mt-4">';
+        include 'templates/alerts.php';
+        include 'templates/tables.php';
+        echo '</div>';
+        include 'templates/modals.php';
+    } catch (Exception $e) {
+        echo '<div class="alert alert-danger m-4">Critical error: Unable to load template files. Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    }
+    ?>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/bookEditor.js"></script>
