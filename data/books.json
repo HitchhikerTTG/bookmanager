@@ -1,4 +1,27 @@
 
 {
-  "books": []
+  "books": [
+    {
+      "file_name": "example.mobi",
+      "upload_date": 1704297600,
+      "title": "Example Book Title",
+      "authors": [
+        {
+          "first_name": "John",
+          "last_name": "Doe"
+        },
+        {
+          "first_name": "Jane",
+          "last_name": "Smith"
+        }
+      ],
+      "genres": [
+        "Fantasy",
+        "Science Fiction"
+      ],
+      "series": null,
+      "series_position": null,
+      "comment": null
+    }
+  ]
 }
