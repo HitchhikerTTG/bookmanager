@@ -515,46 +515,43 @@ $stats = $manager->getStats();
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        let editModal;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
-        });
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+window.editBook = function(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
+    document.getElementById('edit_file_name').value = fileName;
+    document.getElementById('edit_title').value = title || '';
+    document.getElementById('edit_author_first_name').value = authorFirstName || '';
+    document.getElementById('edit_author_last_name').value = authorLastName || '';
+    document.getElementById('edit_genres').value = genres || '';
+    document.getElementById('edit_series').value = series || '';
+    document.getElementById('edit_series_position').value = seriesPosition || '';
+    
+    // Set author select if exists
+    const authorSelect = document.getElementById('author_select');
+    const authorValue = `${authorFirstName}|${authorLastName}`;
+    if ([...authorSelect.options].some(opt => opt.value === authorValue)) {
+        authorSelect.value = authorValue;
+    } else {
+        authorSelect.value = '';
+    }
+    
+    if (!window.editModal) {
+        window.editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+    }
+    window.editModal.show();
+};
 
-        function handleAuthorSelect(select) {
-            const [firstName, lastName] = select.value ? select.value.split('|') : ['', ''];
-            document.getElementById('edit_author_first_name').value = firstName;
-            document.getElementById('edit_author_last_name').value = lastName;
-        }
+window.handleAuthorSelect = function(select) {
+    const [firstName, lastName] = select.value ? select.value.split('|') : ['', ''];
+    document.getElementById('edit_author_first_name').value = firstName;
+    document.getElementById('edit_author_last_name').value = lastName;
+};
 
-        function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
-            document.getElementById('edit_file_name').value = fileName;
-            document.getElementById('edit_title').value = title || '';
-            document.getElementById('edit_author_first_name').value = authorFirstName || '';
-            document.getElementById('edit_author_last_name').value = authorLastName || '';
-            document.getElementById('edit_genres').value = genres || '';
-            document.getElementById('edit_series').value = series || '';
-            document.getElementById('edit_series_position').value = seriesPosition || '';
-            
-            // Set author select if exists
-            const authorSelect = document.getElementById('author_select');
-            const authorValue = `${authorFirstName}|${authorLastName}`;
-            if ([...authorSelect.options].some(opt => opt.value === authorValue)) {
-                authorSelect.value = authorValue;
-            } else {
-                authorSelect.value = '';
-            }
-            
-            if (editModal) {
-                editModal.show();
-            } else {
-                editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
-                editModal.show();
-            }
-        }
-    </script>
+document.addEventListener('DOMContentLoaded', function() {
+    window.editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+});
+</script>
 </body>
 </html>
