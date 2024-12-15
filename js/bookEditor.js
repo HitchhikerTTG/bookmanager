@@ -68,6 +68,27 @@ function addAuthor() {
 function submitBookForm(form) {
     const formData = new FormData(form);
     
+    // Sanitize genres input
+    const genres = formData.get('genres');
+    if (genres) {
+        formData.set('genres', genres.split(',').map(g => g.trim()).filter(g => g).join(','));
+    }
+    
+    // Validate authors
+    const authorEntries = form.querySelectorAll('.author-entry');
+    let hasValidAuthor = false;
+    authorEntries.forEach((entry, index) => {
+        const firstName = entry.querySelector(`input[name="authors[${index}][first_name]"]`).value.trim();
+        const lastName = entry.querySelector(`input[name="authors[${index}][last_name]"]`).value.trim();
+        if (firstName && lastName) {
+            hasValidAuthor = true;
+        }
+    });
+    
+    if (!hasValidAuthor) {
+        throw new Error('At least one author is required');
+    }
+    
     fetch('process_book.php', {
         method: 'POST',
         body: formData
