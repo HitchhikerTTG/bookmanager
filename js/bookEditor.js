@@ -13,8 +13,12 @@ function editBook(fileName, title, authorFirstName, authorLastName, genres, seri
         initializeModal();
     }
     
-    document.getElementById('edit_file_name').value = fileName;
-    document.getElementById('edit_title').value = title || '';
+    const fileNameInput = document.getElementById('edit_file_name');
+    const titleInput = document.getElementById('edit_title');
+    
+    if (fileNameInput && titleInput) {
+        fileNameInput.value = fileName;
+        titleInput.value = title || '';
     
     // Clear existing authors
     const authorsContainer = document.getElementById('authors-container');
@@ -23,12 +27,18 @@ function editBook(fileName, title, authorFirstName, authorLastName, genres, seri
     // Add first author
     addAuthorEntry(authorFirstName, authorLastName);
     
-    document.getElementById('edit_genres').value = genres || '';
-    document.getElementById('edit_series').value = series || '';
-    document.getElementById('edit_series_position').value = seriesPosition || '';
-    document.getElementById('edit_comment').value = comment || '';
+    const genresInput = document.getElementById('edit_genres');
+    const seriesInput = document.getElementById('edit_series');
+    const seriesPosInput = document.getElementById('edit_series_position');
+    const commentInput = document.getElementById('edit_comment');
     
-    editModal.show();
+    if (genresInput) genresInput.value = genres || '';
+    if (seriesInput) seriesInput.value = series || '';
+    if (seriesPosInput) seriesPosInput.value = seriesPosition || '';
+    if (commentInput) commentInput.value = comment || '';
+    
+    if (editModal) editModal.show();
+}
 }
 
 function handleAuthorSelect(select) {
