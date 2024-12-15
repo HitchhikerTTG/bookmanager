@@ -113,19 +113,27 @@ function submitBookForm(form) {
     })
     .then(response => {
         console.log('Response received:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         return response.json();
     })
     .then(data => {
         console.log('Response data:', data);
         if (data.success) {
             window.location.href = 'aniol.php';
-        } else {
-            alert(data.error || 'Error saving book');
+        } else if (data.error) {
+            console.error('Server error:', data.error);
+            alert(data.error);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error saving book: ' + error.message);
+        if (error.name === 'SyntaxError') {
+            alert('Invalid response from server');
+        } else {
+            alert(error.message || 'Error saving book');
+        }
     });
     
     return false;

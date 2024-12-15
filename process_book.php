@@ -7,14 +7,18 @@ try {
     error_log("Processing book submission");
     $manager = new BookManager();
     
+    if (!isset($_POST['file_name']) || !isset($_POST['title']) || !isset($_POST['genres'])) {
+        throw new Exception("Missing required fields");
+    }
+    
     $data = [
-        'file_name' => $_POST['file_name'],
-        'title' => $_POST['title'],
+        'file_name' => trim($_POST['file_name']),
+        'title' => trim($_POST['title']),
         'authors' => [],
-        'genres' => $_POST['genres'],
-        'series' => $_POST['series'] ?? null,
-        'series_position' => $_POST['series_position'] ?? null,
-        'comment' => $_POST['comment'] ?? null
+        'genres' => trim($_POST['genres']),
+        'series' => isset($_POST['series']) ? trim($_POST['series']) : null,
+        'series_position' => isset($_POST['series_position']) ? trim($_POST['series_position']) : null,
+        'comment' => isset($_POST['comment']) ? trim($_POST['comment']) : null
     ];
 
     // Process authors
