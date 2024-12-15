@@ -283,10 +283,26 @@ $stats = $manager->getStats();
                         foreach ($bookData['books'] as &$existingBook) {
                             if ($existingBook['file_name'] === $_POST['file_name']) {
                                 $existingBook['title'] = $_POST['title'];
-                                $existingBook['authors'] = [[
+                                $author = [
                                     'first_name' => $_POST['author_first_name'],
                                     'last_name' => $_POST['author_last_name']
-                                ]];
+                                ];
+                                $existingBook['authors'] = [$author];
+                                
+                                // Update authors list
+                                $listsData = $manager->loadJson('data/lists.json');
+                                $authorExists = false;
+                                foreach ($listsData['authors'] as $existingAuthor) {
+                                    if ($existingAuthor['first_name'] === $author['first_name'] && 
+                                        $existingAuthor['last_name'] === $author['last_name']) {
+                                        $authorExists = true;
+                                        break;
+                                    }
+                                }
+                                if (!$authorExists) {
+                                    $listsData['authors'][] = $author;
+                                    file_put_contents('data/lists.json', json_encode($listsData, JSON_PRETTY_PRINT));
+                                }
                                 $existingBook['genres'] = array_map('trim', explode(',', $_POST['genres']));
                                 $existingBook['series'] = !empty($_POST['series']) ? $_POST['series'] : null;
                                 $existingBook['series_position'] = !empty($_POST['series_position']) ? $_POST['series_position'] : null;
@@ -424,12 +440,21 @@ $stats = $manager->getStats();
                             <input type="text" class="form-control" name="title" id="edit_title" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Author First Name</label>
-                            <input type="text" class="form-control" name="author_first_name" id="edit_author_first_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Author Last Name</label>
-                            <input type="text" class="form-control" name="author_last_name" id="edit_author_last_name" required>
+                            <label class="form-label">Author</label>
+                            <select class="form-select mb-2" id="author_select" onchange="handleAuthorSelect(this)">
+                                <option value="">Add new author</option>
+                                <?php
+                                $authorsList = $manager->loadJson('data/lists.json')['authors'];
+                                foreach ($authorsList as $author) {
+                                    echo '<option value="' . htmlspecialchars($author['first_name']) . '|' . htmlspecialchars($author['last_name']) . '">' 
+                                        . htmlspecialchars($author['first_name'] . ' ' . $author['last_name']) . '</option>';
+                                }
+                                ?>
+                            </select>
+                            <div id="new_author_inputs">
+                                <input type="text" class="form-control mb-2" name="author_first_name" id="edit_author_first_name" placeholder="First Name" required>
+                                <input type="text" class="form-control" name="author_last_name" id="edit_author_last_name" placeholder="Last Name" required>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Genres (comma-separated)</label>
@@ -455,6 +480,12 @@ $stats = $manager->getStats();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function handleAuthorSelect(select) {
+            const [firstName, lastName] = select.value ? select.value.split('|') : ['', ''];
+            document.getElementById('edit_author_first_name').value = firstName;
+            document.getElementById('edit_author_last_name').value = lastName;
+        }
+
         function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
             document.getElementById('edit_file_name').value = fileName;
             document.getElementById('edit_title').value = title || '';
@@ -463,6 +494,16 @@ $stats = $manager->getStats();
             document.getElementById('edit_genres').value = genres || '';
             document.getElementById('edit_series').value = series || '';
             document.getElementById('edit_series_position').value = seriesPosition || '';
+            
+            // Set author select if exists
+            const authorSelect = document.getElementById('author_select');
+            const authorValue = `${authorFirstName}|${authorLastName}`;
+            if ([...authorSelect.options].some(opt => opt.value === authorValue)) {
+                authorSelect.value = authorValue;
+            } else {
+                authorSelect.value = '';
+            }
+            
             new bootstrap.Modal(document.getElementById('editBookModal')).show();
         }
     </script>
