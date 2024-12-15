@@ -86,28 +86,34 @@ function submitBookForm(form) {
     });
     
     if (!hasValidAuthor) {
-        throw new Error('At least one author is required');
+        alert('At least one author is required');
+        return false;
     }
     
     fetch('process_book.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            editModal.hide();
             window.location.href = 'aniol.php';
         } else {
-            throw new Error(data.error || 'Wystąpił błąd podczas zapisywania książki');
+            alert(data.error || 'Error saving book');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-        alertDiv.setAttribute('role', 'alert');
-        alertDiv.innerHTML = `
+        alert('Error saving book: ' + error.message);
+    });
+    
+    return false;
+}ML = `
             Błąd: ${error.message || 'Wystąpił nieznany błąd podczas zapisywania książki'}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
