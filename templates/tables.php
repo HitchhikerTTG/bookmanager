@@ -63,5 +63,17 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?php 
+        $totalPages = ceil(count($manager->getProcessedBooks()) / 10);
+        if ($totalPages > 1): 
+        ?>
+        <nav>
+            <ul class="pagination">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <li class="page-item"><a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a></li>
+                <?php endfor; ?>
+            </ul>
+        </nav>
+        <?php endif; ?>
     </div>
 </div>
