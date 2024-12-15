@@ -11,6 +11,28 @@ if (isset($_SESSION['success_message'])) {
 class BookManager {
     private $booksData;
     private $listsData;
+    private $token;
+    
+    const ITEMS_PER_PAGE = 10;
+    
+    private function validateToken() {
+        return isset($_POST['token']) && $_POST['token'] === $_SESSION['csrf_token'];
+    }
+    
+    private function generateToken() {
+        if (!isset($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        $this->token = $_SESSION['csrf_token'];
+    }
+    
+    private function sanitizeInput($data) {
+        return htmlspecialchars(strip_tags(trim($data)));
+    }
+    
+    private function validateFilePath($path) {
+        return !preg_match('/\.\./', $path) && strpos($path, '_ksiazki/') === 0;
+    }
     
     public function __construct() {
         $this->ensureDataFilesExist();
@@ -35,7 +57,23 @@ class BookManager {
     }
 
     public function loadJson($path) {
-        return json_decode(file_get_contents($path), true);
+        static $cache = [];
+        
+        if (!isset($cache[$path])) {
+            if (!file_exists($path)) {
+                throw new RuntimeException("JSON file not found: $path");
+            }
+            $content = file_get_contents($path);
+            if ($content === false) {
+                throw new RuntimeException("Failed to read JSON file: $path");
+            }
+            $data = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException("Invalid JSON in file: $path");
+            }
+            $cache[$path] = $data;
+        }
+        return $cache[$path];
     }
 
     private function getValidMetadataStructure() {
