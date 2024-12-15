@@ -4,8 +4,26 @@ session_start();
 require_once 'includes/BookManager.php';
 require_once 'includes/functions.php';
 
-$manager = new BookManager();
-$stats = $manager->getStats();
+try {
+    $manager = new BookManager();
+    $stats = $manager->getStats();
+} catch (Exception $e) {
+    die('<div class="alert alert-danger m-4">System error: Unable to initialize book manager. Please contact administrator.</div>');
+}
+
+// Verify template files
+$required_templates = [
+    'templates/header.php',
+    'templates/alerts.php',
+    'templates/tables.php',
+    'templates/modals.php'
+];
+
+foreach ($required_templates as $template) {
+    if (!file_exists($template)) {
+        die('<div class="alert alert-danger m-4">System error: Missing required template file: ' . htmlspecialchars($template) . '</div>');
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
