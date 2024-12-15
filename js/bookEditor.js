@@ -66,7 +66,9 @@ function addAuthor() {
 }
 
 function submitBookForm(form) {
+    console.log('Starting form submission');
     const formData = new FormData(form);
+    console.log('Form data created:', Object.fromEntries(formData));
     
     // Sanitize genres input
     const genres = formData.get('genres');
@@ -97,8 +99,12 @@ function submitBookForm(form) {
             'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response received:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             window.location.href = 'aniol.php';
         } else {
