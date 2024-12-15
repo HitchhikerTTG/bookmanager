@@ -1,17 +1,14 @@
 
-let editModal = null;
-
-function initializeModal() {
-    const modalElement = document.getElementById('editBookModal');
-    if (modalElement) {
-        editModal = new bootstrap.Modal(modalElement);
+function toggleEditForm(rowId) {
+    const form = document.getElementById('edit-form-' + rowId);
+    if (form) {
+        form.classList.toggle('d-none');
     }
 }
 
 function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition, comment) {
-    if (!editModal) {
-        initializeModal();
-    }
+    const rowId = fileName.replace(/[^a-zA-Z0-9]/g, '');
+    toggleEditForm(rowId);
     
     const fileNameInput = document.getElementById('edit_file_name');
     const titleInput = document.getElementById('edit_title');
