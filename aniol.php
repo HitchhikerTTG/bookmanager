@@ -330,11 +330,25 @@ $stats = $manager->getStats();
                         foreach ($bookData['books'] as &$existingBook) {
                             if ($existingBook['file_name'] === $_POST['file_name']) {
                                 $existingBook['title'] = $_POST['title'];
+                                // Preserve existing authors if present
+                                $existingBook['authors'] = isset($existingBook['authors']) && is_array($existingBook['authors']) ? $existingBook['authors'] : [];
+                                // Update or add first author
                                 $author = [
                                     'first_name' => $_POST['author_first_name'],
                                     'last_name' => $_POST['author_last_name']
                                 ];
-                                $existingBook['authors'] = [$author];
+                                if (empty($existingBook['authors'])) {
+                                    $existingBook['authors'] = [$author];
+                                } else {
+                                    $existingBook['authors'][0] = $author;
+                                }
+                                // Ensure upload_date exists
+                                if (!isset($existingBook['upload_date'])) {
+                                    $existingBook['upload_date'] = isset($existingBook['date_uploaded']) ? 
+                                        strtotime($existingBook['date_uploaded']) : 
+                                        filemtime('_ksiazki/' . $_POST['file_name']);
+                                }
+                                unset($existingBook['date_uploaded']); // Remove old date format if exists
                                 
                                 // Update authors list
                                 $listsData = $manager->loadJson('data/lists.json');
