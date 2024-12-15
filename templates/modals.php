@@ -6,7 +6,7 @@
                 <h5 class="modal-title">Edit Book</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="process_book.php" method="post">
+            <form id="editBookForm" onsubmit="return submitBookForm(this)">
                 <div class="modal-body">
                     <input type="hidden" id="edit_file_name" name="file_name">
                     
