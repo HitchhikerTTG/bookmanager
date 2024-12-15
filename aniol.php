@@ -519,7 +519,17 @@ $stats = $manager->getStats();
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-window.editBook = function(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
+let editModal;
+
+function initializeModal() {
+    if (!editModal) {
+        editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+    }
+}
+
+function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
+    initializeModal();
+    
     document.getElementById('edit_file_name').value = fileName;
     document.getElementById('edit_title').value = title || '';
     document.getElementById('edit_author_first_name').value = authorFirstName || '';
@@ -528,7 +538,6 @@ window.editBook = function(fileName, title, authorFirstName, authorLastName, gen
     document.getElementById('edit_series').value = series || '';
     document.getElementById('edit_series_position').value = seriesPosition || '';
     
-    // Set author select if exists
     const authorSelect = document.getElementById('author_select');
     const authorValue = `${authorFirstName}|${authorLastName}`;
     if ([...authorSelect.options].some(opt => opt.value === authorValue)) {
@@ -537,20 +546,17 @@ window.editBook = function(fileName, title, authorFirstName, authorLastName, gen
         authorSelect.value = '';
     }
     
-    if (!window.editModal) {
-        window.editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
-    }
-    window.editModal.show();
-};
+    editModal.show();
+}
 
-window.handleAuthorSelect = function(select) {
+function handleAuthorSelect(select) {
     const [firstName, lastName] = select.value ? select.value.split('|') : ['', ''];
     document.getElementById('edit_author_first_name').value = firstName;
     document.getElementById('edit_author_last_name').value = lastName;
-};
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-    window.editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+    initializeModal();
 });
 </script>
 </body>
