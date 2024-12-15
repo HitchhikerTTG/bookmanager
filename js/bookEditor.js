@@ -52,17 +52,22 @@ function initializeAutocomplete(rowId) {
     }
     
     if (genresInput && availableGenres.length) {
+        const genresBloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            local: availableGenres
+        });
+
         $(genresInput).tagsinput({
-            typeaheadjs: {
-                name: 'genres',
-                source: new Bloodhound({
-                    datumTokenizer: Bloodhound.tokenizers.whitespace,
-                    queryTokenizer: Bloodhound.tokenizers.whitespace,
-                    local: availableGenres
-                }),
+            typeaheadjs: [{
                 hint: true,
-                highlight: true
+                highlight: true,
+                minLength: 1
             },
+            {
+                name: 'genres',
+                source: genresBloodhound
+            }],
             confirmKeys: [13, 44, 32], // Enter, comma, space
             trimValue: true,
             freeInput: true
