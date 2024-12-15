@@ -401,8 +401,10 @@ $stats = $manager->getStats();
                 ?>
             </tbody>
         </table>
+    </div>
 
-        <h2 class="mt-4">Authors</h2>
+    <div class="container mt-4">
+        <h2>Authors</h2>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -570,19 +572,29 @@ function editBook(fileName, title, authorFirstName, authorLastName, genres, seri
     
     document.getElementById('edit_file_name').value = fileName;
     document.getElementById('edit_title').value = title || '';
-    document.getElementById('edit_author_first_name').value = authorFirstName || '';
-    document.getElementById('edit_author_last_name').value = authorLastName || '';
+    
+    // Clear existing authors
+    const authorsContainer = document.getElementById('authors-container');
+    authorsContainer.innerHTML = '';
+    
+    // Add first author
+    const authorEntry = document.createElement('div');
+    authorEntry.className = 'author-entry mb-2';
+    authorEntry.innerHTML = `
+        <select class="form-select mb-2 author-select" onchange="handleAuthorSelect(this)">
+            <option value="">Add new author</option>
+            ${document.querySelector('.author-select').innerHTML.split('\n').slice(1).join('\n')}
+        </select>
+        <div class="author-inputs">
+            <input type="text" class="form-control mb-2" name="authors[0][first_name]" value="${authorFirstName || ''}" placeholder="First Name" required>
+            <input type="text" class="form-control" name="authors[0][last_name]" value="${authorLastName || ''}" placeholder="Last Name" required>
+        </div>
+    `;
+    authorsContainer.appendChild(authorEntry);
+    
     document.getElementById('edit_genres').value = genres || '';
     document.getElementById('edit_series').value = series || '';
     document.getElementById('edit_series_position').value = seriesPosition || '';
-    
-    const authorSelect = document.getElementById('author_select');
-    const authorValue = `${authorFirstName}|${authorLastName}`;
-    if ([...authorSelect.options].some(opt => opt.value === authorValue)) {
-        authorSelect.value = authorValue;
-    } else {
-        authorSelect.value = '';
-    }
     
     editModal.show();
 }
