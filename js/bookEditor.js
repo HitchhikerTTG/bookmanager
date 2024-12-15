@@ -73,17 +73,23 @@ function submitBookForm(form) {
         body: formData
     })
     .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             editModal.hide();
             location.reload();
         } else {
-            alert(data.error || 'Error saving book');
+            alert(data.error || 'Wystąpił błąd podczas zapisywania książki');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error saving book');
+        alert(`Błąd: ${error.message || 'Wystąpił nieznany błąd podczas zapisywania książki'}`);
     });
     
     return false;
