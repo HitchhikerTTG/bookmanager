@@ -586,5 +586,15 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeModal();
 });
 </script>
+
+    <div class="container mt-4">
+        <h2>books.json content:</h2>
+        <pre class="bg-light p-3 border rounded">
+<?php
+$booksJson = file_get_contents('data/books.json');
+echo htmlspecialchars($booksJson);
+?>
+        </pre>
+    </div>
 </body>
 </html>
