@@ -6,6 +6,21 @@ The system manages an e-book library with two main components:
 - `aniol.php`: Book management interface
 - `ksiazki.html`: Public-facing library catalog
 
+## Project Structure
+- `/data/`: Data storage
+  - `books.json`: Stores book metadata
+  - `lists.json`: Stores reference lists
+- `/includes/`: PHP classes and functions
+  - `BookManager.php`: Core library management logic
+  - `functions.php`: Helper functions
+- `/templates/`: UI components
+  - `header.php`: Navigation and statistics bar
+  - `alerts.php`: Success/error messages
+  - `tables.php`: Book listing tables
+  - `modals.php`: Edit/add book forms
+- `/js/`: JavaScript files
+  - `bookEditor.js`: Book editing functionality
+
 ## Data Structure
 - `data/books.json`: Stores book metadata
 - `data/lists.json`: Stores reference lists (authors, genres, series)
@@ -25,14 +40,15 @@ The system manages an e-book library with two main components:
    - "Gotowe": Shows processed books
    - Both tabs implement pagination (10 items per page)
 
-3. Book Addition Form
-   - File upload
-   - Metadata input fields:
-     - Title (required)
-     - Authors (comma-separated, required)
-     - Genres (comma-separated, required)
-     - Series (optional)
-     - Series Position (optional)
+3. Book Addition/Edit Form
+   - File name (hidden)
+   - Title (required)
+   - Authors management
+     - Add/remove multiple authors
+     - First name and last name fields
+   - Genres (comma-separated, required)
+   - Series (optional)
+   - Series Position (optional)
 
 ### Public Catalog (ksiazki.html)
 - Bootstrap-based responsive layout
@@ -45,17 +61,6 @@ The system manages an e-book library with two main components:
   - Upload date
   - Download link
 
-## Data Management
-1. Book Processing
-   - Automatic metadata storage
-   - JSON data structure
-   - File management in _ksiazki directory
-
-2. Reference Lists
-   - Authors list auto-updates
-   - Genres list auto-updates
-   - Series list auto-updates
-
 ## Technical Implementation
 1. File Operations
    - JSON read/write for data storage
@@ -65,13 +70,21 @@ The system manages an e-book library with two main components:
 2. UI Components
    - Bootstrap 5.3.2
    - Responsive design
+   - Modal dialogs for editing
    - Tab-based navigation
    - Pagination system
 
 3. Security
    - Input sanitization
    - HTML escaping
+   - Session management
    - Relative paths for domain independence
+
+## JavaScript Features
+- Dynamic author fields management
+- Modal form handling
+- Book editing functionality
+- Real-time form validation
 
 ## Update History
 - Initial setup: Basic file structure and BookManager class
@@ -79,4 +92,6 @@ The system manages an e-book library with two main components:
 - Added: Tab navigation system
 - Added: Pagination for book lists
 - Added: Status bar with library statistics
-- Added: HTML generation system
+- Added: Template-based structure
+- Added: Dynamic author management
+- Added: Modal-based editing system
