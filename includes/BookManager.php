@@ -163,4 +163,17 @@ class BookManager {
     public function getLists() {
         return $this->listsData;
     }
+
+    public function checkUnprocessedBooks() {
+        $allFiles = array_map('basename', glob('_ksiazki/*.*'));
+        $processedFiles = array_column($this->booksData['books'], 'file_name');
+        
+        $stats = [
+            'total_files' => count($allFiles),
+            'processed_files' => count($processedFiles),
+            'unprocessed_files' => array_diff($allFiles, $processedFiles)
+        ];
+        
+        return $stats;
+    }
 }
