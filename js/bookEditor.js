@@ -76,17 +76,7 @@ function submitBookForm(form) {
     .then(data => {
         if (data.success) {
             editModal.hide();
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-success alert-dismissible fade show';
-            alertDiv.setAttribute('role', 'alert');
-            alertDiv.innerHTML = `
-                Książka została zapisana pomyślnie!
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+            window.location.href = 'aniol.php';
         } else {
             throw new Error(data.error || 'Wystąpił błąd podczas zapisywania książki');
         }
