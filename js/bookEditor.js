@@ -43,9 +43,13 @@ function addAuthorEntry(firstName = '', lastName = '') {
     const index = container.children.length;
     const authorEntry = document.createElement('div');
     authorEntry.className = 'author-entry mb-2';
+    const authors = JSON.parse(document.getElementById('available-authors').value || '[]');
+    const authorOptions = authors.map(author => `<option value="${author}">${author.replace('|', ' ')}</option>`).join('\n');
+    
     authorEntry.innerHTML = `
         <select class="form-select mb-2 author-select" onchange="handleAuthorSelect(this)">
             <option value="">Add new author</option>
+            ${authorOptions}
         </select>
         <div class="author-inputs">
             <input type="text" class="form-control mb-2" name="authors[${index}][first_name]" value="${firstName}" placeholder="First Name" required>

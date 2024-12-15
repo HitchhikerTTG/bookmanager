@@ -164,6 +164,37 @@ class BookManager {
         return $this->listsData;
     }
 
+    public function validateAndUpdateLists() {
+        $allAuthors = [];
+        $allGenres = [];
+        $allSeries = [];
+
+        foreach ($this->booksData['books'] as $book) {
+            foreach ($book['authors'] as $author) {
+                $authorKey = $author['first_name'] . '|' . $author['last_name'];
+                if (!in_array($authorKey, $allAuthors)) {
+                    $allAuthors[] = $authorKey;
+                }
+            }
+
+            foreach ($book['genres'] as $genre) {
+                if (!in_array($genre, $allGenres)) {
+                    $allGenres[] = $genre;
+                }
+            }
+
+            if (!empty($book['series']) && !in_array($book['series'], $allSeries)) {
+                $allSeries[] = $book['series'];
+            }
+        }
+
+        $this->listsData['authors'] = array_values(array_unique(array_merge($this->listsData['authors'], $allAuthors)));
+        $this->listsData['genres'] = array_values(array_unique(array_merge($this->listsData['genres'], $allGenres)));
+        $this->listsData['series'] = array_values(array_unique(array_merge($this->listsData['series'], $allSeries)));
+
+        $this->saveJson('data/lists.json', $this->listsData);
+    }
+
     public function checkUnprocessedBooks() {
         $allFiles = array_map('basename', glob('_ksiazki/*.*'));
         $processedFiles = array_column($this->booksData['books'], 'file_name');

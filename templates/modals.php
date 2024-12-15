@@ -1,4 +1,4 @@
-
+<input type="hidden" id="available-authors" value='<?php echo json_encode($manager->getLists()['authors']); ?>'>
 <div class="modal fade" id="editBookModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
