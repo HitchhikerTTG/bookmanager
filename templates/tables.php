@@ -22,7 +22,7 @@
                 <tr>
                     <td><?php echo htmlspecialchars($book); ?></td>
                     <td>
-                        <button class="btn btn-primary btn-sm" onclick="editBook('<?php echo htmlspecialchars($book); ?>')">Add Metadata</button>
+                        <button class="btn btn-primary btn-sm" onclick="editBook('<?php echo htmlspecialchars($book); ?>', '', '', '', '', '', '')">Add Metadata</button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
