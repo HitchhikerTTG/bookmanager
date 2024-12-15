@@ -8,7 +8,7 @@ function initializeModal() {
     }
 }
 
-function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition) {
+function editBook(fileName, title, authorFirstName, authorLastName, genres, series, seriesPosition, comment) {
     if (!editModal) {
         initializeModal();
     }
@@ -26,6 +26,7 @@ function editBook(fileName, title, authorFirstName, authorLastName, genres, seri
     document.getElementById('edit_genres').value = genres || '';
     document.getElementById('edit_series').value = series || '';
     document.getElementById('edit_series_position').value = seriesPosition || '';
+    document.getElementById('edit_comment').value = comment || '';
     
     editModal.show();
 }

@@ -64,7 +64,8 @@
                             '<?php echo htmlspecialchars($bookData['authors'][0]['last_name']); ?>', 
                             '<?php echo htmlspecialchars(implode(', ', $bookData['genres'])); ?>', 
                             '<?php echo htmlspecialchars($bookData['series'] ?? ''); ?>', 
-                            '<?php echo htmlspecialchars($bookData['series_position'] ?? ''); ?>')">Edit</button>
+                            '<?php echo htmlspecialchars($bookData['series_position'] ?? ''); ?>', 
+                            '<?php echo htmlspecialchars($bookData['comment'] ?? ''); ?>')">Edit</button>
                     <?php else: ?>
                         <button class="btn btn-primary btn-sm" onclick="editBook('<?php echo htmlspecialchars($file); ?>', '', '', '', '', '', '')">Add Metadata</button>
                     <?php endif; ?>

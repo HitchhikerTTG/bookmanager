@@ -35,6 +35,11 @@
                         <label class="form-label">Series Position (optional)</label>
                         <input type="number" class="form-control" id="edit_series_position" name="series_position">
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Comment (optional)</label>
+                        <textarea class="form-control" id="edit_comment" name="comment" rows="3"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
