@@ -7,6 +7,9 @@ function debug_log($message) {
 }
 
 debug_log("Script started");
+
+require_once 'includes/BookManager.php';
+$manager = new BookManager();
 ?>
 <!DOCTYPE html>
 <html lang="en">
