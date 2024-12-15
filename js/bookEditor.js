@@ -1,11 +1,10 @@
-
 function toggleEditForm(rowId) {
     const form = document.getElementById('edit-form-' + rowId);
     if (form) {
         form.classList.toggle('d-none');
         if (!form.classList.contains('d-none')) {
-            initializeAutocomplete(rowId);
             initializeAuthors(rowId);
+            initializeAutocomplete(rowId);
         }
     }
 }
