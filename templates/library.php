@@ -75,9 +75,15 @@
             </tr>
             <tr id="edit-form-<?php echo $rowId; ?>" class="d-none">
                 <td colspan="6">
-                    <form id="editBookForm-<?php echo $rowId; ?>" onsubmit="return submitBookForm(this)" class="p-3 bg-light">
+                    <form id="editBookForm-<?php echo $rowId; ?>" 
+                          onsubmit="return submitBookForm(this)" 
+                          class="p-3 bg-light"
+                          <?php if ($isProcessed): ?>
+                          data-authors='<?php echo json_encode($bookData['authors']); ?>'
+                          <?php endif; ?>>
                         <input type="hidden" name="file_name" value="<?php echo htmlspecialchars($file); ?>">
                         <input type="hidden" id="available-genres-<?php echo $rowId; ?>" value='<?php echo json_encode($manager->getLists()['genres']); ?>'>
+                        <input type="hidden" id="available-authors-<?php echo $rowId; ?>" value='<?php echo json_encode($manager->getLists()['authors']); ?>'>
                         <input type="hidden" id="available-series-<?php echo $rowId; ?>" value='<?php echo json_encode($manager->getLists()['series']); ?>'>
                         <div class="row">
                             <div class="col-md-6 mb-3">

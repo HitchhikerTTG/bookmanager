@@ -5,6 +5,24 @@ function toggleEditForm(rowId) {
         form.classList.toggle('d-none');
         if (!form.classList.contains('d-none')) {
             initializeAutocomplete(rowId);
+            initializeAuthors(rowId);
+        }
+    }
+}
+
+function initializeAuthors(rowId) {
+    const container = document.getElementById('authors-container-' + rowId);
+    if (container) {
+        container.innerHTML = '';
+        const form = document.getElementById('editBookForm-' + rowId);
+        const authorData = form.getAttribute('data-authors');
+        if (authorData) {
+            const authors = JSON.parse(authorData);
+            authors.forEach(author => {
+                addAuthorEntry(author.first_name, author.last_name, rowId);
+            });
+        } else {
+            addAuthorEntry('', '', rowId);
         }
     }
 }
@@ -68,12 +86,12 @@ function handleAuthorSelect(select) {
     inputs.querySelector('input[name$="[last_name]"]').value = lastName;
 }
 
-function addAuthorEntry(firstName = '', lastName = '') {
-    const container = document.getElementById('authors-container');
+function addAuthorEntry(firstName = '', lastName = '', rowId) {
+    const container = document.getElementById('authors-container-' + rowId);
     const index = container.children.length;
     const authorEntry = document.createElement('div');
     authorEntry.className = 'author-entry mb-2';
-    const authors = JSON.parse(document.getElementById('available-authors').value || '[]');
+    const authors = JSON.parse(document.getElementById('available-authors-' + rowId).value || '[]');
     const authorOptions = authors.map(author => `<option value="${author}">${author.replace('|', ' ')}</option>`).join('\n');
     
     authorEntry.innerHTML = `
