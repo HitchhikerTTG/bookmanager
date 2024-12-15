@@ -73,23 +73,34 @@ function submitBookForm(form) {
         body: formData
     })
     .then(response => response.json())
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
     .then(data => {
         if (data.success) {
             editModal.hide();
-            location.reload();
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = `
+                Książka została zapisana pomyślnie!
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         } else {
-            alert(data.error || 'Wystąpił błąd podczas zapisywania książki');
+            throw new Error(data.error || 'Wystąpił błąd podczas zapisywania książki');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert(`Błąd: ${error.message || 'Wystąpił nieznany błąd podczas zapisywania książki'}`);
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.setAttribute('role', 'alert');
+        alertDiv.innerHTML = `
+            Błąd: ${error.message || 'Wystąpił nieznany błąd podczas zapisywania książki'}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
     });
     
     return false;
