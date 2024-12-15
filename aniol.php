@@ -480,6 +480,12 @@ $stats = $manager->getStats();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        let editModal;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+        });
+
         function handleAuthorSelect(select) {
             const [firstName, lastName] = select.value ? select.value.split('|') : ['', ''];
             document.getElementById('edit_author_first_name').value = firstName;
@@ -504,7 +510,12 @@ $stats = $manager->getStats();
                 authorSelect.value = '';
             }
             
-            new bootstrap.Modal(document.getElementById('editBookModal')).show();
+            if (editModal) {
+                editModal.show();
+            } else {
+                editModal = new bootstrap.Modal(document.getElementById('editBookModal'));
+                editModal.show();
+            }
         }
     </script>
 </body>
