@@ -23,7 +23,12 @@
 
                     <div class="mb-3">
                         <label class="form-label">Genres (comma separated)</label>
-                        <input type="text" class="form-control" id="edit_genres" name="genres" required>
+                        <input type="text" class="form-control" id="edit_genres" name="genres" list="genresList" required>
+                        <datalist id="genresList">
+                            <?php foreach ($manager->getLists()['genres'] as $genre): ?>
+                                <option value="<?php echo htmlspecialchars($genre); ?>">
+                            <?php endforeach; ?>
+                        </datalist>
                     </div>
 
                     <div class="mb-3">
