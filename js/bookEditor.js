@@ -55,6 +55,14 @@ function initializeAutocomplete(rowId) {
     }
     
     if (genresInput && availableGenres.length) {
+        const genresBloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            local: availableGenres
+        });
+
+        genresBloodhound.initialize();
+
         $(genresInput).typeahead({
             hint: true,
             highlight: true,
@@ -62,12 +70,8 @@ function initializeAutocomplete(rowId) {
         },
         {
             name: 'genres',
-            source: function(query, syncResults) {
-                const matches = availableGenres.filter(genre => 
-                    genre.toLowerCase().includes(query.toLowerCase())
-                );
-                syncResults(matches);
-            }
+            source: genresBloodhound.ttAdapter(),
+            limit: 10
         });
     }
 }
