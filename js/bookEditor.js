@@ -36,6 +36,12 @@ function initializeAutocomplete(rowId) {
     const availableSeries = JSON.parse(document.getElementById('available-series-' + rowId).value || '[]');
     
     if (seriesInput && availableSeries) {
+        const seriesBloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            local: availableSeries
+        });
+
         $(seriesInput).typeahead({
             hint: true,
             highlight: true,
@@ -43,11 +49,8 @@ function initializeAutocomplete(rowId) {
         },
         {
             name: 'series',
-            source: new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.whitespace,
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                local: availableSeries
-            })
+            source: seriesBloodhound,
+            limit: 10
         });
     }
     
