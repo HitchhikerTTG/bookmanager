@@ -68,11 +68,16 @@ function initializeAutocomplete(rowId) {
         },
         {
             name: 'genres',
-            source: genresBloodhound
-        }).tagsinput({
-            confirmKeys: [13, 44, 32], // Enter, comma, space
-            trimValue: true,
-            freeInput: true
+            source: genresBloodhound,
+            limit: 10
+        });
+        
+        // Handle multiple genres with comma separation
+        $(genresInput).on('typeahead:select', function(e, suggestion) {
+            const currentValue = $(this).val();
+            const genres = currentValue.split(',').map(g => g.trim()).filter(g => g);
+            genres.push(suggestion);
+            $(this).typeahead('val', genres.join(', '));
         });
     }
 }
