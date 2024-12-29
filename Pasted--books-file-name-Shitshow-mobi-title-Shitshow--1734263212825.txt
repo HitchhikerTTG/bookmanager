@@ -1,0 +1,116 @@
+{
+    "books": [
+        {
+            "file_name": "Shitshow.mobi",
+            "title": "Shitshow!",
+            "authors": [
+                {
+                    "first_name": "Charlie",
+                    "last_name": "LeDuff"
+                }
+            ],
+            "date_uploaded": "2024-12-13 16:22:55",
+            "genres": [
+                "Reporta\u017c"
+            ],
+            "series": null,
+            "series_position": null
+        },
+        {
+            "file_name": "Masz_sie_lasic.mobi",
+            "title": "Masz si\u0119 \u0142asi\u0107",
+            "authors": [
+                {
+                    "first_name": "Katarzyna",
+                    "last_name": "Bednarczyk\u00f3wna"
+                }
+            ],
+            "genres": [
+                "Reporta\u017c"
+            ],
+            "series": null,
+            "series_position": null,
+            "date_uploaded": "2024-12-13 16:27:45"
+        },
+        {
+            "file_name": "powiedziala-wydawnictwo_poznanskie.mobi",
+            "title": "Powiedzia\u0142a",
+            "authors": [
+                {
+                    "first_name": "Jodi",
+                    "last_name": "Kantor"
+                },
+                {
+                    "first_name": "Megan",
+                    "last_name": "Twohey"
+                }
+            ],
+            "genres": [
+                "Reporta\u017c"
+            ],
+            "series": null,
+            "series_position": null,
+            "date_uploaded": "2024-12-13 16:50:08"
+        },
+        {
+            "file_name": null,
+            "title": null,
+            "authors": [],
+            "genres": null,
+            "series": null,
+            "series_position": null
+        },
+        {
+            "file_name": "Dlatego_klamalismy.mobi",
+            "upload_date": 1729979893,
+            "title": "",
+            "authors": [],
+            "genres": [],
+            "series": null,
+            "series_position": null
+        },
+        {
+            "file_name": "Na_haju.mobi",
+            "upload_date": 1729979752,
+            "title": "",
+            "authors": [],
+            "genres": [],
+            "series": null,
+            "series_position": null
+        },
+        {
+            "file_name": "Nowa_zimna_wojna.mobi",
+            "upload_date": 1646391674,
+            "title": "",
+            "authors": [],
+            "genres": [],
+            "series": null,
+            "series_position": null
+        },
+        {
+            "file_name": "Winy_ktore_nosimy.mobi",
+            "upload_date": 1728542683,
+            "title": "",
+            "authors": [],
+            "genres": [],
+            "series": null,
+            "series_position": null
+        },
+        {
+            "file_name": "co_zasiejesz_to_zbierzesz.mobi",
+            "upload_date": 1660083842,
+            "title": "Co zasiejesz, to zbierzesz",
+            "authors": [
+                {
+                    "first_name": "Michael",
+                    "last_name": "Hjorth"
+                }
+            ],
+            "genres": [
+                "Krymina\u0142"
+            ],
+            "series": "Sebastian Bergman",
+            "series_position": "7"
+        }
+    ]
+}
