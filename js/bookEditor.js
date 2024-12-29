@@ -192,13 +192,29 @@ function submitBookForm(form) {
 }
 
 function validateForm(form) {
-    const title = form.querySelector('[name="title"]').value;
-    const authors = form.querySelectorAll('.author-entry');
-    const genres = form.querySelector('[name="genres"]').value;
+    if (!form) return false;
     
-    if (!title) return false;
-    if (authors.length === 0) return false;
-    if (!genres) return false;
+    const title = form.querySelector('[name="title"]')?.value;
+    const authors = form.querySelectorAll('.author-entry');
+    const genres = form.querySelector('[name="genres"]')?.value;
+    const seriesPosition = form.querySelector('[name="series_position"]')?.value;
+    
+    if (!title) {
+        alert('Title is required');
+        return false;
+    }
+    if (authors.length === 0) {
+        alert('At least one author is required');
+        return false;
+    }
+    if (!genres) {
+        alert('At least one genre is required');
+        return false;
+    }
+    if (seriesPosition && isNaN(seriesPosition)) {
+        alert('Series position must be a number');
+        return false;
+    }
     
     return true;
 }

@@ -52,18 +52,7 @@ $manager = new BookManager();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css" rel="stylesheet">
-    <style>
-    .bootstrap-tagsinput {
-        width: 100%;
-    }
-    .bootstrap-tagsinput .tag {
-        margin-right: 2px;
-        color: white;
-        background-color: #0d6efd;
-        padding: 0.2rem 0.6rem;
-        border-radius: 0.25rem;
-    }
-    </style>
+    
 </head>
 <body>
     <div class="container mt-4">
