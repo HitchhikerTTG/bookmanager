@@ -117,6 +117,27 @@ $manager = new BookManager();
                 </table>
             </div>
         </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Available Genre Predictions</h3>
+                <div class="card">
+                    <div class="card-body">
+                        <?php
+                        $availableGenres = $manager->getLists()['genres'];
+                        if (empty($availableGenres)): ?>
+                            <p class="text-muted">No genres available for prediction yet.</p>
+                        <?php else: ?>
+                            <div class="d-flex flex-wrap gap-2">
+                                <?php foreach ($availableGenres as $genre): ?>
+                                    <span class="badge bg-primary"><?php echo htmlspecialchars($genre); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <?php include 'templates/modals.php'; ?>
