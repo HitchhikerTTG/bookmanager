@@ -61,16 +61,15 @@ function initializeAutocomplete(rowId) {
             local: availableGenres
         });
 
-        $(genresInput).tagsinput({
-            typeaheadjs: [{
-                hint: true,
-                highlight: true,
-                minLength: 1
-            },
-            {
-                name: 'genres',
-                source: genresBloodhound
-            }],
+        $(genresInput).typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'genres',
+            source: genresBloodhound
+        }).tagsinput({
             confirmKeys: [13, 44, 32], // Enter, comma, space
             trimValue: true,
             freeInput: true
