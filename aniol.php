@@ -58,6 +58,65 @@ $manager = new BookManager();
     <div class="container mt-4">
         <h1>Book Manager</h1>
         <?php include 'templates/library.php'; ?>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h3>Authors Statistics</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Author</th>
+                            <th>Books Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $authorStats = [];
+                        foreach ($manager->getProcessedBooks() as $book) {
+                            foreach ($book['authors'] as $author) {
+                                $authorKey = $author['first_name'] . ' ' . $author['last_name'];
+                                $authorStats[$authorKey] = ($authorStats[$authorKey] ?? 0) + 1;
+                            }
+                        }
+                        arsort($authorStats);
+                        foreach ($authorStats as $author => $count): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($author); ?></td>
+                                <td><?php echo $count; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h3>Genres Statistics</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Genre</th>
+                            <th>Books Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $genreStats = [];
+                        foreach ($manager->getProcessedBooks() as $book) {
+                            foreach ($book['genres'] as $genre) {
+                                $genreStats[$genre] = ($genreStats[$genre] ?? 0) + 1;
+                            }
+                        }
+                        arsort($genreStats);
+                        foreach ($genreStats as $genre => $count): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($genre); ?></td>
+                                <td><?php echo $count; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
     <?php include 'templates/modals.php'; ?>
