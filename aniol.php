@@ -59,13 +59,12 @@ $stats = $manager->getStats(); // Assuming getStats() returns an array with 'las
 <body>
     <div class="container mt-4">
         <h1>Book Manager</h1>
-        <button onclick="generatePublicPage()" class="btn btn-primary mb-3">Generuj stronę publiczną</button>
 
         <nav class="navbar navbar-light bg-light mt-3">
             <div class="container-fluid">
                 <div>Last Update: <?php echo $stats['lastUpdate']; ?></div>
                 <div class="ms-3">Last HTML Update: <?php echo date('Y-m-d H:i:s', file_exists('index.html') ? filemtime('index.html') : 0); ?></div>
-                <button onclick="generatePublicPage()" class="btn btn-primary ms-3">Generate Public Page</button>
+                <button onclick="generatePublicPage()" class="btn btn-primary ms-3">Generuj stronę publiczną</button>
             </div>
         </nav>
 
