@@ -59,6 +59,7 @@ $stats = $manager->getStats(); // Assuming getStats() returns an array with 'las
 <body>
     <div class="container mt-4">
         <h1>Book Manager</h1>
+        <button onclick="generatePublicPage()" class="btn btn-primary mb-3">Generuj stronę publiczną</button>
 
         <nav class="navbar navbar-light bg-light mt-3">
             <div class="container-fluid">
