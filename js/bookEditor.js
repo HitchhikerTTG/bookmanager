@@ -192,6 +192,47 @@ function submitBookForm(form) {
     return false;
 }
 
+function addGenre(rowId, genre) {
+    const input = document.getElementById(`genres-${rowId}`);
+    const container = document.getElementById(`selected-genres-${rowId}`);
+    const currentGenres = input.value ? input.value.split(',').map(g => g.trim()) : [];
+    
+    if (!currentGenres.includes(genre)) {
+        currentGenres.push(genre);
+        input.value = currentGenres.join(', ');
+        
+        const badge = document.createElement('span');
+        badge.className = 'badge bg-primary genre-badge';
+        badge.style.margin = '2px';
+        badge.innerHTML = `${genre} <i class="bi bi-x" onclick="removeGenre('${rowId}', '${genre}')" style="cursor: pointer;"></i>`;
+        container.appendChild(badge);
+    }
+}
+
+function removeGenre(rowId, genre) {
+    const input = document.getElementById(`genres-${rowId}`);
+    const container = document.getElementById(`selected-genres-${rowId}`);
+    let currentGenres = input.value.split(',').map(g => g.trim());
+    
+    currentGenres = currentGenres.filter(g => g !== genre);
+    input.value = currentGenres.join(', ');
+    
+    const badges = container.getElementsByClassName('genre-badge');
+    for (let badge of badges) {
+        if (badge.textContent.includes(genre)) {
+            badge.remove();
+            break;
+        }
+    }
+}
+
+function addNewGenre(rowId) {
+    const genre = prompt('Enter new genre:');
+    if (genre && genre.trim()) {
+        addGenre(rowId, genre.trim());
+    }
+}
+
 function validateForm(form) {
     if (!form) return false;
     

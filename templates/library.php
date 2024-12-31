@@ -89,9 +89,32 @@
                             </div>
                             <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Genres</label>
-                                <input type="text" class="form-control" name="genres" id="genres-<?php echo $rowId; ?>" 
+                                <div class="mb-2 genre-tags">
+                                    <?php foreach ($manager->getLists()['genres'] as $genre): ?>
+                                        <span class="badge bg-secondary genre-tag" 
+                                              style="cursor: pointer; margin: 2px;"
+                                              onclick="addGenre('<?php echo $rowId; ?>', '<?php echo htmlspecialchars($genre); ?>')">
+                                            <?php echo htmlspecialchars($genre); ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                    <span class="badge bg-primary" style="cursor: pointer; margin: 2px;" 
+                                          onclick="addNewGenre('<?php echo $rowId; ?>')">
+                                        + Add New
+                                    </span>
+                                </div>
+                                <div id="selected-genres-<?php echo $rowId; ?>" class="mb-2">
+                                    <?php if ($isProcessed): 
+                                        foreach ($bookData['genres'] as $genre): ?>
+                                            <span class="badge bg-primary genre-badge" style="margin: 2px;">
+                                                <?php echo htmlspecialchars($genre); ?>
+                                                <i class="bi bi-x" onclick="removeGenre('<?php echo $rowId; ?>', '<?php echo htmlspecialchars($genre); ?>')" style="cursor: pointer;"></i>
+                                            </span>
+                                        <?php endforeach;
+                                    endif; ?>
+                                </div>
+                                <input type="hidden" name="genres" id="genres-<?php echo $rowId; ?>" 
                                        value="<?php echo $isProcessed ? htmlspecialchars(implode(', ', $bookData['genres'])) : ''; ?>" 
-                                       data-role="tagsinput" required>
+                                       required>
                             </div>
                         </div>
                         <div id="authors-container-<?php echo $rowId; ?>"></div>
