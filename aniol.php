@@ -67,6 +67,11 @@ $stats = $manager->getStats(); // Assuming getStats() returns an array with 'las
                 <button onclick="generatePublicPage()" class="btn btn-primary ms-3">Generuj stronę publiczną</button>
             </div>
         </nav>
+                <div>Last Update: <?php echo $stats['lastUpdate']; ?></div>
+                <div class="ms-3">Last HTML Update: <?php echo date('Y-m-d H:i:s', file_exists('index.html') ? filemtime('index.html') : 0); ?></div>
+                <button onclick="generatePublicPage()" class="btn btn-primary ms-3">Generuj stronę publiczną</button>
+            </div>
+        </nav>
 
 
         <div class="row mt-4">
@@ -194,6 +199,16 @@ $stats = $manager->getStats(); // Assuming getStats() returns an array with 'las
                 initializeAutocomplete(rowId);
             });
         });
+
+        function generatePublicPage() {
+            fetch('generate_public.php')
+                .then(response => response.json())
+                .then(data => {
+                    if(data.success) {
+                        location.reload();
+                    }
+                });
+        }
 
         function generatePublicPage() {
             fetch('generate_public.php')
