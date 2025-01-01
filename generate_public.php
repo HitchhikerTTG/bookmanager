@@ -1,4 +1,3 @@
-
 <?php
 require_once 'includes/BookManager.php';
 $manager = new BookManager();
@@ -22,13 +21,13 @@ if ($search !== '') {
 usort($processedBooks, function($a, $b) use ($sort) {
     switch ($sort) {
         case 'author':
-            $authorA = $a['authors'][0]['last_name'] . ' ' . $a['authors'][0]['first_name'];
-            $authorB = $b['authors'][0]['last_name'] . ' ' . $b['authors'][0]['first_name'];
+            $authorA = isset($a['authors'][0]['last_name'], $a['authors'][0]['first_name']) ? $a['authors'][0]['last_name'] . ' ' . $a['authors'][0]['first_name'] : '';
+            $authorB = isset($b['authors'][0]['last_name'], $b['authors'][0]['first_name']) ? $b['authors'][0]['last_name'] . ' ' . $b['authors'][0]['first_name'] : '';
             return strcasecmp($authorA, $authorB);
         case 'date':
-            return $b['upload_date'] - $a['upload_date'];
+            return isset($a['upload_date'], $b['upload_date']) ? $b['upload_date'] - $a['upload_date'] : 0;
         case 'genre':
-            return strcasecmp($a['genres'][0], $b['genres'][0]);
+            return isset($a['genres'][0], $b['genres'][0]) ? strcasecmp($a['genres'][0], $b['genres'][0]) : 0;
         default: // title
             return strcasecmp($a['title'], $b['title']);
     }
@@ -57,10 +56,10 @@ $html = <<<HTML
                     </div>
                     <div class="col-md-6">
                         <div class="btn-group w-100" role="group">
-                            <button type="button" class="btn btn-outline-primary <?php echo $sort === 'title' ? 'active' : ''; ?>" onclick="updateSort('title')">Po tytule</button>
-                            <button type="button" class="btn btn-outline-primary <?php echo $sort === 'author' ? 'active' : ''; ?>" onclick="updateSort('author')">Po autorze</button>
-                            <button type="button" class="btn btn-outline-primary <?php echo $sort === 'date' ? 'active' : ''; ?>" onclick="updateSort('date')">Po dacie</button>
-                            <button type="button" class="btn btn-outline-primary <?php echo $sort === 'genre' ? 'active' : ''; ?>" onclick="updateSort('genre')">Po gatunku</button>
+                            <button type="button" class="btn btn-outline-primary ' . ($sort === 'title' ? 'active' : '') . '" onclick="updateSort(\'title\')">Po tytule</button>
+                            <button type="button" class="btn btn-outline-primary ' . ($sort === 'author' ? 'active' : '') . '" onclick="updateSort(\'author\')">Po autorze</button>
+                            <button type="button" class="btn btn-outline-primary ' . ($sort === 'date' ? 'active' : '') . '" onclick="updateSort(\'date\')">Po dacie</button>
+                            <button type="button" class="btn btn-outline-primary ' . ($sort === 'genre' ? 'active' : '') . '" onclick="updateSort(\'genre\')">Po gatunku</button>
                         </div>
                     </div>
                 </div>
