@@ -61,12 +61,19 @@ class BookManager {
 
     public function getUnprocessedBooks() {
         $allFiles = glob('_ksiazki/*.*');
-        $processedFiles = array_column($this->booksData['books'], 'file_name');
+        $processedBooks = $this->getProcessedBooks();
+        $processedFiles = array_column($processedBooks, 'file_name');
         return array_map('basename', array_diff($allFiles, $processedFiles));
     }
 
     public function getProcessedBooks() {
-        return $this->booksData['books'];
+        return array_filter($this->booksData['books'], function($book) {
+            return !empty($book['title']) && 
+                   !empty($book['authors']) && 
+                   count($book['authors']) > 0 &&
+                   !empty($book['authors'][0]['first_name']) && 
+                   !empty($book['authors'][0]['last_name']);
+        });
     }
 
     public function addBook($data) {
