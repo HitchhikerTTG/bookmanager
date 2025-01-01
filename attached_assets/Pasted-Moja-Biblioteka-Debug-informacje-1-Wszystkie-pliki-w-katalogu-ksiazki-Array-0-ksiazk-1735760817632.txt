@@ -1,0 +1,282 @@
+Moja Biblioteka
+Debug informacje:
+1. Wszystkie pliki w katalogu _ksiazki:
+Array
+(
+    [0] => _ksiazki/Dlatego_klamalismy.mobi
+    [1] => _ksiazki/Masz_sie_lasic.mobi
+    [2] => _ksiazki/Na_haju.mobi
+    [3] => _ksiazki/Nowa_zimna_wojna.mobi
+    [4] => _ksiazki/Shitshow.mobi
+    [5] => _ksiazki/Winy_ktore_nosimy.mobi
+    [6] => _ksiazki/co_zasiejesz_to_zbierzesz.mobi
+    [7] => _ksiazki/powiedziala-wydawnictwo_poznanskie.mobi
+)
+
+
+2. Książki z kompletnymi metadanymi:
+Array
+(
+    [0] => Array
+        (
+            [file_name] => example.mobi
+            [upload_date] => 1704297600
+            [title] => Example Book Title
+            [authors] => Array
+                (
+                    [0] => Array
+                        (
+                            [first_name] => John
+                            [last_name] => Doe
+                        )
+
+                    [1] => Array
+                        (
+                            [first_name] => Jane
+                            [last_name] => Smith
+                        )
+
+                )
+
+            [genres] => Array
+                (
+                    [0] => Fantasy
+                    [1] => Science Fiction
+                )
+
+            [series] => 
+            [series_position] => 
+            [comment] => 
+        )
+
+    [1] => Array
+        (
+            [file_name] => Dlatego_klamalismy.mobi
+            [upload_date] => 1734292530
+            [title] => Dlatego kłamaliśmy
+            [authors] => Array
+                (
+                    [0] => Array
+                        (
+                            [first_name] => Karin
+                            [last_name] => Slaughter
+                        )
+
+                )
+
+            [genres] => Array
+                (
+                    [0] => Kryminał
+                )
+
+            [series] => Will Trent & Sara Linton
+            [series_position] => 
+            [comment] => 
+        )
+
+    [2] => Array
+        (
+            [file_name] => Shitshow.mobi
+            [upload_date] => 1734293453
+            [title] => Shitshow!
+            [authors] => Array
+                (
+                    [0] => Array
+                        (
+                            [first_name] => Charlie
+                            [last_name] => LeDuff
+                        )
+
+                )
+
+            [genres] => Array
+                (
+                    [0] => Reportaż
+                )
+
+            [series] => 
+            [series_position] => 
+            [comment] => 
+        )
+
+    [3] => Array
+        (
+            [file_name] => Winy_ktore_nosimy.mobi
+            [upload_date] => 1734293937
+            [title] => Winy, które nosimy
+            [authors] => Array
+                (
+                    [0] => Array
+                        (
+                            [first_name] => Michael
+                            [last_name] => Hjorth
+                        )
+
+                )
+
+            [genres] => Array
+                (
+                    [0] => Kryminał
+                )
+
+            [series] => Sebastian Bergman
+            [series_position] => 
+            [comment] => 
+        )
+
+    [4] => Array
+        (
+            [file_name] => co_zasiejesz_to_zbierzesz.mobi
+            [upload_date] => 1734294080
+            [title] => Co zasiejesz, to zbierzesz
+            [authors] => Array
+                (
+                    [0] => Array
+                        (
+                            [first_name] => Michael
+                            [last_name] => Hjorth
+                        )
+
+                )
+
+            [genres] => Array
+                (
+                    [0] => Kryminał
+                )
+
+            [series] => Sebastian Bergman
+            [series_position] => 
+            [comment] => 
+        )
+
+    [5] => Array
+        (
+            [file_name] => Masz_sie_lasic.mobi
+            [upload_date] => 1734294190
+            [title] => Masz się łasić
+            [authors] => Array
+                (
+                    [0] => Array
+                        (
+                            [first_name] => Katarzyna
+                            [last_name] => Bednarczykówna
+                        )
+
+                )
+
+            [genres] => Array
+                (
+                    [0] => Reportaż
+                )
+
+            [series] => 
+            [series_position] => 
+            [comment] => 
+        )
+
+    [6] => Array
+        (
+            [file_name] => powiedziala-wydawnictwo_poznanskie.mobi
+            [upload_date] => 1734294471
+            [title] => Powiedziała
+            [authors] => Array
+                (
+                    [0] => Array
+                        (
+                            [first_name] => Kantor
+                            [last_name] => Jodi
+                        )
+
+                    [1] => Array
+                        (
+                            [first_name] => Megan
+                            [last_name] => Twohey
+                        )
+
+                )
+
+            [genres] => Array
+                (
+                    [0] => Reportaż
+                )
+
+            [series] => 
+            [series_position] => 
+            [comment] => 
+        )
+
+    [7] => Array
+        (
+            [file_name] => Na_haju.mobi
+            [upload_date] => 1734294654
+            [title] => Na haju - testowanie
+            [authors] => Array
+                (
+                    [0] => Array
+                        (
+                            [first_name] => Tiffany
+                            [last_name] => Jenkins
+                        )
+
+                )
+
+            [genres] => Array
+                (
+                    [0] => Biografia
+                )
+
+            [series] => 
+            [series_position] => 
+            [comment] => 
+        )
+
+)
+
+
+3. Książki bez metadanych:
+Array
+(
+    [0] => Dlatego_klamalismy.mobi
+    [1] => Masz_sie_lasic.mobi
+    [2] => Na_haju.mobi
+    [3] => Nowa_zimna_wojna.mobi
+    [4] => Shitshow.mobi
+    [5] => Winy_ktore_nosimy.mobi
+    [6] => co_zasiejesz_to_zbierzesz.mobi
+    [7] => powiedziala-wydawnictwo_poznanskie.mobi
+)
+Książki z metadanymi
+Example Book Title
+Autorzy: John Doe, Jane Smith
+Plik: example.mobi
+Dlatego kłamaliśmy
+Autorzy: Karin Slaughter
+Plik: Dlatego_klamalismy.mobi
+Shitshow!
+Autorzy: Charlie LeDuff
+Plik: Shitshow.mobi
+Winy, które nosimy
+Autorzy: Michael Hjorth
+Plik: Winy_ktore_nosimy.mobi
+Co zasiejesz, to zbierzesz
+Autorzy: Michael Hjorth
+Plik: co_zasiejesz_to_zbierzesz.mobi
+Masz się łasić
+Autorzy: Katarzyna Bednarczykówna
+Plik: Masz_sie_lasic.mobi
+Powiedziała
+Autorzy: Kantor Jodi, Megan Twohey
+Plik: powiedziala-wydawnictwo_poznanskie.mobi
+Na haju - testowanie
+Autorzy: Tiffany Jenkins
+Plik: Na_haju.mobi
+Książki bez metadanych
+Plik: Dlatego_klamalismy.mobi
+Plik: Masz_sie_lasic.mobi
+Plik: Na_haju.mobi
+Plik: Nowa_zimna_wojna.mobi
+Plik: Shitshow.mobi
+Plik: Winy_ktore_nosimy.mobi
+Plik: co_zasiejesz_to_zbierzesz.mobi
+Plik: powiedziala-wydawnictwo_poznanskie.mobi
+Strona wygenerowana: 2025-01-01 19:42:07
