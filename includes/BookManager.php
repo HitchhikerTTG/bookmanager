@@ -61,9 +61,8 @@ class BookManager {
 
     public function getUnprocessedBooks() {
         $allFiles = glob('_ksiazki/*.*');
-        $processedBooks = $this->getProcessedBooks();
-        $processedFiles = array_column($processedBooks, 'file_name');
-        return array_map('basename', array_diff($allFiles, $processedFiles));
+        $booksWithCompleteMetadata = array_column($this->getProcessedBooks(), 'file_name');
+        return array_values(array_diff(array_map('basename', $allFiles), $booksWithCompleteMetadata));
     }
 
     public function getProcessedBooks() {
