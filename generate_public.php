@@ -15,9 +15,9 @@ debug_log("Unprocessed books loaded: " . count($unprocessedBooks) . " books");
 $generationTime = date('Y-m-d H:i:s');
 debug_log("Generation time set: " . $generationTime);
 
-// Get sorting parameter
-$sort = $_GET['sort'] ?? 'title';
-$search = $_GET['search'] ?? '';
+// Get sorting parameter and sanitize inputs
+$sort = htmlspecialchars($_GET['sort'] ?? 'title');
+$search = htmlspecialchars($_GET['search'] ?? '');
 debug_log("Sort parameter: " . $sort);
 debug_log("Search parameter: " . $search);
 
@@ -35,13 +35,15 @@ if ($search !== '') {
 usort($processedBooks, function($a, $b) use ($sort) {
     switch ($sort) {
         case 'author':
-            $authorA = isset($a['authors'][0]['last_name'], $a['authors'][0]['first_name']) ? $a['authors'][0]['last_name'] . ' ' . $a['authors'][0]['first_name'] : '';
-            $authorB = isset($b['authors'][0]['last_name'], $b['authors'][0]['first_name']) ? $b['authors'][0]['last_name'] . ' ' . $b['authors'][0]['first_name'] : '';
+            $authorA = isset($a['authors'][0]) ? ($a['authors'][0]['last_name'] ?? '') . ' ' . ($a['authors'][0]['first_name'] ?? '') : '';
+            $authorB = isset($b['authors'][0]) ? ($b['authors'][0]['last_name'] ?? '') . ' ' . ($b['authors'][0]['first_name'] ?? '') : '';
             return strcasecmp($authorA, $authorB);
         case 'date':
-            return isset($a['upload_date'], $b['upload_date']) ? $b['upload_date'] - $a['upload_date'] : 0;
+            return isset($a['upload_date'], $b['upload_date']) ? strtotime($b['upload_date']) - strtotime($a['upload_date']) : 0;
         case 'genre':
-            return isset($a['genres'][0], $b['genres'][0]) ? strcasecmp($a['genres'][0], $b['genres'][0]) : 0;
+            $genreA = isset($a['genres'][0]) ? $a['genres'][0] : '';
+            $genreB = isset($b['genres'][0]) ? $b['genres'][0] : '';
+            return strcasecmp($genreA, $genreB);
         default: // title
             return strcasecmp($a['title'], $b['title']);
     }
@@ -131,7 +133,7 @@ $html .= <<<HTML
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    let currentSort = '<?php echo $sort; ?>';
+    let currentSort = <?php echo json_encode($sort); ?>;
     const books = <?php echo json_encode($processedBooks); ?>;
     
     function updateSort(sortType) {
