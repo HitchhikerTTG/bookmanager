@@ -29,10 +29,6 @@ try {
     <meta name="generation-time" content="{$generationTime}">
     <title>Moja Biblioteka</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .book-card { transition: transform 0.2s; }
-        .book-card:hover { transform: translateY(-5px); }
-    </style>
 </head>
 <body>
     <div class="container py-4">
@@ -54,7 +50,18 @@ try {
             </div>
         </div>
 
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="booksList">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="booksTable">
+                <thead>
+                    <tr>
+                        <th>Tytuł</th>
+                        <th>Autor</th>
+                        <th>Gatunki</th>
+                        <th>Data dodania</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
 HTML;
 
     foreach ($processedBooks as $book) {
@@ -66,23 +73,23 @@ HTML;
         $date = date('Y-m-d', $book['upload_date']);
         
         $html .= <<<HTML
-            <div class="col">
-                <div class="card h-100 book-card">
-                    <div class="card-body">
-                        <h5 class="card-title">{$book['title']}</h5>
-                        <p class="card-text"><strong>Autor:</strong> {$authors}</p>
-                        <p class="card-text"><strong>Gatunki:</strong> {$genres}</p>
-                        <p class="card-text"><small class="text-muted">Dodano: {$date}</small></p>
-                        <a href="_ksiazki/{$book['file_name']}" class="btn btn-primary">Pobierz</a>
-                    </div>
-                </div>
-            </div>
+                    <tr>
+                        <td>{$book['title']}</td>
+                        <td>{$authors}</td>
+                        <td>{$genres}</td>
+                        <td>{$date}</td>
+                        <td>
+                            <a href="_ksiazki/{$book['file_name']}" class="btn btn-primary btn-sm">Pobierz</a>
+                        </td>
+                    </tr>
 HTML;
     }
 
     $booksJson = json_encode($processedBooks);
     
     $html .= <<<HTML
+                </tbody>
+            </table>
         </div>
     </div>
     
@@ -119,25 +126,23 @@ HTML;
     }
     
     function renderBooks(booksToRender) {
-        const container = document.getElementById('booksList');
-        container.innerHTML = booksToRender.map(book => {
+        const tbody = document.querySelector('#booksTable tbody');
+        tbody.innerHTML = booksToRender.map(book => {
             const authors = book.authors.map(a => 
                 `\${a.first_name} \${a.last_name}`).join(', ');
             const genres = book.genres.join(', ');
             const date = new Date(book.upload_date * 1000).toISOString().split('T')[0];
             
             return `
-                <div class="col">
-                    <div class="card h-100 book-card">
-                        <div class="card-body">
-                            <h5 class="card-title">\${book.title}</h5>
-                            <p class="card-text"><strong>Autor:</strong> \${authors}</p>
-                            <p class="card-text"><strong>Gatunki:</strong> \${genres}</p>
-                            <p class="card-text"><small class="text-muted">Dodano: \${date}</small></p>
-                            <a href="_ksiazki/\${book.file_name}" class="btn btn-primary">Pobierz</a>
-                        </div>
-                    </div>
-                </div>
+                <tr>
+                    <td>\${book.title}</td>
+                    <td>\${authors}</td>
+                    <td>\${genres}</td>
+                    <td>\${date}</td>
+                    <td>
+                        <a href="_ksiazki/\${book.file_name}" class="btn btn-primary btn-sm">Pobierz</a>
+                    </td>
+                </tr>
             `;
         }).join('');
     }
