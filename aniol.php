@@ -57,6 +57,7 @@ $manager = new BookManager();
 <body>
     <div class="container mt-4">
         <h1>Book Manager</h1>
+        <button onclick="generatePublicPage()" class="btn btn-primary mb-3">Generuj stronę publiczną</button>
         <?php include 'templates/library.php'; ?>
         
         <div class="row mt-4">
@@ -157,4 +158,19 @@ $manager = new BookManager();
         });
     </script>
 </body>
+
+        <script>
+            function generatePublicPage() {
+                fetch('generate_public.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.success) {
+                            alert('Strona została wygenerowana pomyślnie');
+                        }
+                    });
+            }
+        </script>
+    </body>
+</html>
+
 </html>
