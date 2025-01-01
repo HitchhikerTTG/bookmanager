@@ -3,6 +3,8 @@
 require_once 'includes/BookManager.php';
 $manager = new BookManager();
 
+$processedBooks = $manager->getProcessedBooks();
+$unprocessedBooks = $manager->getUnprocessedBooks();
 $generationTime = date('Y-m-d H:i:s');
 
 $html = <<<HTML
@@ -18,6 +20,48 @@ $html = <<<HTML
 <body>
     <div class="container mt-4">
         <h1>Moja Biblioteka</h1>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h2>Książki z metadanymi</h2>
+                <div class="list-group">
+HTML;
+
+foreach ($processedBooks as $book) {
+    $authors = array_map(function($author) {
+        return $author['first_name'] . ' ' . $author['last_name'];
+    }, $book['authors']);
+    
+    $html .= <<<HTML
+    <div class="list-group-item">
+        <h5 class="mb-1">{$book['title']}</h5>
+        <p class="mb-1">Autorzy: {$authors}</p>
+        <small>Plik: {$book['file_name']}</small>
+    </div>
+HTML;
+}
+
+$html .= <<<HTML
+                </div>
+            </div>
+            
+            <div class="col-12 mt-4">
+                <h2>Książki bez metadanych</h2>
+                <div class="list-group">
+HTML;
+
+foreach ($unprocessedBooks as $fileName) {
+    $html .= <<<HTML
+    <div class="list-group-item">
+        <p class="mb-1">Plik: {$fileName}</p>
+    </div>
+HTML;
+}
+
+$html .= <<<HTML
+                </div>
+            </div>
+        </div>
         
         <footer class="mt-5 text-muted">
             <p>Strona wygenerowana: $generationTime</p>
