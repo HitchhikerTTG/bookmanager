@@ -1,10 +1,19 @@
 <?php
+function debug_log($message) {
+    echo "DEBUG: " . $message . "\n";
+}
+
 require_once 'includes/BookManager.php';
+debug_log("BookManager loaded");
 $manager = new BookManager();
+debug_log("BookManager initialized");
 
 $processedBooks = $manager->getProcessedBooks();
+debug_log("Processed books loaded: " . count($processedBooks) . " books");
 $unprocessedBooks = $manager->getUnprocessedBooks();
+debug_log("Unprocessed books loaded: " . count($unprocessedBooks) . " books");
 $generationTime = date('Y-m-d H:i:s');
+debug_log("Generation time set: " . $generationTime);
 
 // Get sorting parameter
 $sort = $_GET['sort'] ?? 'title';
@@ -186,7 +195,13 @@ $html .= <<<HTML
 </html>
 HTML;
 
-file_put_contents('index.html', $html);
-
-header('Content-Type: application/json');
-echo json_encode(['success' => true]);
+debug_log("Attempting to write to index.html");
+if(file_put_contents('index.html', $html) !== false) {
+    debug_log("Successfully wrote to index.html");
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'debug_messages' => 'Check server logs for details']);
+} else {
+    debug_log("Failed to write to index.html");
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'Failed to write file']);
+}
