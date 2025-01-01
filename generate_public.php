@@ -7,18 +7,6 @@ $processedBooks = $manager->getProcessedBooks();
 $unprocessedBooks = $manager->getUnprocessedBooks();
 $generationTime = date('Y-m-d H:i:s');
 
-// Debug information
-$allFiles = glob('_ksiazki/*.*');
-$debug = "<h3>Debug informacje:</h3>";
-$debug .= "<pre>";
-$debug .= "1. Wszystkie pliki w katalogu _ksiazki:\n";
-$debug .= print_r($allFiles, true);
-$debug .= "\n\n2. Książki z kompletnymi metadanymi:\n";
-$debug .= print_r($processedBooks, true);
-$debug .= "\n\n3. Książki bez metadanych:\n";
-$debug .= print_r($unprocessedBooks, true);
-$debug .= "</pre>";
-
 $html = <<<HTML
 <!DOCTYPE html>
 <html lang="pl">
@@ -32,8 +20,6 @@ $html = <<<HTML
 <body>
     <div class="container mt-4">
         <h1>Moja Biblioteka</h1>
-        
-        {$debug}
         
         <div class="row mt-4">
             <div class="col-12">
