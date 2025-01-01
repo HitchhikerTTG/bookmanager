@@ -50,22 +50,20 @@ $html = <<<HTML
         
         <div class="row mt-4">
             <div class="col-12 mb-3">
-                <form class="row g-3" method="get">
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" name="search" placeholder="Szukaj po tytule..." value="{$search}">
+                <div class="row g-3">
+                    <div class="col-md-6" id="searchContainer">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Wyszukaj..." value="{$search}">
+                        <div id="searchSuggestions" class="list-group mt-1 position-absolute w-100" style="z-index: 1000; display: none;"></div>
                     </div>
-                    <div class="col-md-4">
-                        <select class="form-select" name="sort">
-                            <option value="title" <?php echo $sort === 'title' ? 'selected' : ''; ?>>Sortuj po tytule</option>
-                            <option value="author" <?php echo $sort === 'author' ? 'selected' : ''; ?>>Sortuj po autorze</option>
-                            <option value="date" <?php echo $sort === 'date' ? 'selected' : ''; ?>>Sortuj po dacie</option>
-                            <option value="genre" <?php echo $sort === 'genre' ? 'selected' : ''; ?>>Sortuj po gatunku</option>
-                        </select>
+                    <div class="col-md-6">
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-primary <?php echo $sort === 'title' ? 'active' : ''; ?>" onclick="updateSort('title')">Po tytule</button>
+                            <button type="button" class="btn btn-outline-primary <?php echo $sort === 'author' ? 'active' : ''; ?>" onclick="updateSort('author')">Po autorze</button>
+                            <button type="button" class="btn btn-outline-primary <?php echo $sort === 'date' ? 'active' : ''; ?>" onclick="updateSort('date')">Po dacie</button>
+                            <button type="button" class="btn btn-outline-primary <?php echo $sort === 'genre' ? 'active' : ''; ?>" onclick="updateSort('genre')">Po gatunku</button>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary">Zastosuj</button>
-                    </div>
-                </form>
+                </div>
             </div>
             
             <div class="col-12">
@@ -116,6 +114,72 @@ $html .= <<<HTML
         </footer>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    let currentSort = '<?php echo $sort; ?>';
+    const books = <?php echo json_encode($processedBooks); ?>;
+    
+    function updateSort(sortType) {
+        window.location.href = '?' + new URLSearchParams({
+            sort: sortType,
+            search: document.getElementById('searchInput').value
+        }).toString();
+    }
+
+    function updateSearchVisibility() {
+        const searchContainer = document.getElementById('searchContainer');
+        if (currentSort === 'date' || currentSort === 'genre') {
+            searchContainer.style.display = 'none';
+        } else {
+            searchContainer.style.display = 'block';
+        }
+    }
+
+    function getSuggestions(input) {
+        if (!input) return [];
+        input = input.toLowerCase();
+        const suggestions = new Set();
+        
+        books.forEach(book => {
+            if (currentSort === 'title' && book.title.toLowerCase().includes(input)) {
+                suggestions.add(book.title);
+            } else if (currentSort === 'author') {
+                book.authors.forEach(author => {
+                    const fullName = `${author.first_name} ${author.last_name}`;
+                    if (fullName.toLowerCase().includes(input)) {
+                        suggestions.add(fullName);
+                    }
+                });
+            }
+        });
+        
+        return Array.from(suggestions).slice(0, 5);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const suggestions = getSuggestions(e.target.value);
+        const suggestionsList = document.getElementById('searchSuggestions');
+        
+        if (suggestions.length > 0) {
+            suggestionsList.innerHTML = suggestions.map(s => 
+                `<a href="#" class="list-group-item list-group-item-action">${s}</a>`
+            ).join('');
+            suggestionsList.style.display = 'block';
+        } else {
+            suggestionsList.style.display = 'none';
+        }
+    });
+
+    document.getElementById('searchSuggestions').addEventListener('click', function(e) {
+        if (e.target.tagName === 'A') {
+            e.preventDefault();
+            document.getElementById('searchInput').value = e.target.textContent;
+            this.style.display = 'none';
+            updateSort(currentSort);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', updateSearchVisibility);
+    </script>
 </body>
 </html>
 HTML;
