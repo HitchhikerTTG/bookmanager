@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -9,9 +10,6 @@ debug_log("Script started");
 
 require_once 'includes/BookManager.php';
 $manager = new BookManager();
-
-$stats = $manager->getStats(); // Assuming getStats() returns an array with 'lastUpdate'
-
 ?>
 <!DOCTYPE html>
 
@@ -59,50 +57,8 @@ $stats = $manager->getStats(); // Assuming getStats() returns an array with 'las
 <body>
     <div class="container mt-4">
         <h1>Book Manager</h1>
-
-        <nav class="navbar navbar-light bg-light mt-3">
-            <div class="container-fluid">
-                <div>Last Update: <?php echo $stats['lastUpdate']; ?></div>
-                <div class="ms-3">Last HTML Update: <?php echo date('Y-m-d H:i:s', file_exists('index.html') ? filemtime('index.html') : 0); ?></div>
-                <button onclick="generatePublicPage()" class="btn btn-primary ms-3">Generuj stronę publiczną</button>
-            </div>
-        </nav>
-                <div>Last Update: <?php echo $stats['lastUpdate']; ?></div>
-                <div class="ms-3">Last HTML Update: <?php echo date('Y-m-d H:i:s', file_exists('index.html') ? filemtime('index.html') : 0); ?></div>
-                <button onclick="generatePublicPage()" class="btn btn-primary ms-3">Generuj stronę publiczną</button>
-            </div>
-        </nav>
-
-
-        <div class="row mt-4">
-            <div class="col-12">
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="my-library-tab" data-bs-toggle="tab" data-bs-target="#my-library" type="button" role="tab" aria-controls="my-library" aria-selected="true">Moja biblioteka</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="preparing-books-tab" data-bs-toggle="tab" data-bs-target="#preparing-books" type="button" role="tab" aria-controls="preparing-books" aria-selected="false">Książki w przygotowaniu</button>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="my-library" role="tabpanel" aria-labelledby="my-library-tab">
-                        <?php
-                            $booksWithTitleAndAuthor = $manager->countBooksWithTitleAndAuthor();
-                            echo "<p>Liczba książek z tytułem i autorem: " . $booksWithTitleAndAuthor . "</p>";
-                        ?>
-                    </div>
-                    <div class="tab-pane fade" id="preparing-books" role="tabpanel" aria-labelledby="preparing-books-tab">
-                        <?php
-                            $booksWithoutTitleAndAuthor = $manager->countBooksWithoutTitleAndAuthor();
-                            echo "<p>Liczba książek bez tytułu i autora: " . $booksWithoutTitleAndAuthor . "</p>";
-                        ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <?php include 'templates/library.php'; ?>
-
+        
         <div class="row mt-4">
             <div class="col-md-6">
                 <h3>Authors Statistics</h3>
@@ -199,26 +155,6 @@ $stats = $manager->getStats(); // Assuming getStats() returns an array with 'las
                 initializeAutocomplete(rowId);
             });
         });
-
-        function generatePublicPage() {
-            fetch('generate_public.php')
-                .then(response => response.json())
-                .then(data => {
-                    if(data.success) {
-                        location.reload();
-                    }
-                });
-        }
-
-        function generatePublicPage() {
-            fetch('generate_public.php')
-                .then(response => response.json())
-                .then(data => {
-                    if(data.success) {
-                        location.reload();
-                    }
-                });
-        }
     </script>
 </body>
 </html>
