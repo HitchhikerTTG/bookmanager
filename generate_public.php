@@ -7,6 +7,18 @@ $processedBooks = $manager->getProcessedBooks();
 $unprocessedBooks = $manager->getUnprocessedBooks();
 $generationTime = date('Y-m-d H:i:s');
 
+// Debug information
+$allFiles = glob('_ksiazki/*.*');
+$debug = "<h3>Debug informacje:</h3>";
+$debug .= "<pre>";
+$debug .= "1. Wszystkie pliki w katalogu _ksiazki:\n";
+$debug .= print_r($allFiles, true);
+$debug .= "\n\n2. Książki z kompletnymi metadanymi:\n";
+$debug .= print_r($processedBooks, true);
+$debug .= "\n\n3. Książki bez metadanych:\n";
+$debug .= print_r($unprocessedBooks, true);
+$debug .= "</pre>";
+
 $html = <<<HTML
 <!DOCTYPE html>
 <html lang="pl">
@@ -21,6 +33,8 @@ $html = <<<HTML
     <div class="container mt-4">
         <h1>Moja Biblioteka</h1>
         
+        {$debug}
+        
         <div class="row mt-4">
             <div class="col-12">
                 <h2>Książki z metadanymi</h2>
@@ -28,9 +42,9 @@ $html = <<<HTML
 HTML;
 
 foreach ($processedBooks as $book) {
-    $authors = array_map(function($author) {
+    $authors = implode(', ', array_map(function($author) {
         return $author['first_name'] . ' ' . $author['last_name'];
-    }, $book['authors']);
+    }, $book['authors']));
     
     $html .= <<<HTML
     <div class="list-group-item">
