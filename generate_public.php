@@ -76,6 +76,9 @@ foreach ($processedBooks as $book) {
         return $author['first_name'] . ' ' . $author['last_name'];
     }, $book['authors']));
     
+    $genres = implode(', ', $book['genres']);
+    $date = date('Y-m-d', $book['upload_date']);
+    
     $html .= <<<HTML
     <div class="list-group-item">
         <h5 class="mb-1"><a href="_ksiazki/{$book['file_name']}">{$book['title']}</a></h5>
