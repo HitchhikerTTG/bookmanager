@@ -34,9 +34,9 @@ foreach ($processedBooks as $book) {
     
     $html .= <<<HTML
     <div class="list-group-item">
-        <h5 class="mb-1">{$book['title']}</h5>
+        <h5 class="mb-1"><a href="_ksiazki/{$book['file_name']}">{$book['title']}</a></h5>
         <p class="mb-1">Autorzy: {$authors}</p>
-        <small>Plik: {$book['file_name']}</small>
+        <small><a href="http://{$_SERVER['HTTP_HOST']}/_ksiazki/{$book['file_name']}">alternatywnie pobierz po http</a></small>
     </div>
 HTML;
 }
