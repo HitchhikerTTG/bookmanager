@@ -7,6 +7,33 @@ $processedBooks = $manager->getProcessedBooks();
 $unprocessedBooks = $manager->getUnprocessedBooks();
 $generationTime = date('Y-m-d H:i:s');
 
+// Get sorting parameter
+$sort = $_GET['sort'] ?? 'title';
+$search = $_GET['search'] ?? '';
+
+// Filter books based on search
+if ($search !== '') {
+    $processedBooks = array_filter($processedBooks, function($book) use ($search) {
+        return stripos($book['title'], $search) !== false;
+    });
+}
+
+// Sort books
+usort($processedBooks, function($a, $b) use ($sort) {
+    switch ($sort) {
+        case 'author':
+            $authorA = $a['authors'][0]['last_name'] . ' ' . $a['authors'][0]['first_name'];
+            $authorB = $b['authors'][0]['last_name'] . ' ' . $b['authors'][0]['first_name'];
+            return strcasecmp($authorA, $authorB);
+        case 'date':
+            return $b['upload_date'] - $a['upload_date'];
+        case 'genre':
+            return strcasecmp($a['genres'][0], $b['genres'][0]);
+        default: // title
+            return strcasecmp($a['title'], $b['title']);
+    }
+});
+
 $html = <<<HTML
 <!DOCTYPE html>
 <html lang="pl">
@@ -22,6 +49,25 @@ $html = <<<HTML
         <h1>Moja Biblioteka</h1>
         
         <div class="row mt-4">
+            <div class="col-12 mb-3">
+                <form class="row g-3" method="get">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="search" placeholder="Szukaj po tytule..." value="{$search}">
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" name="sort">
+                            <option value="title" <?php echo $sort === 'title' ? 'selected' : ''; ?>>Sortuj po tytule</option>
+                            <option value="author" <?php echo $sort === 'author' ? 'selected' : ''; ?>>Sortuj po autorze</option>
+                            <option value="date" <?php echo $sort === 'date' ? 'selected' : ''; ?>>Sortuj po dacie</option>
+                            <option value="genre" <?php echo $sort === 'genre' ? 'selected' : ''; ?>>Sortuj po gatunku</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">Zastosuj</button>
+                    </div>
+                </form>
+            </div>
+            
             <div class="col-12">
                 <h2>Książki z metadanymi</h2>
                 <div class="list-group">
@@ -36,6 +82,8 @@ foreach ($processedBooks as $book) {
     <div class="list-group-item">
         <h5 class="mb-1"><a href="_ksiazki/{$book['file_name']}">{$book['title']}</a></h5>
         <p class="mb-1">Autorzy: {$authors}</p>
+        <p class="mb-1">Gatunki: {$genres}</p>
+        <small>Data dodania: {$date}</small><br>
         <small><a href="http://{$_SERVER['HTTP_HOST']}/_ksiazki/{$book['file_name']}">alternatywnie pobierz po http</a></small>
     </div>
 HTML;
