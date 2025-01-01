@@ -18,6 +18,11 @@ debug_log("Generation time set: " . $generationTime);
 // Get sorting parameter
 $sort = $_GET['sort'] ?? 'title';
 $search = $_GET['search'] ?? '';
+debug_log("Sort parameter: " . $sort);
+debug_log("Search parameter: " . $search);
+
+// Debug books array
+debug_log("Books array structure: " . print_r($processedBooks, true));
 
 // Filter books based on search
 if ($search !== '') {
