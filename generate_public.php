@@ -15,7 +15,6 @@ try {
     
     $generationTime = date('Y-m-d H:i:s');
     
-    // Sort books by title by default
     usort($processedBooks, function($a, $b) {
         return strcasecmp($a['title'], $b['title']);
     });
@@ -29,6 +28,31 @@ try {
     <meta name="generation-time" content="{$generationTime}">
     <title>Moja Biblioteka</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .book-card {
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+        .book-card:hover {
+            transform: translateY(-2px);
+        }
+        .book-title {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .book-title:hover {
+            text-decoration: underline;
+        }
+        .book-metadata {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+        .book-series {
+            font-style: italic;
+            color: #28a745;
+        }
+    </style>
 </head>
 <body>
     <div class="container py-4">
@@ -50,18 +74,7 @@ try {
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped table-hover" id="booksTable">
-                <thead>
-                    <tr>
-                        <th>Tytuł</th>
-                        <th>Autor</th>
-                        <th>Gatunki</th>
-                        <th>Data dodania</th>
-                        <th>Akcje</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <div class="row" id="booksList">
 HTML;
 
     foreach ($processedBooks as $book) {
@@ -70,26 +83,30 @@ HTML;
         }, $book['authors']));
         
         $genres = implode(', ', $book['genres']);
-        $date = date('Y-m-d', $book['upload_date']);
+        $seriesInfo = '';
+        if (!empty($book['series'])) {
+            $seriesInfo = "<div class='book-series'>{$book['series']} #{$book['series_position']}</div>";
+        }
         
         $html .= <<<HTML
-                    <tr>
-                        <td>{$book['title']}</td>
-                        <td>{$authors}</td>
-                        <td>{$genres}</td>
-                        <td>{$date}</td>
-                        <td>
-                            <a href="_ksiazki/{$book['file_name']}" class="btn btn-primary btn-sm">Pobierz</a>
-                        </td>
-                    </tr>
+            <div class="col-12 book-card">
+                <div class="card">
+                    <div class="card-body">
+                        <a href="_ksiazki/{$book['file_name']}" class="book-title">{$book['title']}</a>
+                        <div class="book-metadata">
+                            <strong>Autorzy:</strong> {$authors}<br>
+                            <strong>Gatunki:</strong> {$genres}
+                            {$seriesInfo}
+                        </div>
+                    </div>
+                </div>
+            </div>
 HTML;
     }
 
     $booksJson = json_encode($processedBooks);
     
     $html .= <<<HTML
-                </tbody>
-            </table>
         </div>
     </div>
     
@@ -120,29 +137,37 @@ HTML;
                 (author.first_name + ' ' + author.last_name)
                 .toLowerCase()
                 .includes(query)
-            )
+            ) ||
+            book.genres.some(genre => 
+                genre.toLowerCase().includes(query)
+            ) ||
+            (book.series && book.series.toLowerCase().includes(query))
         );
         renderBooks(filtered);
     }
     
     function renderBooks(booksToRender) {
-        const tbody = document.querySelector('#booksTable tbody');
-        tbody.innerHTML = booksToRender.map(book => {
+        const container = document.getElementById('booksList');
+        container.innerHTML = booksToRender.map(book => {
             const authors = book.authors.map(a => 
                 `\${a.first_name} \${a.last_name}`).join(', ');
             const genres = book.genres.join(', ');
-            const date = new Date(book.upload_date * 1000).toISOString().split('T')[0];
+            const seriesInfo = book.series ? 
+                `<div class="book-series">\${book.series} #\${book.series_position}</div>` : '';
             
             return `
-                <tr>
-                    <td>\${book.title}</td>
-                    <td>\${authors}</td>
-                    <td>\${genres}</td>
-                    <td>\${date}</td>
-                    <td>
-                        <a href="_ksiazki/\${book.file_name}" class="btn btn-primary btn-sm">Pobierz</a>
-                    </td>
-                </tr>
+                <div class="col-12 book-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <a href="_ksiazki/\${book.file_name}" class="book-title">\${book.title}</a>
+                            <div class="book-metadata">
+                                <strong>Autorzy:</strong> \${authors}<br>
+                                <strong>Gatunki:</strong> \${genres}
+                                \${seriesInfo}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
         }).join('');
     }
