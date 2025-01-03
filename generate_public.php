@@ -199,10 +199,10 @@ foreach (\$filteredBooks as \$book) {
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title d-flex justify-content-between">
-                        <a href="\$httpsLink" class="text-decoration-none">{\$book['title']}</a>
-                        <a href="\$httpLink" class="btn btn-sm btn-primary">http</a>
-                    </h5>
+        <h5 class="card-title d-flex align-items-center">
+            <a href="<?= $httpsLink ?>" class="text-decoration-none flex-grow-1"><?= htmlspecialchars($book['title']) ?></a>
+            <a href="<?= $httpLink ?>" class="btn btn-sm btn-primary ms-auto">http</a>
+        </h5>
                     <p class="card-text d-flex justify-content-between">
                         <span>Autor: {\$authors}</span>
                         <span>Gatunek: {\$genres}</span>
