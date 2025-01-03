@@ -198,21 +198,22 @@ foreach (\$filteredBooks as \$book) {
     echo <<<HTML
         <div class="col-12">
             <div class="card">
+                 <div class="card-header">{\$genres}</div>
                 <div class="card-body">
                     <h5 class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
                         <a href="\$httpsLink"style="text-decoration: none; flex-grow: 1;">{\$book['title']}</a>
                         <a href="\$httpLink" style="margin-left: auto; padding: 0.2em 0.5em; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">http</a>
                     </h5>
+                        if (!empty(\$series)) {
+        echo <<<HTML
+        <h6 class="card-subtitle mb-2 text-body-secondary">{\$series}</h6>
+HTML;
                     <p class="card-text" style="display: flex; justify-content: space-between;">
                         <span>Autor: {\$authors}</span>
-                        <span>Gatunek: {\$genres}</span>
                     </p>
 HTML;
 
-    if (!empty(\$series)) {
-        echo <<<HTML
-                    <p class="card-text">Seria: {\$series}</p>
-HTML;
+
     }
 
     echo <<<HTML
