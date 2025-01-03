@@ -13,41 +13,62 @@ try {
     $processedBooks = $manager->getProcessedBooks();
     $generationTime = date('Y-m-d H:i:s');
     
-    // Get all unique genres
+    // Get all unique genres and series
     $allGenres = [];
+    $allSeries = [];
     foreach ($processedBooks as $book) {
         foreach ($book['genres'] as $genre) {
             if (!in_array($genre, $allGenres)) {
                 $allGenres[] = $genre;
             }
         }
+        if (!empty($book['series']) && !in_array($book['series'], $allSeries)) {
+            $allSeries[] = $book['series'];
+        }
     }
     sort($allGenres);
-    debug_log("Found " . count($allGenres) . " unique genres");
+    sort($allSeries);
+    debug_log("Found " . count($allGenres) . " unique genres and " . count($allSeries) . " series");
 
-    // Handle sorting
+    // Handle sorting and filtering
     $sort = isset($_GET['sort']) ? sanitizeInput($_GET['sort']) : 'title';
     $selectedGenre = isset($_GET['genre']) ? sanitizeInput($_GET['genre']) : '';
+    $selectedSeries = isset($_GET['series']) ? sanitizeInput($_GET['series']) : '';
 
     // Sort books
-    switch($sort) {
-        case 'author':
-            usort($processedBooks, function($a, $b) {
-                return strcasecmp($a['authors'][0]['last_name'], $b['authors'][0]['last_name']);
-            });
-            break;
-        default:
-            usort($processedBooks, function($a, $b) {
-                return strcasecmp($a['title'], $b['title']);
-            });
+    if ($selectedSeries) {
+        usort($processedBooks, function($a, $b) {
+            if (empty($a['series_position'])) return 1;
+            if (empty($b['series_position'])) return -1;
+            return $a['series_position'] - $b['series_position'];
+        });
+    } else {
+        switch($sort) {
+            case 'author':
+                usort($processedBooks, function($a, $b) {
+                    return strcasecmp($a['authors'][0]['last_name'], $b['authors'][0]['last_name']);
+                });
+                break;
+            default:
+                usort($processedBooks, function($a, $b) {
+                    return strcasecmp($a['title'], $b['title']);
+                });
+        }
     }
 
-    debug_log("Books sorted by: " . $sort);
+    debug_log("Books sorted by: " . ($selectedSeries ? 'series position' : $sort));
 
     // Filter by genre if selected
     if ($selectedGenre && $selectedGenre !== 'all') {
         $processedBooks = array_filter($processedBooks, function($book) use ($selectedGenre) {
             return in_array($selectedGenre, $book['genres']);
+        });
+    }
+
+    // Filter by series if selected
+    if ($selectedSeries) {
+        $processedBooks = array_filter($processedBooks, function($book) use ($selectedSeries) {
+            return $book['series'] === $selectedSeries;
         });
     }
 
@@ -92,6 +113,13 @@ try {
             font-size: 0.8em;
             color: #666;
         }
+        .series-link {
+            color: #28a745;
+            text-decoration: none;
+        }
+        .series-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -134,6 +162,15 @@ HTML;
         <div class="row">
 HTML;
 
+    if ($selectedSeries) {
+        $html .= <<<HTML
+            <div class="col-12 mb-4">
+                <h2>Seria: {$selectedSeries}</h2>
+                <a href="?" class="btn btn-outline-secondary btn-sm">Powrót do wszystkich książek</a>
+            </div>
+HTML;
+    }
+
     foreach ($processedBooks as $book) {
         $authors = implode(', ', array_map(function($author) {
             return htmlspecialchars($author['first_name'] . ' ' . $author['last_name']);
@@ -142,9 +179,11 @@ HTML;
         $genres = implode(', ', array_map('htmlspecialchars', $book['genres']));
         $seriesInfo = '';
         if (!empty($book['series'])) {
+            $seriesLink = htmlspecialchars($book['series']);
+            $position = htmlspecialchars($book['series_position']);
             $seriesInfo = "<div class='book-series'>" . 
-                         htmlspecialchars($book['series']) . 
-                         " #" . htmlspecialchars($book['series_position']) . 
+                         "<a href='?series={$seriesLink}' class='series-link'>" . 
+                         $seriesLink . "</a> #" . $position . 
                          "</div>";
         }
         
