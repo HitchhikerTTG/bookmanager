@@ -159,10 +159,20 @@ $indexContent .= <<<HTML
     </div>
 </div>
 
-<!-- Stopka -->
+// Debugowanie parametrów URL
+$getParamsDebug = htmlspecialchars(print_r($_GET, true));
+$logDebug = print_r($_GET, true);
+
+// Zapis parametrów URL do logu (opcjonalnie)
+file_put_contents('log.txt', $logDebug, FILE_APPEND);
+
+// Generowanie stopki z debugowaniem
+$indexContent .= <<<HTML
 <footer class="text-center mt-5">
     <p>Strona wygenerowana: $generationTime</p>
+    <pre>Debug GET params: $getParamsDebug</pre>
 </footer>
+HTML;
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
