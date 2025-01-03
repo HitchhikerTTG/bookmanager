@@ -103,25 +103,50 @@ if (empty(\$filteredBooks)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista książek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
+<style>
+        /* Poprawiona czytelność dla Kindle */
         body {
-            font-size: 24px;
+            font-family: Georgia, serif;
+            font-size: 1.5em; /* Około 24px */
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
         }
-        .card {
+
+        h1 {
+            font-size: 2em; /* Około 32px */
             margin-bottom: 1rem;
         }
-        .card-body p {
-            margin-bottom: 0.5rem;
+
+        .card {
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
         }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.6em; /* Około 24px */
+        }
+
         .btn-genre {
-            font-size: 24px;
-            margin: 0.2rem;
+            font-size: 1em; /* Około 16px */
+            margin: 0.3rem;
         }
-        @media (max-width: 1200px) {
-            .col-md-4 {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
+
+        .row {
+            margin: 0; /* Usuń marginesy dla rzędu */
+        }
+
+        .col-12 {
+            padding: 0.5rem;
+        }
+
+        /* Ustaw karty na pełną szerokość */
+        .card {
+            width: 100%;
         }
     </style>
 </head>
