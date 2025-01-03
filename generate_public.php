@@ -26,6 +26,9 @@ $booksFile = 'data/books.json';
 $booksData = loadJsonFile($booksFile);
 $books = $booksData['books'] ?? [];
 
+// Domenę można zmienić na rzeczywistą domenę witryny
+$domain = "https://twojadomena";
+
 // Generowanie pliku index.php
 $indexContent = <<<HTML
 <!DOCTYPE html>
@@ -40,35 +43,29 @@ $indexContent = <<<HTML
 <div class="container my-4">
     <h1 class="text-center mb-4">Lista książek</h1>
 
-    <!-- Filtry i sortowanie -->
+    <!-- Filtry gatunków -->
     <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center">
-            <!-- Sortowanie -->
-            <div>
-                <a href="?sort=title" class="btn btn-primary btn-sm">Sortuj po tytule</a>
-                <a href="?sort=author" class="btn btn-secondary btn-sm">Sortuj po autorze</a>
-            </div>
-
-            <!-- Filtry gatunków -->
-            <form method="get" class="d-inline">
-                <select name="genre" class="form-select form-select-sm" onchange="this.form.submit()">
-                    <option value="">Wszystkie gatunki</option>
+        <div class="d-flex flex-wrap">
+            <a href="?" class="btn btn-outline-secondary btn-sm me-2 mb-2">Wszystkie</a>
 HTML;
 
-// Dodanie gatunków do selektora
+// Dodanie przycisków gatunków
 $genres = array_unique(array_merge(...array_column($books, 'genres')));
 sort($genres);
 
 foreach ($genres as $genre) {
-    $selected = (isset($_GET['genre']) && $_GET['genre'] === $genre) ? 'selected' : '';
-    $indexContent .= "<option value=\"$genre\" $selected>$genre</option>";
+    $active = (isset($_GET['genre']) && $_GET['genre'] === $genre) ? 'btn-primary' : 'btn-outline-primary';
+    $indexContent .= "<a href=\"?genre=$genre\" class=\"btn $active btn-sm me-2 mb-2\">$genre</a>";
 }
 
 $indexContent .= <<<HTML
-                </select>
-                <a href="?" class="btn btn-link btn-sm">Resetuj filtr</a>
-            </form>
         </div>
+    </div>
+
+    <!-- Sortowanie -->
+    <div class="mb-3">
+        <a href="?sort=title" class="btn btn-primary btn-sm me-2">Sortuj po tytule</a>
+        <a href="?sort=author" class="btn btn-secondary btn-sm">Sortuj po autorze</a>
     </div>
 
     <!-- Lista książek -->
@@ -113,14 +110,16 @@ foreach ($books as $book) {
 
     $genres = implode(', ', $book['genres']);
     $series = $book['series'] ? "<a href=\"?series={$book['series']}\" class=\"text-decoration-none\">{$book['series']} ({$book['series_position']})</a>" : 'Brak';
+    $httpsLink = "$domain/_ksiazki/{$book['file_name']}";
+    $httpLink = str_replace('https://', 'http://', $httpsLink);
 
     $indexContent .= <<<HTML
         <div class="col-md-4 mb-3">
             <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a href="https://example.com/{$book['file_name']}" class="text-decoration-none">{$book['title']}</a>
-                        <a href="http://example.com/{$book['file_name']}" class="btn btn-sm btn-outline-primary">[http]</a>
+                        <a href="$httpsLink" class="text-decoration-none">{$book['title']}</a>
+                        <a href="$httpLink" class="btn btn-sm btn-outline-primary">[http]</a>
                     </h5>
                     <h6 class="card-subtitle text-muted">Autor: {$authors}</h6>
                     <p class="card-text">Gatunek: {$genres}</p>
