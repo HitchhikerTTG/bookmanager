@@ -7,10 +7,18 @@ require_once 'includes/functions.php';
 $debug = true;
 $logFile = 'logs/generate.log';
 
-// Funkcja logowania
+// Funkcja logowania z automatycznym tworzeniem katalogu
 function logMessage($message) {
     global $debug, $logFile;
     if ($debug) {
+        $logDir = dirname($logFile);
+
+        // Sprawdzenie, czy katalog istnieje, jeśli nie - utwórz
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+        }
+
+        // Zapis wiadomości do pliku logów
         file_put_contents($logFile, date('[Y-m-d H:i:s] ') . $message . PHP_EOL, FILE_APPEND);
     }
 }
