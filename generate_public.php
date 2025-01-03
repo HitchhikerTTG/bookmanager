@@ -1,99 +1,58 @@
 <?php
 
-// Funkcja do wczytywania danych z pliku JSON
-function loadJsonFile($filePath) {
-    if (!file_exists($filePath)) {
-        die("Błąd: Plik $filePath nie istnieje.");
-    }
-
-    $jsonData = file_get_contents($filePath);
-
-    if ($jsonData === false) {
-        die("Błąd: Nie można odczytać pliku $filePath. Sprawdź uprawnienia.");
-    }
-
-    $data = json_decode($jsonData, true);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        die("Błąd: Nie można zdekodować JSON z pliku $filePath. " . json_last_error_msg());
-    }
-
-    return $data;
-}
-
-// Wczytanie danych z JSON
-$booksFile = 'data/books.json';
-$booksData = loadJsonFile($booksFile);
-
-if (!isset($booksData['books']) || !is_array($booksData['books'])) {
-    die("Błąd: Nieprawidłowa struktura pliku JSON.");
-}
-
-$books = $booksData['books'];
-
-// Data i godzina generowania strony
-$generationTime = date('Y-m-d H:i:s');
-
-// Generowanie pliku index.php
-$indexContent = <<<PHP
-<?php
-
 // Dane książek
-\$books = json_decode('
-PHP;
-
-$indexContent .= json_encode($books, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-$indexContent .= <<<PHP
+$books = json_decode('
+<?php echo json_encode($books, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE); ?>
 ', true);
 
 // Dynamiczne pobieranie domeny
-\$protocol = (!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-\$domain = \$protocol . "://" . \$_SERVER['HTTP_HOST'];
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+$domain = $protocol . "://" . $_SERVER['HTTP_HOST'];
 
 // Parametry URL
-\$sort = \$_GET['sort'] ?? null;
-\$filterGenre = \$_GET['genre'] ?? null;
-\$filterSeries = \$_GET['series'] ?? null;
+$sort = $_GET['sort'] ?? null;
+$filterGenre = $_GET['genre'] ?? null;
+$filterSeries = $_GET['series'] ?? null;
 
 // Filtry i sortowanie
-\$filteredBooks = \$books;
+$filteredBooks = $books;
 
-if (\$filterGenre) {
-    \$filteredBooks = array_filter(\$filteredBooks, function (\$book) use (\$filterGenre) {
-        return in_array(\$filterGenre, \$book['genres']);
+if ($filterGenre) {
+    $filteredBooks = array_filter($filteredBooks, function ($book) use ($filterGenre) {
+        return in_array($filterGenre, $book['genres']);
     });
 }
 
-if (\$filterSeries) {
-    \$filteredBooks = array_filter(\$filteredBooks, function (\$book) use (\$filterSeries) {
-        return \$book['series'] === \$filterSeries;
+if ($filterSeries) {
+    $filteredBooks = array_filter($filteredBooks, function ($book) use ($filterSeries) {
+        return $book['series'] === $filterSeries;
     });
-    usort(\$filteredBooks, function (\$a, \$b) {
-        return ((int)(\$a['series_position'] ?? 0)) <=> ((int)(\$b['series_position'] ?? 0));
+    usort($filteredBooks, function ($a, $b) {
+        return ((int)($a['series_position'] ?? 0)) <=> ((int)($b['series_position'] ?? 0));
     });
-} elseif (\$sort === 'author') {
-    usort(\$filteredBooks, function (\$a, \$b) {
-        \$authorA = \$a['authors'][0]['last_name'] ?? '';
-        \$authorB = \$b['authors'][0]['last_name'] ?? '';
-        return strcmp(\$authorA, \$authorB);
+} elseif ($sort === 'author') {
+    usort($filteredBooks, function ($a, $b) {
+        $authorA = $a['authors'][0]['last_name'] ?? '';
+        $authorB = $b['authors'][0]['last_name'] ?? '';
+        return strcmp($authorA, $authorB);
     });
-} elseif (\$sort === 'title') {
-    usort(\$filteredBooks, function (\$a, \$b) {
-        return strcmp(\$a['title'], \$b['title']);
+} elseif ($sort === 'title') {
+    usort($filteredBooks, function ($a, $b) {
+        return strcmp($a['title'], $b['title']);
     });
 }
 
 // Generowanie informacji o filtrze
-\$filterDescription = "Wszystkie książki";
-if (\$filterGenre) {
-    \$filterDescription = "Książki z gatunku: " . htmlspecialchars(\$filterGenre);
+$filterDescription = "Wszystkie książki";
+if ($filterGenre) {
+    $filterDescription = "Książki z gatunku: " . htmlspecialchars($filterGenre);
 }
-if (\$filterSeries) {
-    \$filterDescription = "Książki z serii: " . htmlspecialchars(\$filterSeries);
+if ($filterSeries) {
+    $filterDescription = "Książki z serii: " . htmlspecialchars($filterSeries);
 }
 
-if (empty(\$filteredBooks)) {
-    \$filterDescription .= " (Brak wyników)";
+if (empty($filteredBooks)) {
+    $filterDescription .= " (Brak wyników)";
 }
 ?>
 <!DOCTYPE html>
@@ -103,6 +62,26 @@ if (empty(\$filteredBooks)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista książek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-size: 16px;
+        }
+        .card {
+            margin-bottom: 1rem;
+        }
+        .card-body p {
+            margin-bottom: 0.5rem;
+        }
+        .btn-genre {
+            font-size: 16px;
+            margin: 0.2rem;
+        }
+        @media (max-width: 768px) {
+            .card {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container my-4">
@@ -111,14 +90,14 @@ if (empty(\$filteredBooks)) {
     <!-- Filtry gatunków -->
     <div class="mb-3">
         <div class="d-flex flex-wrap">
-            <a href="?" class="btn btn-outline-secondary btn-sm me-2 mb-2">Wszystkie</a>
+            <a href="?" class="btn btn-outline-secondary btn-genre">Wszystkie</a>
 <?php
-\$genres = array_unique(array_merge(...array_filter(array_column(\$books, 'genres'))));
-sort(\$genres);
+$genres = array_unique(array_merge(...array_filter(array_column($books, 'genres'))));
+sort($genres);
 
-foreach (\$genres as \$genre) {
-    \$active = (isset(\$_GET['genre']) && \$_GET['genre'] === \$genre) ? 'btn-primary' : 'btn-outline-primary';
-    echo "<a href=\"?genre=" . htmlspecialchars(\$genre) . "\" class=\"btn \$active btn-sm me-2 mb-2\">" . htmlspecialchars(\$genre) . "</a>";
+foreach ($genres as $genre) {
+    $active = (isset($_GET['genre']) && $_GET['genre'] === $genre) ? 'btn-primary' : 'btn-outline-primary';
+    echo "<a href=\"?genre=" . htmlspecialchars($genre) . "\" class=\"btn $active btn-genre\">" . htmlspecialchars($genre) . "</a>";
 }
 ?>
         </div>
@@ -132,33 +111,44 @@ foreach (\$genres as \$genre) {
 
     <!-- Informacja o filtrach -->
     <div class="alert alert-info">
-        <strong>Wybrano:</strong> <?php echo \$filterDescription; ?>
+        <strong>Wybrano:</strong> <?php echo $filterDescription; ?>
     </div>
 
     <!-- Lista książek -->
     <div class="row">
 <?php
-foreach (\$filteredBooks as \$book) {
-    \$authors = implode(', ', array_map(function (\$author) {
-        return htmlspecialchars(\$author['first_name'] . ' ' . \$author['last_name']);
-    }, \$book['authors']));
+foreach ($filteredBooks as $book) {
+    $authors = implode(', ', array_map(function ($author) {
+        return htmlspecialchars($author['first_name'] . ' ' . $author['last_name']);
+    }, $book['authors']));
 
-    \$genres = implode(', ', array_map('htmlspecialchars', \$book['genres']));
-    \$series = \$book['series'] ? htmlspecialchars(\$book['series']) : 'Brak';
-    \$httpsLink = "\$domain/_ksiazki/" . htmlspecialchars(\$book['file_name']);
-    \$httpLink = str_replace('https://', 'http://', \$httpsLink);
+    $genres = implode(', ', array_map('htmlspecialchars', $book['genres']));
+    $series = $book['series'] ? htmlspecialchars($book['series']) . " (" . htmlspecialchars($book['series_position']) . ")" : '';
+
+    $httpsLink = "$domain/_ksiazki/" . htmlspecialchars($book['file_name']);
+    $httpLink = str_replace('https://', 'http://', $httpsLink);
 
     echo <<<HTML
-        <div class="col-md-4 mb-3">
-            <div class="card h-100">
+        <div class="col-md-4 col-sm-12">
+            <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a href="\$httpsLink" class="text-decoration-none">{\$book['title']}</a>
-                        <a href="\$httpLink" class="btn btn-sm btn-outline-primary">[http]</a>
+                        <a href="$httpsLink" class="text-decoration-none">{$book['title']}</a>
+                        <a href="$httpLink" class="btn btn-sm btn-outline-primary">[http]</a>
                     </h5>
-                    <h6 class="card-subtitle text-muted">Autor: {\$authors}</h6>
-                    <p class="card-text">Gatunek: {\$genres}</p>
-                    <p class="card-text">Seria: {\$series}</p>
+                    <p class="card-text d-flex justify-content-between">
+                        <span>Autor: {$authors}</span>
+                        <span>Gatunek: {$genres}</span>
+                    </p>
+HTML;
+
+    if (!empty($series)) {
+        echo <<<HTML
+                    <p class="card-text">Seria: {$series}</p>
+HTML;
+    }
+
+    echo <<<HTML
                 </div>
             </div>
         </div>
@@ -168,16 +158,8 @@ HTML;
     </div>
 </div>
 <footer class="text-center mt-5">
-    <p>Strona wygenerowana: <?php echo "$generationTime"; ?></p>
+    <p>Strona wygenerowana: <?php echo date('Y-m-d H:i:s'); ?></p>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-PHP;
-
-// Zapisanie pliku index.php
-if (file_put_contents('index.php', $indexContent) === false) {
-    die("Błąd: Nie można zapisać pliku index.php. Sprawdź uprawnienia katalogu.");
-}
-
-echo json_encode(['status' => 'success', 'message' => 'Plik index.php został wygenerowany.']);
