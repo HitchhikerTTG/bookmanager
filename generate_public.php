@@ -7,6 +7,11 @@ function loadJsonFile($filePath) {
     }
 
     $jsonData = file_get_contents($filePath);
+
+    if ($jsonData === false) {
+        die("Błąd: Nie można odczytać pliku $filePath. Sprawdź uprawnienia.");
+    }
+
     $data = json_decode($jsonData, true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
@@ -20,8 +25,11 @@ function loadJsonFile($filePath) {
 $booksFile = 'data/books.json';
 $listsFile = 'data/lists.json';
 
-$books = loadJsonFile($booksFile);
+$booksData = loadJsonFile($booksFile);
 $lists = loadJsonFile($listsFile);
+
+// Pobranie książek
+$books = $booksData['books'] ?? [];
 
 ?>
 
@@ -30,33 +38,40 @@ $lists = loadJsonFile($listsFile);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Podgląd danych</title>
+    <title>Podgląd danych książek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container my-4">
-    <h1 class="mb-4 text-center">Podgląd danych</h1>
+    <h1 class="mb-4 text-center">Podgląd danych książek</h1>
 
     <!-- Wyświetlenie książek -->
     <h2>Książki</h2>
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th>ID</th>
             <th>Tytuł</th>
-            <th>Autor</th>
-            <th>Gatunek</th>
+            <th>Autorzy</th>
+            <th>Gatunki</th>
             <th>Seria</th>
+            <th>Data przesłania</th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($books as $book): ?>
             <tr>
-                <td><?= htmlspecialchars($book['id']) ?></td>
                 <td><?= htmlspecialchars($book['title']) ?></td>
-                <td><?= htmlspecialchars($book['author']) ?></td>
-                <td><?= htmlspecialchars($book['genre']) ?></td>
-                <td><?= htmlspecialchars($book['series']) ?></td>
+                <td>
+                    <?php 
+                    $authors = array_map(function($author) {
+                        return $author['first_name'] . ' ' . $author['last_name'];
+                    }, $book['authors']);
+                    echo htmlspecialchars(implode(', ', $authors));
+                    ?>
+                </td>
+                <td><?= htmlspecialchars(implode(', ', $book['genres'])) ?></td>
+                <td><?= htmlspecialchars($book['series'] ?? 'Brak') ?></td>
+                <td><?= htmlspecialchars(date('Y-m-d', $book['upload_date'])) ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
