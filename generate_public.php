@@ -38,52 +38,6 @@ $domain = $protocol . "://" . $_SERVER['HTTP_HOST'];
 // Data i godzina generowania strony
 $generationTime = date('Y-m-d H:i:s');
 
-// Parametry URL
-$sort = $_GET['sort'] ?? null;
-$filterGenre = $_GET['genre'] ?? null;
-$filterSeries = $_GET['series'] ?? null;
-
-// Filtry i sortowanie
-$filteredBooks = $books;
-
-if ($filterGenre) {
-    $filteredBooks = array_filter($filteredBooks, function ($book) use ($filterGenre) {
-        return in_array($filterGenre, $book['genres']);
-    });
-}
-
-if ($filterSeries) {
-    $filteredBooks = array_filter($filteredBooks, function ($book) use ($filterSeries) {
-        return $book['series'] === $filterSeries;
-    });
-    usort($filteredBooks, function ($a, $b) {
-        return ((int)($a['series_position'] ?? 0)) <=> ((int)($b['series_position'] ?? 0));
-    });
-} elseif ($sort === 'author') {
-    usort($filteredBooks, function ($a, $b) {
-        $authorA = $a['authors'][0]['last_name'] ?? '';
-        $authorB = $b['authors'][0]['last_name'] ?? '';
-        return strcmp($authorA, $authorB);
-    });
-} elseif ($sort === 'title') {
-    usort($filteredBooks, function ($a, $b) {
-        return strcmp($a['title'], $b['title']);
-    });
-}
-
-// Generowanie informacji o filtrze
-$filterDescription = "Wszystkie książki";
-if ($filterGenre) {
-    $filterDescription = "Książki z gatunku: " . htmlspecialchars($filterGenre);
-}
-if ($filterSeries) {
-    $filterDescription = "Książki z serii: " . htmlspecialchars($filterSeries);
-}
-
-if (empty($filteredBooks)) {
-    $filterDescription .= " (Brak wyników)";
-}
-
 // Generowanie pliku index.php
 $indexContent = <<<HTML
 <!DOCTYPE html>
@@ -98,34 +52,9 @@ $indexContent = <<<HTML
 <div class="container my-4">
     <h1 class="text-center mb-4">Lista książek</h1>
 
-    <!-- Filtry gatunków -->
-    <div class="mb-3">
-        <div class="d-flex flex-wrap">
-            <a href="?" class="btn btn-outline-secondary btn-sm me-2 mb-2">Wszystkie</a>
-HTML;
-
-// Dodanie przycisków gatunków
-$genres = array_unique(array_merge(...array_filter(array_column($books, 'genres'))));
-sort($genres);
-
-foreach ($genres as $genre) {
-    $active = (isset($_GET['genre']) && $_GET['genre'] === $genre) ? 'btn-primary' : 'btn-outline-primary';
-    $indexContent .= "<a href=\"?genre=" . htmlspecialchars($genre) . "\" class=\"btn $active btn-sm me-2 mb-2\">" . htmlspecialchars($genre) . "</a>";
-}
-
-$indexContent .= <<<HTML
-        </div>
-    </div>
-
-    <!-- Sortowanie -->
-    <div class="mb-3">
-        <a href="?sort=title" class="btn btn-primary btn-sm me-2">Sortuj po tytule</a>
-        <a href="?sort=author" class="btn btn-secondary btn-sm">Sortuj po autorze</a>
-    </div>
-
     <!-- Informacja o filtrach -->
     <div class="alert alert-info">
-        <strong>Wybrano:</strong> $filterDescription
+        <strong>Wybrano:</strong> <?php echo isset(\$_GET['genre']) ? htmlspecialchars(\$_GET['genre']) : 'Wszystkie książki'; ?>
     </div>
 
     <!-- Lista książek -->
@@ -133,13 +62,13 @@ $indexContent .= <<<HTML
 HTML;
 
 // Generowanie kart książek
-foreach ($filteredBooks as $book) {
+foreach ($books as $book) {
     $authors = implode(', ', array_map(function ($author) {
         return htmlspecialchars($author['first_name'] . ' ' . $author['last_name']);
     }, $book['authors']));
 
     $genres = implode(', ', array_map('htmlspecialchars', $book['genres']));
-    $series = $book['series'] ? "<a href=\"?series=" . htmlspecialchars($book['series']) . "\" class=\"text-decoration-none\">" . htmlspecialchars($book['series']) . " (" . htmlspecialchars($book['series_position']) . ")</a>" : 'Brak';
+    $series = $book['series'] ? htmlspecialchars($book['series']) : 'Brak';
     $httpsLink = "$domain/_ksiazki/" . htmlspecialchars($book['file_name']);
     $httpLink = str_replace('https://', 'http://', $httpsLink);
 
@@ -161,10 +90,17 @@ HTML;
 }
 
 $indexContent .= <<<HTML
+    </div>
+</div>
+
+<!-- Debugowanie parametrów URL -->
 <footer class="text-center mt-5">
     <p>Strona wygenerowana: $generationTime</p>
     <pre><?php echo htmlspecialchars(json_encode(\$_GET, JSON_PRETTY_PRINT)); ?></pre>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 HTML;
 
 // Zapisanie pliku index.php
