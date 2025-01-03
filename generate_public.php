@@ -38,6 +38,52 @@ $domain = $protocol . "://" . $_SERVER['HTTP_HOST'];
 // Data i godzina generowania strony
 $generationTime = date('Y-m-d H:i:s');
 
+// Parametry URL
+$sort = $_GET['sort'] ?? null;
+$filterGenre = $_GET['genre'] ?? null;
+$filterSeries = $_GET['series'] ?? null;
+
+// Filtry i sortowanie
+$filteredBooks = $books;
+
+if ($filterGenre) {
+    $filteredBooks = array_filter($filteredBooks, function ($book) use ($filterGenre) {
+        return in_array($filterGenre, $book['genres']);
+    });
+}
+
+if ($filterSeries) {
+    $filteredBooks = array_filter($filteredBooks, function ($book) use ($filterSeries) {
+        return $book['series'] === $filterSeries;
+    });
+    usort($filteredBooks, function ($a, $b) {
+        return ((int)($a['series_position'] ?? 0)) <=> ((int)($b['series_position'] ?? 0));
+    });
+} elseif ($sort === 'author') {
+    usort($filteredBooks, function ($a, $b) {
+        $authorA = $a['authors'][0]['last_name'] ?? '';
+        $authorB = $b['authors'][0]['last_name'] ?? '';
+        return strcmp($authorA, $authorB);
+    });
+} elseif ($sort === 'title') {
+    usort($filteredBooks, function ($a, $b) {
+        return strcmp($a['title'], $b['title']);
+    });
+}
+
+// Generowanie informacji o filtrze
+$filterDescription = "Wszystkie książki";
+if ($filterGenre) {
+    $filterDescription = "Książki z gatunku: " . htmlspecialchars($filterGenre);
+}
+if ($filterSeries) {
+    $filterDescription = "Książki z serii: " . htmlspecialchars($filterSeries);
+}
+
+if (empty($filteredBooks)) {
+    $filterDescription .= " (Brak wyników)";
+}
+
 // Generowanie pliku index.php
 $indexContent = <<<HTML
 <!DOCTYPE html>
@@ -54,7 +100,7 @@ $indexContent = <<<HTML
 
     <!-- Informacja o filtrach -->
     <div class="alert alert-info">
-        <strong>Wybrano:</strong> <?php echo isset(\$_GET['genre']) ? htmlspecialchars(\$_GET['genre']) : 'Wszystkie książki'; ?>
+        <strong>Wybrano:</strong> $filterDescription
     </div>
 
     <!-- Lista książek -->
@@ -62,7 +108,7 @@ $indexContent = <<<HTML
 HTML;
 
 // Generowanie kart książek
-foreach ($books as $book) {
+foreach ($filteredBooks as $book) {
     $authors = implode(', ', array_map(function ($author) {
         return htmlspecialchars($author['first_name'] . ' ' . $author['last_name']);
     }, $book['authors']));
