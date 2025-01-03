@@ -32,6 +32,52 @@ $domain = "https://twojadomena";
 // Data i godzina generowania strony
 $generationTime = date('Y-m-d H:i:s');
 
+// Parametry URL
+$sort = $_GET['sort'] ?? null;
+$filterGenre = $_GET['genre'] ?? null;
+$filterSeries = $_GET['series'] ?? null;
+
+// Filtry i sortowanie
+$filteredBooks = $books;
+
+if ($filterGenre) {
+    $filteredBooks = array_filter($filteredBooks, function ($book) use ($filterGenre) {
+        return in_array($filterGenre, $book['genres']);
+    });
+}
+
+if ($filterSeries) {
+    $filteredBooks = array_filter($filteredBooks, function ($book) use ($filterSeries) {
+        return $book['series'] === $filterSeries;
+    });
+    usort($filteredBooks, function ($a, $b) {
+        return ($a['series_position'] ?? 0) <=> ($b['series_position'] ?? 0);
+    });
+} elseif ($sort === 'author') {
+    usort($filteredBooks, function ($a, $b) {
+        $authorA = $a['authors'][0]['last_name'] ?? '';
+        $authorB = $b['authors'][0]['last_name'] ?? '';
+        return strcmp($authorA, $authorB);
+    });
+} elseif ($sort === 'title') {
+    usort($filteredBooks, function ($a, $b) {
+        return strcmp($a['title'], $b['title']);
+    });
+}
+
+// Generowanie informacji o filtrze
+$filterDescription = "Wszystkie książki";
+if ($filterGenre) {
+    $filterDescription = "Książki z gatunku: $filterGenre";
+}
+if ($filterSeries) {
+    $filterDescription = "Książki z serii: $filterSeries";
+}
+
+if (empty($filteredBooks)) {
+    $filterDescription .= " (Brak wyników)";
+}
+
 // Generowanie pliku index.php
 $indexContent = <<<HTML
 <!DOCTYPE html>
@@ -71,42 +117,17 @@ $indexContent .= <<<HTML
         <a href="?sort=author" class="btn btn-secondary btn-sm">Sortuj po autorze</a>
     </div>
 
+    <!-- Informacja o filtrach -->
+    <div class="alert alert-info">
+        <strong>Wybrano:</strong> $filterDescription
+    </div>
+
     <!-- Lista książek -->
     <div class="row">
 HTML;
 
-// Sortowanie i filtrowanie
-$sort = $_GET['sort'] ?? null;
-$filterGenre = $_GET['genre'] ?? null;
-$filterSeries = $_GET['series'] ?? null;
-
-if ($filterGenre) {
-    $books = array_filter($books, function ($book) use ($filterGenre) {
-        return in_array($filterGenre, $book['genres']);
-    });
-}
-
-if ($filterSeries) {
-    $books = array_filter($books, function ($book) use ($filterSeries) {
-        return $book['series'] === $filterSeries;
-    });
-    usort($books, function ($a, $b) {
-        return ($a['series_position'] ?? 0) <=> ($b['series_position'] ?? 0);
-    });
-} elseif ($sort === 'author') {
-    usort($books, function ($a, $b) {
-        $authorA = $a['authors'][0]['last_name'] ?? '';
-        $authorB = $b['authors'][0]['last_name'] ?? '';
-        return strcmp($authorA, $authorB);
-    });
-} elseif ($sort === 'title') {
-    usort($books, function ($a, $b) {
-        return strcmp($a['title'], $b['title']);
-    });
-}
-
 // Generowanie kart książek
-foreach ($books as $book) {
+foreach ($filteredBooks as $book) {
     $authors = implode(', ', array_map(function ($author) {
         return $author['first_name'] . ' ' . $author['last_name'];
     }, $book['authors']));
@@ -134,26 +155,6 @@ HTML;
 }
 
 $indexContent .= <<<HTML
-    </div>
-
-    <!-- Lista tytułów -->
-    <div class="mt-4">
-        <h3>Lista tytułów</h3>
-        <ul class="list-group">
-HTML;
-
-// Generowanie listy tytułów
-foreach ($books as $book) {
-    $httpsLink = "$domain/_ksiazki/{$book['file_name']}";
-    $indexContent .= <<<HTML
-            <li class="list-group-item">
-                <a href="$httpsLink" class="text-decoration-none">{$book['title']}</a>
-            </li>
-HTML;
-}
-
-$indexContent .= <<<HTML
-        </ul>
     </div>
 </div>
 
