@@ -215,8 +215,8 @@ HTML;
 
     debug_log("HTML generation completed");
     
-    if(file_put_contents('index.html', $html)) {
-        debug_log("Successfully wrote index.html");
+    if(file_put_contents('index.php', $html)) {
+        debug_log("Successfully wrote index.php");
         header('Content-Type: application/json');
         echo json_encode(['success' => true]);
     } else {
