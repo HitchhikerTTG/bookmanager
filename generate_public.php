@@ -1,4 +1,3 @@
-
 <?php
 require_once 'includes/BookManager.php';
 require_once 'includes/functions.php';
@@ -150,11 +149,11 @@ HTML;
     foreach ($allGenres as $genre) {
         $html .= <<<HTML
                 <form method="GET" style="display: inline-block; margin-right: 0.5rem;">
-                    <input type="hidden" name="genre" value="<?php echo htmlspecialchars('{$genre}'); ?>">
+                    <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
                     <?php if ($sort !== "title"): ?>
                         <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
                     <?php endif; ?>
-                    <button type="submit" class="btn <?php echo \$selectedGenre === '{$genre}' ? 'btn-secondary' : 'btn-outline-secondary'; ?> btn-sm">{$genre}</button>
+                    <button type="submit" class="btn <?php echo $selectedGenre === $genre ? 'btn-secondary' : 'btn-outline-secondary'; ?> btn-sm">{$genre}</button>
                 </form>
 HTML;
     }
@@ -164,30 +163,30 @@ HTML;
         </header>
 
         <div class="row">
-        <?php foreach (\$processedBooks as \$book): ?>
+        <?php foreach ($processedBooks as $book): ?>
             <div class="col-12 book-card">
-                <a href="_ksiazki/<?php echo htmlspecialchars(\$book['file_name']); ?>" class="book-title"><?php echo htmlspecialchars(\$book['title']); ?></a>
-                <a href="http://_ksiazki/<?php echo htmlspecialchars(\$book['file_name']); ?>" class="download-icon">⬇</a>
+                <a href="_ksiazki/<?php echo htmlspecialchars($book['file_name']); ?>" class="book-title"><?php echo htmlspecialchars($book['title']); ?></a>
+                <a href="http://_ksiazki/<?php echo htmlspecialchars($book['file_name']); ?>" class="download-icon">⬇</a>
                 <div class="book-metadata">
-                    <strong>Autorzy:</strong> <?php echo implode(', ', array_map(function(\$author) { return htmlspecialchars(\$author['first_name'] . ' ' . \$author['last_name']); }, \$book['authors'])); ?><br>
-                    <strong>Gatunki:</strong> <?php echo htmlspecialchars(implode(', ', \$book['genres'])); ?>
-                    <?php if (!empty(\$book['series'])): ?>
+                    <strong>Autorzy:</strong> <?php echo implode(', ', array_map(function($author) { return htmlspecialchars($author['first_name'] . ' ' . $author['last_name']); }, $book['authors'])); ?><br>
+                    <strong>Gatunki:</strong> <?php echo htmlspecialchars(implode(', ', $book['genres'])); ?>
+                    <?php if (!empty($book['series'])): ?>
                     <div class='book-series'>
-                        <a href='?series=<?php echo urlencode(\$book['series']); ?>' class='series-link'><?php echo htmlspecialchars(\$book['series']); ?></a>
-                        <?php echo !empty(\$book['series_position']) ? ' #' . htmlspecialchars(\$book['series_position']) : ''; ?>
+                        <a href='?series=<?php echo urlencode($book['series']); ?>' class='series-link'><?php echo htmlspecialchars($book['series']); ?></a>
+                        <?php echo !empty($book['series_position']) ? ' #' . htmlspecialchars($book['series_position']) : ''; ?>
                     </div>
                     <?php endif; ?>
                 </div>
             </div>
         <?php endforeach; ?>
         </div>
-        <?php if (\$selectedSeries): ?>
+        <?php if ($selectedSeries): ?>
         <div class="text-center mt-4">
             <a href="?" class="btn btn-outline-secondary">Pokaż wszystkie książki</a>
         </div>
         <?php endif; ?>
         <footer class="text-center text-muted mt-4">
-            <small>Strona wygenerowana: <?php echo htmlspecialchars('{$generationTime}'); ?></small>
+            <small>Strona wygenerowana: <?php echo htmlspecialchars($generationTime); ?></small>
         </footer>
     </div>
 </body>
