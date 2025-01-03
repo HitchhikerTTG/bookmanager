@@ -24,7 +24,12 @@ function loadJsonFile($filePath) {
 // Wczytanie danych z JSON
 $booksFile = 'data/books.json';
 $booksData = loadJsonFile($booksFile);
-$books = $booksData['books'] ?? [];
+
+if (!isset($booksData['books']) || !is_array($booksData['books'])) {
+    die("Błąd: Nieprawidłowa struktura pliku JSON.");
+}
+
+$books = $booksData['books'];
 
 // Dynamiczne pobieranie domeny
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
@@ -52,7 +57,7 @@ if ($filterSeries) {
         return $book['series'] === $filterSeries;
     });
     usort($filteredBooks, function ($a, $b) {
-        return ($a['series_position'] ?? 0) <=> ($b['series_position'] ?? 0);
+        return ((int)($a['series_position'] ?? 0)) <=> ((int)($b['series_position'] ?? 0));
     });
 } elseif ($sort === 'author') {
     usort($filteredBooks, function ($a, $b) {
@@ -69,10 +74,10 @@ if ($filterSeries) {
 // Generowanie informacji o filtrze
 $filterDescription = "Wszystkie książki";
 if ($filterGenre) {
-    $filterDescription = "Książki z gatunku: $filterGenre";
+    $filterDescription = "Książki z gatunku: " . htmlspecialchars($filterGenre);
 }
 if ($filterSeries) {
-    $filterDescription = "Książki z serii: $filterSeries";
+    $filterDescription = "Książki z serii: " . htmlspecialchars($filterSeries);
 }
 
 if (empty($filteredBooks)) {
@@ -100,12 +105,12 @@ $indexContent = <<<HTML
 HTML;
 
 // Dodanie przycisków gatunków
-$genres = array_unique(array_merge(...array_column($books, 'genres')));
+$genres = array_unique(array_merge(...array_filter(array_column($books, 'genres'))));
 sort($genres);
 
 foreach ($genres as $genre) {
     $active = (isset($_GET['genre']) && $_GET['genre'] === $genre) ? 'btn-primary' : 'btn-outline-primary';
-    $indexContent .= "<a href=\"?genre=$genre\" class=\"btn $active btn-sm me-2 mb-2\">$genre</a>";
+    $indexContent .= "<a href=\"?genre=" . htmlspecialchars($genre) . "\" class=\"btn $active btn-sm me-2 mb-2\">" . htmlspecialchars($genre) . "</a>";
 }
 
 $indexContent .= <<<HTML
@@ -130,12 +135,12 @@ HTML;
 // Generowanie kart książek
 foreach ($filteredBooks as $book) {
     $authors = implode(', ', array_map(function ($author) {
-        return $author['first_name'] . ' ' . $author['last_name'];
+        return htmlspecialchars($author['first_name'] . ' ' . $author['last_name']);
     }, $book['authors']));
 
-    $genres = implode(', ', $book['genres']);
-    $series = $book['series'] ? "<a href=\"?series={$book['series']}\" class=\"text-decoration-none\">{$book['series']} ({$book['series_position']})</a>" : 'Brak';
-    $httpsLink = "$domain/_ksiazki/{$book['file_name']}";
+    $genres = implode(', ', array_map('htmlspecialchars', $book['genres']));
+    $series = $book['series'] ? "<a href=\"?series=" . htmlspecialchars($book['series']) . "\" class=\"text-decoration-none\">" . htmlspecialchars($book['series']) . " (" . htmlspecialchars($book['series_position']) . ")</a>" : 'Brak';
+    $httpsLink = "$domain/_ksiazki/" . htmlspecialchars($book['file_name']);
     $httpLink = str_replace('https://', 'http://', $httpsLink);
 
     $indexContent .= <<<HTML
@@ -159,26 +164,19 @@ $indexContent .= <<<HTML
     </div>
 </div>
 
-// Debugowanie parametrów URL
-$getParamsDebug = htmlspecialchars(print_r($_GET, true));
-$logDebug = print_r($_GET, true);
-
-// Zapis parametrów URL do logu (opcjonalnie)
-file_put_contents('log.txt', $logDebug, FILE_APPEND);
-
-// Generowanie stopki z debugowaniem
-$indexContent .= <<<HTML
+<!-- Debugowanie parametrów URL -->
 <footer class="text-center mt-5">
     <p>Strona wygenerowana: $generationTime</p>
-    <pre>Debug GET params: $getParamsDebug</pre>
+    <pre>Debug GET params: {htmlspecialchars(json_encode($_GET, JSON_PRETTY_PRINT))}</pre>
 </footer>
-HTML;
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 HTML;
 
 // Zapisanie pliku index.php
-file_put_contents('index.php', $indexContent);
-echo json_encode(['status' => 'success', 'message' => 'Plik index.php - wygenerowany.']);
+if (file_put_contents('index.php', $indexContent) === false) {
+    die("Błąd: Nie można zapisać pliku index.php. Sprawdź uprawnienia katalogu.");
+}
+
+echo json_encode(['status' => 'success', 'message' => 'Plik index.php został wygenerowany.']);
