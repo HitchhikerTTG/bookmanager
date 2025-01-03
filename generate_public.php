@@ -161,17 +161,10 @@ HTML;
 }
 
 $indexContent .= <<<HTML
-    </div>
-</div>
-
-<!-- Debugowanie parametrów URL -->
 <footer class="text-center mt-5">
     <p>Strona wygenerowana: $generationTime</p>
-    <pre>Debug GET params: {htmlspecialchars(json_encode($_GET, JSON_PRETTY_PRINT))}</pre>
+    <pre><?php echo htmlspecialchars(json_encode(\$_GET, JSON_PRETTY_PRINT)); ?></pre>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
 HTML;
 
 // Zapisanie pliku index.php
