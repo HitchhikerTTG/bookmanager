@@ -29,6 +29,9 @@ $books = $booksData['books'] ?? [];
 // Domenę można zmienić na rzeczywistą domenę witryny
 $domain = "https://twojadomena";
 
+// Data i godzina generowania strony
+$generationTime = date('Y-m-d H:i:s');
+
 // Generowanie pliku index.php
 $indexContent = <<<HTML
 <!DOCTYPE html>
@@ -132,7 +135,33 @@ HTML;
 
 $indexContent .= <<<HTML
     </div>
+
+    <!-- Lista tytułów -->
+    <div class="mt-4">
+        <h3>Lista tytułów</h3>
+        <ul class="list-group">
+HTML;
+
+// Generowanie listy tytułów
+foreach ($books as $book) {
+    $httpsLink = "$domain/_ksiazki/{$book['file_name']}";
+    $indexContent .= <<<HTML
+            <li class="list-group-item">
+                <a href="$httpsLink" class="text-decoration-none">{$book['title']}</a>
+            </li>
+HTML;
+}
+
+$indexContent .= <<<HTML
+        </ul>
+    </div>
 </div>
+
+<!-- Stopka -->
+<footer class="text-center mt-5">
+    <p>Strona wygenerowana: $generationTime</p>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
