@@ -107,8 +107,8 @@ if (empty(\$filteredBooks)) {
         /* Poprawiona czytelność dla Kindle */
         body {
             font-family: Georgia, serif;
-            font-size: 1.5em; /* Około 24px */
-            line-height: 1.6;
+            font-size: 1.1em; /* Około 24px */
+            line-height: 1.2;
             margin: 0;
             padding: 0;
         }
@@ -128,7 +128,7 @@ if (empty(\$filteredBooks)) {
         }
 
         .card-title {
-            font-size: 1.6em; /* Około 24px */
+            font-size: 1.3em; /* Około 24px */
         }
 
         .btn-genre {
@@ -196,7 +196,7 @@ foreach (\$filteredBooks as \$book) {
     \$httpLink = str_replace('https://', 'http://', \$httpsLink);
 
     echo <<<HTML
-        <div class="col-md-4 col-sm-12">
+        <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title d-flex justify-content-between">
