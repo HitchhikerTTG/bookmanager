@@ -105,7 +105,7 @@ if (empty(\$filteredBooks)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-size: 16px;
+            font-size: 24px;
         }
         .card {
             margin-bottom: 1rem;
@@ -114,12 +114,13 @@ if (empty(\$filteredBooks)) {
             margin-bottom: 0.5rem;
         }
         .btn-genre {
-            font-size: 16px;
+            font-size: 24px;
             margin: 0.2rem;
         }
-        @media (max-width: 768px) {
-            .card {
-                width: 100%;
+        @media (max-width: 1200px) {
+            .col-md-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
             }
         }
     </style>
@@ -164,7 +165,7 @@ foreach (\$filteredBooks as \$book) {
     }, \$book['authors']));
 
     \$genres = implode(', ', array_map('htmlspecialchars', \$book['genres']));
-    \$series = \$book['series'] ? htmlspecialchars(\$book['series']) . " (" . htmlspecialchars(\$book['series_position']) . ")" : '';
+    \$series = \$book['series'] ? "<a href=\"?series=" . htmlspecialchars(\$book['series']) . "\">" . htmlspecialchars(\$book['series']) . "</a> (" . htmlspecialchars(\$book['series_position']) . ")" : '';
 
     \$httpsLink = "\$domain/_ksiazki/" . htmlspecialchars(\$book['file_name']);
     \$httpLink = str_replace('https://', 'http://', \$httpsLink);
@@ -173,9 +174,9 @@ foreach (\$filteredBooks as \$book) {
         <div class="col-md-4 col-sm-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">
+                    <h5 class="card-title d-flex justify-content-between">
                         <a href="\$httpsLink" class="text-decoration-none">{\$book['title']}</a>
-                        <a href="\$httpLink" class="btn btn-sm btn-outline-primary">[http]</a>
+                        <a href="\$httpLink" class="btn btn-sm btn-primary">http</a>
                     </h5>
                     <p class="card-text d-flex justify-content-between">
                         <span>Autor: {\$authors}</span>
