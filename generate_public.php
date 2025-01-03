@@ -26,8 +26,9 @@ $booksFile = 'data/books.json';
 $booksData = loadJsonFile($booksFile);
 $books = $booksData['books'] ?? [];
 
-// Domenę można zmienić na rzeczywistą domenę witryny
-$domain = "https://twojadomena";
+// Dynamiczne pobieranie domeny
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+$domain = $protocol . "://" . $_SERVER['HTTP_HOST'];
 
 // Data i godzina generowania strony
 $generationTime = date('Y-m-d H:i:s');
@@ -170,4 +171,4 @@ HTML;
 
 // Zapisanie pliku index.php
 file_put_contents('index.php', $indexContent);
-echo json_encode(['status' => 'success', 'message' => 'Plik index.php został wygenerowany.']);
+echo json_encode(['status' => 'success', 'message' => 'Plik index.php - wygenerowany.']);
