@@ -21,43 +21,34 @@ function loadJsonFile($filePath) {
     return $data;
 }
 
-// Dynamiczne pobieranie domeny
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-$domain = $protocol . "://" . $_SERVER['HTTP_HOST'];
+// Wczytanie danych z JSON
+$booksFile = 'data/books.json';
+$booksData = loadJsonFile($booksFile);
+
+if (!isset($booksData['books']) || !is_array($booksData['books'])) {
+    die("Błąd: Nieprawidłowa struktura pliku JSON.");
+}
+
+$books = $booksData['books'];
 
 // Data i godzina generowania strony
 $generationTime = date('Y-m-d H:i:s');
 
-// Generowanie pliku index.php z dynamiczną logiką
+// Generowanie pliku index.php
 $indexContent = <<<PHP
 <?php
 
-// Funkcja do wczytywania danych z pliku JSON
-function loadJsonFile(\$filePath) {
-    if (!file_exists(\$filePath)) {
-        die("Błąd: Plik \$filePath nie istnieje.");
-    }
+// Dane książek
+\$books = json_decode('
+PHP;
 
-    \$jsonData = file_get_contents(\$filePath);
+$indexContent .= json_encode($books, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+$indexContent .= <<<PHP
+', true);
 
-    if (\$jsonData === false) {
-        die("Błąd: Nie można odczytać pliku \$filePath. Sprawdź uprawnienia.");
-    }
-
-    \$data = json_decode(\$jsonData, true);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        die("Błąd: Nie można zdekodować JSON z pliku \$filePath. " . json_last_error_msg());
-    }
-
-    return \$data;
-}
-
-// Wczytanie danych z JSON
-\$booksFile = 'data/books.json';
-\$booksData = loadJsonFile(\$booksFile);
-
-\$books = \$booksData['books'] ?? [];
+// Dynamiczne pobieranie domeny
+\$protocol = (!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+\$domain = \$protocol . "://" . \$_SERVER['HTTP_HOST'];
 
 // Parametry URL
 \$sort = \$_GET['sort'] ?? null;
@@ -154,7 +145,7 @@ foreach (\$filteredBooks as \$book) {
 
     \$genres = implode(', ', array_map('htmlspecialchars', \$book['genres']));
     \$series = \$book['series'] ? htmlspecialchars(\$book['series']) : 'Brak';
-    \$httpsLink = "$domain/_ksiazki/" . htmlspecialchars(\$book['file_name']);
+    \$httpsLink = "\$domain/_ksiazki/" . htmlspecialchars(\$book['file_name']);
     \$httpLink = str_replace('https://', 'http://', \$httpsLink);
 
     echo <<<HTML
@@ -162,12 +153,12 @@ foreach (\$filteredBooks as \$book) {
             <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a href="$httpsLink" class="text-decoration-none">{$book['title']}</a>
-                        <a href="$httpLink" class="btn btn-sm btn-outline-primary">[http]</a>
+                        <a href="\$httpsLink" class="text-decoration-none">{\$book['title']}</a>
+                        <a href="\$httpLink" class="btn btn-sm btn-outline-primary">[http]</a>
                     </h5>
-                    <h6 class="card-subtitle text-muted">Autor: {$authors}</h6>
-                    <p class="card-text">Gatunek: {$genres}</p>
-                    <p class="card-text">Seria: {$series}</p>
+                    <h6 class="card-subtitle text-muted">Autor: {\$authors}</h6>
+                    <p class="card-text">Gatunek: {\$genres}</p>
+                    <p class="card-text">Seria: {\$series}</p>
                 </div>
             </div>
         </div>
