@@ -119,12 +119,12 @@ if (empty(\$filteredBooks)) {
         }
 
         .card {
-            margin-bottom: 1rem;
+            margin-bottom: 0.6rem;
             border: 1px solid #ddd;
         }
 
         .card-body {
-            padding: 1rem;
+            padding: 0.5rem;
         }
 
         .card-title {
@@ -199,11 +199,11 @@ foreach (\$filteredBooks as \$book) {
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title d-flex align-items-center">
-                        <a href="\$httpsLink" class="text-decoration-none flex-grow-1">{\$book['title']}</a>
-                        <a href="\$httpLink" class="btn btn-sm btn-primary ms-auto">http</a>
+                    <h5 class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                        <a href="\$httpsLink"style="text-decoration: none; flex-grow: 1;">{\$book['title']}</a>
+                        <a href="\$httpLink" style="margin-left: auto; padding: 0.2em 0.5em; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">http</a>
                     </h5>
-                    <p class="card-text d-flex justify-content-between">
+                    <p class="card-text" style="display: flex; justify-content: space-between;">
                         <span>Autor: {\$authors}</span>
                         <span>Gatunek: {\$genres}</span>
                     </p>
