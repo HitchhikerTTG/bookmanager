@@ -135,6 +135,11 @@ if (empty(\$filteredBooks)) {
             font-size: 1.3em; /* Około 16px */
             margin: 0.5rem;
         }
+        .btn-sort {
+            font-size: 1.3em; /* Około 16px */
+            margin: 0.5rem;
+        }
+        
 
         .row {
             margin: 0; /* Usuń marginesy dla rzędu */
@@ -142,6 +147,9 @@ if (empty(\$filteredBooks)) {
 
         .col-12 {
             padding: 0.5rem;
+        }
+        .alert{
+            margin: 0.4em;
         }
 
         /* Ustaw karty na pełną szerokość */
@@ -152,7 +160,7 @@ if (empty(\$filteredBooks)) {
 </head>
 <body>
 <div class="container my-4">
-    <h1 class="text-center mb-4">Lista książek</h1>
+    <h3 class="text-center mb-4">e-biblioteczka</h3>
 
     <!-- Filtry gatunków -->
     <div class="mb-3">
@@ -172,13 +180,13 @@ foreach (\$genres as \$genre) {
 
     <!-- Sortowanie -->
     <div class="mb-3">
-        <a href="?sort=title" class="btn btn-primary btn-sm me-2">Sortuj po tytule</a>
-        <a href="?sort=author" class="btn btn-secondary btn-sm">Sortuj po autorze</a>
+        <a href="?sort=title" class="btn btn-primary btn-sm me-2 btn-sort">Sortuj po tytule</a>
+        <a href="?sort=author" class="btn btn-secondary btn-sm btn-sort">Sortuj po autorze</a>
     </div>
 
     <!-- Informacja o filtrach -->
     <div class="alert alert-info">
-        <strong>Wybrano:</strong> <?php echo \$filterDescription; ?>
+        <strong>Teraz przeglądasz:</strong> <?php echo \$filterDescription; ?>
     </div>
 
     <!-- Lista książek -->
@@ -198,7 +206,7 @@ foreach (\$filteredBooks as \$book) {
     echo <<<HTML
         <div class="col-12">
             <div class="card">
-                 <div class="card-header">{\$genres}</div>
+                 <div class="card-header bg-secondary">{\$genres}</div>
                 <div class="card-body">
                     <h5 class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
                         <a href="\$httpsLink"style="text-decoration: none; flex-grow: 1;">{\$book['title']}</a>
