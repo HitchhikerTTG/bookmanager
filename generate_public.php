@@ -53,6 +53,7 @@ $indexContent .= <<<PHP
 // Parametry URL
 \$sort = \$_GET['sort'] ?? null;
 \$filterGenre = \$_GET['genre'] ?? null;
+\$filterAuthor = \$_GET['author'] ?? null;
 \$filterSeries = \$_GET['series'] ?? null;
 
 // Filtry i sortowanie
@@ -61,6 +62,18 @@ $indexContent .= <<<PHP
 if (\$filterGenre) {
     \$filteredBooks = array_filter(\$filteredBooks, function (\$book) use (\$filterGenre) {
         return in_array(\$filterGenre, \$book['genres']);
+    });
+}
+
+if (\$filterAuthor) {
+    \$filteredBooks = array_filter(\$filteredBooks, function (\$book) use (\$filterAuthor) {
+        foreach (\$book['authors'] as \$author) {
+            \$authorFullName = \$author['first_name'] . ' ' . \$author['last_name'];
+            if (\$authorFullName === \$filterAuthor) {
+                return true;
+            }
+        }
+        return false;
     });
 }
 
@@ -81,12 +94,20 @@ if (\$filterSeries) {
     usort(\$filteredBooks, function (\$a, \$b) {
         return strcmp(\$a['title'], \$b['title']);
     });
+} else {
+    // Domyślne sortowanie według daty dodania
+    usort(\$filteredBooks, function (\$a, \$b) {
+        return ($b['upload_date'] ?? 0) <=> ($a['upload_date'] ?? 0);
+    });
 }
 
 // Generowanie informacji o filtrze
 \$filterDescription = "Wszystkie książki";
 if (\$filterGenre) {
     \$filterDescription = "Książki z gatunku: " . htmlspecialchars(\$filterGenre);
+}
+if (\$filterAuthor) {
+    \$filterDescription .= " autora: " . htmlspecialchars(\$filterAuthor);
 }
 if (\$filterSeries) {
     \$filterDescription = "Książki z serii: " . htmlspecialchars(\$filterSeries);
@@ -103,58 +124,15 @@ if (empty(\$filteredBooks)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista książek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-        /* Poprawiona czytelność dla Kindle */
+    <style>
         body {
             font-family: Georgia, serif;
-            font-size: 1.3em; /* Około 24px */
+            font-size: 1.3em; 
             line-height: 1.3;
-            margin: 0;
-            padding: 0;
         }
-
-        h1 {
-            font-size: 2em; /* Około 32px */
-            margin-bottom: 1rem;
-        }
-
-        .card {
-            margin-bottom: 0.6rem;
-            border: 1px solid #ddd;
-        }
-
-        .card-body {
-            padding: 0.5rem;
-        }
-
-        .card-title {
-            font-size: 1.4em; /* Około 24px */
-        }
-
-        .btn-genre {
-            font-size: 1.3em; /* Około 16px */
+        .btn-genre, .btn-author {
+            font-size: 1.3em;
             margin: 0.5rem;
-        }
-        .btn-sort {
-            font-size: 1.3em; /* Około 16px */
-            margin: 0.5rem;
-        }
-        
-
-        .row {
-            margin: 0; /* Usuń marginesy dla rzędu */
-        }
-
-        .col-12 {
-            padding: 0.5rem;
-        }
-        .alert{
-            margin: 0.4em;
-        }
-
-        /* Ustaw karty na pełną szerokość */
-        .card {
-            width: 100%;
         }
     </style>
 </head>
@@ -166,79 +144,71 @@ if (empty(\$filteredBooks)) {
     <div class="mb-3">
         <div class="d-flex flex-wrap">
             <a href="?" class="btn btn-outline-secondary btn-genre">Wszystkie</a>
-<?php
-\$genres = array_unique(array_merge(...array_filter(array_column(\$books, 'genres'))));
-sort(\$genres);
+            <?php
+            \$genres = array_unique(array_merge(...array_filter(array_column(\$books, 'genres'))));
+            sort(\$genres);
 
-foreach (\$genres as \$genre) {
-    \$active = (isset(\$_GET['genre']) && \$_GET['genre'] === \$genre) ? 'btn-primary' : 'btn-outline-primary';
-    echo "<a href=\"?genre=" . htmlspecialchars(\$genre) . "\" class=\"btn \$active btn-genre\">" . htmlspecialchars(\$genre) . "</a>";
-}
-?>
+            foreach (\$genres as \$genre) {
+                \$active = (isset(\$_GET['genre']) && \$_GET['genre'] === \$genre) ? 'btn-primary' : 'btn-outline-primary';
+                echo "<a href=\"?genre=" . htmlspecialchars(\$genre) . "\" class=\"btn \$active btn-genre\">" . htmlspecialchars(\$genre) . "</a>";
+            }
+            ?>
         </div>
     </div>
 
-    <!-- Sortowanie -->
-    <div class="mb-3">
-        <a href="?sort=title" class="btn btn-primary btn-sm me-2 btn-sort">Sortuj po tytule</a>
-        <a href="?sort=author" class="btn btn-secondary btn-sm btn-sort">Sortuj po autorze</a>
-    </div>
+    <!-- Filtry autorów -->
+    <?php
+    if (\$filterGenre || \$sort === 'author') {
+        \$filteredAuthors = [];
+        foreach (\$filteredBooks as \$book) {
+            foreach (\$book['authors'] as \$author) {
+                \$authorFullName = \$author['first_name'] . ' ' . \$author['last_name'];
+                if (!in_array(\$authorFullName, \$filteredAuthors)) {
+                    \$filteredAuthors[] = \$authorFullName;
+                }
+            }
+        }
 
-    <!-- Informacja o filtrach -->
-    <div class="alert alert-info">
-        <strong>Teraz przeglądasz:</strong> <?php echo \$filterDescription; ?>
-    </div>
+        sort(\$filteredAuthors);
+
+        echo '<div class="mb-3">';
+        echo '<strong>Filtruj wg autora:</strong><br>';
+        foreach (\$filteredAuthors as \$author) {
+            \$active = (isset(\$_GET['author']) && \$_GET['author'] === \$author) ? 'btn-primary' : 'btn-outline-primary';
+            echo "<a href=\"?genre=\$filterGenre&author=" . urlencode(\$author) . "\" class=\"btn \$active btn-author\">" . htmlspecialchars(\$author) . "</a>";
+        }
+        echo '</div>';
+    }
+    ?>
 
     <!-- Lista książek -->
     <div class="row">
-<?php
-foreach (\$filteredBooks as \$book) {
-    \$authors = implode(', ', array_map(function (\$author) {
-        return htmlspecialchars(\$author['first_name'] . ' ' . \$author['last_name']);
-    }, \$book['authors']));
+        <?php
+        foreach (\$filteredBooks as \$book) {
+            \$authors = implode(', ', array_map(function (\$author) {
+                \$authorFullName = \$author['first_name'] . ' ' . \$author['last_name'];
+                return "<a href=\"?author=" . urlencode(\$authorFullName) . "\">$authorFullName</a>";
+            }, \$book['authors']));
 
-    \$genres = implode(', ', array_map('htmlspecialchars', \$book['genres']));
-    \$series = \$book['series'] ? "<a href=\"?series=" . htmlspecialchars(\$book['series']) . "\">" . htmlspecialchars(\$book['series']) . "</a> (" . htmlspecialchars(\$book['series_position']) . ")" : '';
+            \$genres = implode(', ', array_map('htmlspecialchars', \$book['genres']));
+            \$series = \$book['series'] ? "<a href=\"?series=" . htmlspecialchars(\$book['series']) . "\">" . htmlspecialchars(\$book['series']) . "</a>" : '';
 
-    \$httpsLink = "\$domain/_ksiazki/" . htmlspecialchars(\$book['file_name']);
-    \$httpLink = str_replace('https://', 'http://', \$httpsLink);
-
-    echo <<<HTML
-        <div class="col-12">
-            <div class="card">
-                 <div class="card-header bg-secondary">{\$genres}</div>
-                <div class="card-body">
-                    <h5 class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
-                        <a href="\$httpsLink"style="text-decoration: none; flex-grow: 1;">{\$book['title']}</a>
-                    </h5>
-                    <p class="card-text" style="display: flex; justify-content: space-between;">
-                        <span>Autor: {\$authors}</span>
-                        
-                    </p>
-HTML;
-
-    if (!empty(\$series)) {
-        echo <<<HTML
-                    <p class="card-text">Seria: {\$series}</p>
-HTML;
-    }
-
-    echo <<<HTML
+            echo <<<HTML
+            <div class="col-12">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{$book['title']}</h5>
+                        <p class="card-text">Autor: {$authors}</p>
+                        <p class="card-text">Gatunek: {$genres}</p>
+                        <p class="card-text">Seria: {$series}</p>
+                    </div>
                 </div>
-                <div class="card-footer" style="text-align:right">
-      <small><a href="\$httpLink" class="card-link">pobierz http</a></small>
-    </div>
             </div>
-        </div>
-HTML;
-}
-?>
+            HTML;
+        }
+        ?>
     </div>
 </div>
-<footer class="text-center mt-5">
-    <p>Strona wygenerowana: <?php echo "$generationTime"; ?></p>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 PHP;
