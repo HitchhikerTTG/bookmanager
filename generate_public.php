@@ -107,8 +107,8 @@ if (empty(\$filteredBooks)) {
         /* Poprawiona czytelność dla Kindle */
         body {
             font-family: Georgia, serif;
-            font-size: 1.1em; /* Około 24px */
-            line-height: 1.1;
+            font-size: 1.3em; /* Około 24px */
+            line-height: 1.3;
             margin: 0;
             padding: 0;
         }
@@ -128,11 +128,11 @@ if (empty(\$filteredBooks)) {
         }
 
         .card-title {
-            font-size: 1.3em; /* Około 24px */
+            font-size: 1.4em; /* Około 24px */
         }
 
         .btn-genre {
-            font-size: 1.2em; /* Około 16px */
+            font-size: 1.3em; /* Około 16px */
             margin: 0.5rem;
         }
 
@@ -218,7 +218,7 @@ HTML;
     echo <<<HTML
                 </div>
                 <div class="card-footer">
-      <small><a href="\$httpLink" class="card-link">pobierz http</a></small>
+      <small><a href="\$httpLink" class="card-link" style="text-align:right">pobierz http</a></small>
     </div>
             </div>
         </div>
