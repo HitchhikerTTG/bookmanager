@@ -195,7 +195,7 @@ if (empty(\$filteredBooks)) {
                 <div class="card-header">{\$genres}</div>
                     <div class="card-body">
                         <h5 class="card-title">{\$book['title']}</h5>
-                        <p class="card-text">Autor: {\$authors}</p>
+                        <p class="card-text">Autor: {\$book[authors]}</p>
                         
                         <p class="card-text">Seria: {\$series}</p>
                     </div>
