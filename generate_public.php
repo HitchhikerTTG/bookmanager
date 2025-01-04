@@ -192,11 +192,12 @@ if (empty(\$filteredBooks)) {
             echo <<<HTML
             <div class="col-12">
                 <div class="card mb-3">
+                <div class="card-header">{\$genres}</div>
                     <div class="card-body">
-                        <h5 class="card-title">{$book['title']}</h5>
-                        <p class="card-text">Autor: {$authors}</p>
-                        <p class="card-text">Gatunek: {$genres}</p>
-                        <p class="card-text">Seria: {$series}</p>
+                        <h5 class="card-title">{\$book['title']}</h5>
+                        <p class="card-text">Autor: {\$authors}</p>
+                        
+                        <p class="card-text">Seria: {\$series}</p>
                     </div>
                 </div>
             </div>
