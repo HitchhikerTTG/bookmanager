@@ -152,6 +152,31 @@ if (empty(\$filteredBooks)) {
         </div>
     </div>
 
+    <!-- Filtry autorów -->
+    <?php
+    if (\$filterGenre || \$sort === 'author') {
+        \$filteredAuthors = [];
+        foreach (\$filteredBooks as \$book) {
+            foreach (\$book['authors'] as \$author) {
+                \$authorFullName = \$author['first_name'] . ' ' . \$author['last_name'];
+                if (!in_array(\$authorFullName, \$filteredAuthors)) {
+                    \$filteredAuthors[] = \$authorFullName;
+                }
+            }
+        }
+
+        sort(\$filteredAuthors);
+
+        echo '<div class="mb-3">';
+        echo '<strong>Filtruj wg autora:</strong><br>';
+        foreach (\$filteredAuthors as \$author) {
+            \$active = (isset(\$_GET['author']) && \$_GET['author'] === \$author) ? 'btn-primary' : 'btn-outline-primary';
+            echo "<a href=\"?genre=\$filterGenre&author=" . urlencode(\$author) . "\" class=\"btn \$active btn-author\">" . htmlspecialchars(\$author) . "</a>";
+        }
+        echo '</div>';
+    }
+    ?>
+
     <!-- Lista książek -->
     <div class="row">
         <?php
