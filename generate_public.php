@@ -217,8 +217,8 @@ HTML;
 
     echo <<<HTML
                 </div>
-                <div class="card-footer">
-      <small><a href="\$httpLink" class="card-link" style="text-align:right">pobierz http</a></small>
+                <div class="card-footer" style="text-align:right">
+      <small><a href="\$httpLink" class="card-link">pobierz http</a></small>
     </div>
             </div>
         </div>
