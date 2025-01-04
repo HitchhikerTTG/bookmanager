@@ -194,14 +194,14 @@ if (empty(\$filteredBooks)) {
             echo <<<HTML
             <div class="col-12">
                 <div class="card mb-3">
-                <div class="card-header" style="text-aling:right">{\$genres}</div>
+                <div class="card-header" style="text-align:right">{\$genres}</div>
                     <div class="card-body">
                         <h5 class="card-title"><a href="{\$httpsLink}" class="text-decoration-none">{\$book['title']}</a></h5>
                         <p class="card-text">Autor: {\$authors}</p>
                         
                         <p class="card-text">Seria: {\$series}</p>
                     </div>
-                    <div class="card-footer" style="text-aling:right"><small><a href="{\$httpLink}" class="card-link">(HTTP)</a></small></div>
+                    <div class="card-footer" style="text-align:right"><small><a href="{\$httpLink}" class="card-link">(HTTP)</a></small></div>
                 </div>
             </div>
             HTML;
