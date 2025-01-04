@@ -183,7 +183,7 @@ if (empty(\$filteredBooks)) {
         foreach (\$filteredBooks as \$book) {
             \$authors = implode(', ', array_map(function (\$author) {
                 \$authorFullName = \$author['first_name'] . ' ' . \$author['last_name'];
-                return "<a href=\"?author=" . urlencode(\$authorFullName) . "\">$authorFullName</a>";
+                return "<a href=\"?author=" . urlencode(\$authorFullName) . "\">\$authorFullName</a>";
             }, \$book['authors']));
 
             \$genres = implode(', ', array_map('htmlspecialchars', \$book['genres']));
