@@ -34,17 +34,14 @@ $books = $booksData['books'];
 // Data i godzina generowania strony
 $generationTime = date('Y-m-d H:i:s');
 
-// Generowanie pliku index.php
+// Przygotowanie kodu PHP do wygenerowanego pliku
+$booksJson = json_encode($books, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
 $indexContent = <<<PHP
 <?php
 
 // Dane książek
-\$books = json_decode('
-PHP;
-
-$indexContent .= json_encode($books, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-$indexContent .= <<<PHP
-', true);
+\$books = json_decode('{$booksJson}', true);
 
 // Dynamiczne pobieranie domeny
 \$protocol = (!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off') ? "https" : "http";
@@ -97,7 +94,7 @@ if (\$filterSeries) {
 } else {
     // Domyślne sortowanie według daty dodania
     usort(\$filteredBooks, function (\$a, \$b) {
-        return ($b['upload_date'] ?? 0) <=> ($a['upload_date'] ?? 0);
+        return (\$b['upload_date'] ?? 0) <=> (\$a['upload_date'] ?? 0);
     });
 }
 
@@ -127,11 +124,10 @@ if (empty(\$filteredBooks)) {
     <style>
         body {
             font-family: Georgia, serif;
-            font-size: 1.3em; 
-            line-height: 1.3;
+            font-size: 1.3em;
         }
         .btn-genre, .btn-author {
-            font-size: 1.3em;
+            font-size: 1.2em;
             margin: 0.5rem;
         }
     </style>
@@ -155,31 +151,6 @@ if (empty(\$filteredBooks)) {
             ?>
         </div>
     </div>
-
-    <!-- Filtry autorów -->
-    <?php
-    if (\$filterGenre || \$sort === 'author') {
-        \$filteredAuthors = [];
-        foreach (\$filteredBooks as \$book) {
-            foreach (\$book['authors'] as \$author) {
-                \$authorFullName = \$author['first_name'] . ' ' . \$author['last_name'];
-                if (!in_array(\$authorFullName, \$filteredAuthors)) {
-                    \$filteredAuthors[] = \$authorFullName;
-                }
-            }
-        }
-
-        sort(\$filteredAuthors);
-
-        echo '<div class="mb-3">';
-        echo '<strong>Filtruj wg autora:</strong><br>';
-        foreach (\$filteredAuthors as \$author) {
-            \$active = (isset(\$_GET['author']) && \$_GET['author'] === \$author) ? 'btn-primary' : 'btn-outline-primary';
-            echo "<a href=\"?genre=\$filterGenre&author=" . urlencode(\$author) . "\" class=\"btn \$active btn-author\">" . htmlspecialchars(\$author) . "</a>";
-        }
-        echo '</div>';
-    }
-    ?>
 
     <!-- Lista książek -->
     <div class="row">
