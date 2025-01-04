@@ -198,8 +198,16 @@ if (empty(\$filteredBooks)) {
                     <div class="card-body">
                         <h5 class="card-title"><a href="{\$httpsLink}" class="text-decoration-none">{\$book['title']}</a></h5>
                         <p class="card-text">Autor: {\$authors}</p>
-                        
-                        <p class="card-text">Seria: {\$series}</p>
+
+HTML;
+
+    if (!empty(\$series)) {
+        echo <<<HTML
+                    <p class="card-text">Seria: {\$series}</p>
+HTML;
+    }
+
+    echo <<<HTML
                     </div>
                     <div class="card-footer" style="text-align:right"><small><a href="{\$httpLink}" class="card-link">(HTTP)</a></small></div>
                 </div>
