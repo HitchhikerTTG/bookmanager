@@ -187,7 +187,7 @@ if (empty(\$filteredBooks)) {
             }, \$book['authors']));
 
             \$genres = implode(', ', array_map('htmlspecialchars', \$book['genres']));
-            \$series = \$book['series'] ? "<a href=\"?series=" . htmlspecialchars(\$book['series']) . "\">" . htmlspecialchars(\$book['series']) . "</a>".(!empty(\$book['series_position']) ? " (Pozycja: " . htmlspecialchars(\$book['series_position']) . ")" : ''). : '';
+            \$series = \$book['series'] ? "<a href=\"?series=" . htmlspecialchars(\$book['series']) . "\">" . htmlspecialchars(\$book['series']) . "</a>".(!empty(\$book['series_position']) ? " (Pozycja: " . htmlspecialchars(\$book['series_position']) . ")" : '') : '';
             \$httpsLink = "\$domain/_ksiazki/" . htmlspecialchars(\$book['file_name']);
             \$httpLink = str_replace('https://', 'http://', \$httpsLink);
             
