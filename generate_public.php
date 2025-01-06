@@ -187,13 +187,13 @@ if (empty(\$filteredBooks)) {
             }, \$book['authors']));
 
             \$genres = implode(', ', array_map('htmlspecialchars', \$book['genres']));
-            \$series = \$book['series'] ? "<a href=\"?series=" . htmlspecialchars(\$book['series']) . "\">" . htmlspecialchars(\$book['series']) . "</a>" : '';
+            \$series = \$book['series'] ? "<a href=\"?series=" . htmlspecialchars(\$book['series']) . "\">" . htmlspecialchars(\$book['series']) . "</a>".(!empty(\$book['series_position']) ? " (Pozycja: " . htmlspecialchars(\$book['series_position']) . ")" : ''). : '';
             \$httpsLink = "\$domain/_ksiazki/" . htmlspecialchars(\$book['file_name']);
             \$httpLink = str_replace('https://', 'http://', \$httpsLink);
             
             echo <<<HTML
             <div class="col-12">
-                <div class="card mb-3" style="border-bottom:1px dashed black">
+                <div class="card mb-3" style="border-bottom:1px dashed   black">
                 <div class="card-header" style="text-align:right">{\$genres}</div>
                     <div class="card-body">
                         <h5 class="card-title"><a href="{\$httpsLink}" class="text-decoration-none">{\$book['title']}</a></h5>
