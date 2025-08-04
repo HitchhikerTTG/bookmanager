@@ -62,7 +62,16 @@ $manager = new BookManager();
     <div class="container mt-4">
         <h1>Book Manager</h1>
         <button onclick="generatePublicPage()" class="btn btn-primary mb-3">Generuj stronę publiczną</button>
-        <?php include 'templates/library.php'; ?>
+        <?php 
+        $templatesPath = $basePath . '/templates/library.php';
+        debug_log("Loading template from: " . $templatesPath);
+        if (file_exists($templatesPath)) {
+            include $templatesPath;
+        } else {
+            debug_log("Template not found, trying relative path");
+            include 'templates/library.php';
+        }
+        ?>
 
         <div class="row mt-4">
             <div class="col-md-6">
@@ -151,11 +160,19 @@ $manager = new BookManager();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
-    <script src="<?php echo dirname($_SERVER['SCRIPT_NAME']) . '/'; ?>js/bookEditor.js"></script>
+    <script>
+        // Debug - sprawdź czy jQuery jest załadowane
+        console.log('jQuery loaded:', typeof $ !== 'undefined');
+        console.log('Current path:', window.location.pathname);
+        console.log('Script directory:', '<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>');
+    </script>
+    <script src="js/bookEditor.js"></script>
     <script>
         $(document).ready(function() {
+            console.log('Document ready, initializing...');
             $('.edit-form:not(.d-none)').each(function() {
                 const rowId = this.id.replace('edit-form-', '');
+                console.log('Initializing rowId:', rowId);
                 initializeAuthors(rowId);
                 initializeAutocomplete(rowId);
             });

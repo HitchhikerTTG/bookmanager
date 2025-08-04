@@ -70,10 +70,14 @@ function initializeAutocomplete(rowId) {
 }
 
 function editBook(fileName, title, genres, series, seriesPosition, comment) {
+    console.log('editBook called with:', { fileName, title, genres, series, seriesPosition, comment });
     const rowId = fileName.replace(/[^a-zA-Z0-9]/g, '');
+    console.log('Generated rowId:', rowId);
+    
     toggleEditForm(rowId);
     
     const form = document.getElementById('editBookForm-' + rowId);
+    console.log('Form found:', form);
     if (form) {
         const titleInput = form.querySelector('input[name="title"]');
         const genresInput = document.getElementById('genres-' + rowId);

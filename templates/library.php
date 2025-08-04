@@ -59,7 +59,7 @@
                     <?php 
                     $rowId = preg_replace('/[^a-zA-Z0-9]/', '', $file);
                     if ($isProcessed): ?>
-                        <button class="btn btn-warning btn-sm" onclick="editBook('<?php echo htmlspecialchars($file); ?>', 
+                        <button class="btn btn-warning btn-sm" onclick="console.log('Edit button clicked for:', '<?php echo htmlspecialchars($file); ?>'); editBook('<?php echo htmlspecialchars($file); ?>', 
                             '<?php echo htmlspecialchars($bookData['title']); ?>', 
                             '<?php echo htmlspecialchars(implode(', ', $bookData['genres'])); ?>', 
                             '<?php echo htmlspecialchars($bookData['series'] ?? ''); ?>', 
