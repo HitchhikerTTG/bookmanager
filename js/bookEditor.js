@@ -43,15 +43,11 @@ function initializeAuthors(rowId) {
 }
 
 function initializeAutocomplete(rowId) {
-    // Initialize genres typeahead
-    const genresInput = document.getElementById('genres-' + rowId);
-    const availableGenres = JSON.parse(document.getElementById('available-genres-' + rowId).value || '[]');
-    
     // Initialize series typeahead
     const seriesInput = document.getElementById('series-' + rowId);
     const availableSeries = JSON.parse(document.getElementById('available-series-' + rowId).value || '[]');
     
-    if (seriesInput && availableSeries) {
+    if (seriesInput && availableSeries.length > 0) {
         const seriesBloodhound = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.whitespace,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -66,27 +62,6 @@ function initializeAutocomplete(rowId) {
         {
             name: 'series',
             source: seriesBloodhound,
-            limit: 10
-        });
-    }
-    
-    if (genresInput && availableGenres.length) {
-        const genresBloodhound = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            local: availableGenres
-        });
-
-        genresBloodhound.initialize();
-
-        $(genresInput).typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-            name: 'genres',
-            source: genresBloodhound.ttAdapter(),
             limit: 10
         });
     }
@@ -207,11 +182,19 @@ function initializeAuthorAutocomplete(authorEntry, rowId) {
     
     // Convert authors from "firstName|lastName" format to "firstName lastName" format
     const authorNames = authors.map(author => {
-        const [firstName, lastName] = author.split('|');
-        return `${firstName} ${lastName}`;
-    });
+        if (typeof author === 'string' && author.includes('|')) {
+            const [firstName, lastName] = author.split('|');
+            return `${firstName.trim()} ${lastName.trim()}`;
+        }
+        return author;
+    }).filter(name => name && name.trim());
     
     if (authorNames.length > 0) {
+        // Destroy existing typeahead if present
+        if ($(authorInput).data('ttTypeahead')) {
+            $(authorInput).typeahead('destroy');
+        }
+        
         const authorsBloodhound = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.whitespace,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
