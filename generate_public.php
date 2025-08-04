@@ -170,15 +170,10 @@ function buildUrl($params = []) {
         /* Ukrywanie/pokazywanie filtrów */
         .filters-toggle {
             margin-bottom: 16px;
-            text-align: center;
         }
         
-        .filters-checkbox {
-            display: none;
-        }
-        
-        .filters-toggle-btn {
-            display: inline-block;
+        .filters-toggle summary {
+            display: block;
             padding: 12px 24px;
             border: 2px solid #000000;
             background: #ffffff;
@@ -187,31 +182,17 @@ function buildUrl($params = []) {
             font-weight: bold;
             cursor: pointer;
             text-align: center;
+            list-style: none;
             user-select: none;
         }
         
-        .filters-toggle-btn:hover {
+        .filters-toggle summary:hover {
             background: #000000;
             color: #ffffff;
         }
         
-        /* Domyślnie filtry ukryte */
-        .filters-container {
+        .filters-toggle summary::-webkit-details-marker {
             display: none;
-        }
-        
-        /* Pokazywanie/ukrywanie tekstu na przycisku */
-        .filters-checkbox:checked + .filters-toggle-btn .show-text {
-            display: none;
-        }
-        
-        .filters-checkbox:not(:checked) + .filters-toggle-btn .hide-text {
-            display: none;
-        }
-        
-        /* Pokazywanie filtrów gdy checkbox zaznaczony */
-        .filters-checkbox:checked ~ .filters-container {
-            display: block;
         }
         
         body {
@@ -544,16 +525,8 @@ function buildUrl($params = []) {
         <h1 class="main-title">E-Biblioteczka - Książki do pobrania</h1>
         
         <!-- Przycisk do pokazywania/ukrywania filtrów -->
-        <div class="filters-toggle">
-            <input type="checkbox" id="show-filters" class="filters-checkbox">
-            <label for="show-filters" class="btn filters-toggle-btn">
-                <span class="show-text">📋 Pokaż filtry</span>
-                <span class="hide-text">📋 Ukryj filtry</span>
-            </label>
-        </div>
-        
-        <!-- Kontener z filtrami -->
-        <div class="filters-container">
+        <details class="filters-toggle">
+            <summary>📋 Pokaż/Ukryj filtry</summary>
             <!-- Sekcja wyszukiwania -->
             <div class="form-section">
                 <h3>Wyszukiwanie</h3>
@@ -609,7 +582,7 @@ function buildUrl($params = []) {
                 <button type="submit" class="btn">Sortuj</button>
             </form>
         </div>
-        </div>
+        </details>
         <!-- Koniec kontenera z filtrami -->
         
         <?php if (!empty($search) || !empty($genre) || !empty($series)): ?>
