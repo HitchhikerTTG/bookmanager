@@ -2,15 +2,30 @@
 session_start();
 
 // Include central version definition
-require_once 'includes/version.php';
+$basePath = dirname(__FILE__);
+$includesPath = $basePath . '/includes/';
+
+if (file_exists($includesPath . 'version.php')) {
+    require_once $includesPath . 'version.php';
+} else {
+    define('SCRIPT_VERSION', '1.0.4-relocated');
+}
 
 function debug_log($message) {
     echo "<div style='background: #f8f9fa; border: 1px solid #ddd; margin: 2px; padding: 5px;'>DEBUG: " . htmlspecialchars($message) . "</div>";
 }
 
-debug_log("Script started");
+debug_log("Script started from: " . __FILE__);
+debug_log("Base path: " . $basePath);
+debug_log("Includes path: " . $includesPath);
 
-require_once 'includes/BookManager.php';
+if (file_exists($includesPath . 'BookManager.php')) {
+    require_once $includesPath . 'BookManager.php';
+    debug_log("BookManager.php loaded successfully");
+} else {
+    debug_log("ERROR: BookManager.php not found at: " . $includesPath . 'BookManager.php');
+    die("Critical error: BookManager.php not found");
+}
 $manager = new BookManager();
 ?>
 <!DOCTYPE html>
@@ -136,7 +151,7 @@ $manager = new BookManager();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
-    <script src="js/bookEditor.js"></script>
+    <script src="<?php echo dirname($_SERVER['SCRIPT_NAME']) . '/'; ?>js/bookEditor.js"></script>
     <script>
         $(document).ready(function() {
             $('.edit-form:not(.d-none)').each(function() {

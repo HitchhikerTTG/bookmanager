@@ -1,6 +1,17 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-require_once 'includes/BookManager.php';
+
+$basePath = dirname(__FILE__);
+$includesPath = $basePath . '/includes/';
+
+if (file_exists($includesPath . 'BookManager.php')) {
+    require_once $includesPath . 'BookManager.php';
+} else {
+    error_log("BookManager.php not found at: " . $includesPath . 'BookManager.php');
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'BookManager not found']);
+    exit();
+}
 
 try {
     error_log("Processing book submission");
