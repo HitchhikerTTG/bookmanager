@@ -212,6 +212,12 @@ function buildUrl($params = []) {
             line-height: 1.5;
             padding: 16px;
             font-size: 16px;
+            min-font-size: 16px;
+        }
+        
+        /* Zapewniamy minimalną czcionkę 16px dla wszystkich elementów */
+        * {
+            font-size: max(1em, 16px);
         }
         
         .container {
@@ -300,7 +306,7 @@ function buildUrl($params = []) {
         }
         
         .active-filters {
-            font-size: 0.9em;
+            font-size: max(0.9em, 16px);
             margin-top: 8px;
             color: #333333;
         }
@@ -523,7 +529,7 @@ function buildUrl($params = []) {
             margin-top: 32px;
             padding: 16px;
             color: #666666;
-            font-size: 0.9em;
+            font-size: max(0.9em, 16px);
             border-top: 1px solid #cccccc;
         }
         
