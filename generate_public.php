@@ -1,27 +1,77 @@
 
 <?php
-require_once 'includes/BookManager.php';
-require_once 'includes/functions.php';
 
-function debug_log($message) {
-    error_log("[" . date('Y-m-d H:i:s') . "] " . $message);
+// Funkcja do wczytywania danych z pliku JSON
+function loadJsonFile($filePath) {
+    if (!file_exists($filePath)) {
+        die("Błąd: Plik $filePath nie istnieje.");
+    }
+
+    $jsonData = file_get_contents($filePath);
+
+    if ($jsonData === false) {
+        die("Błąd: Nie można odczytać pliku $filePath. Sprawdź uprawnienia.");
+    }
+
+    $data = json_decode($jsonData, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        die("Błąd: Nie można zdekodować JSON z pliku $filePath. " . json_last_error_msg());
+    }
+
+    return $data;
 }
 
-try {
-    debug_log("Starting public page generation");
-    $manager = new BookManager();
-    $processedBooks = $manager->getProcessedBooks();
-    $generationTime = date('Y-m-d H:i:s');
-    
-    // Get all unique genres and series
-    $allGenres = [];
-    $allSeries = [];
-    foreach ($processedBooks as $book) {
-        foreach ($book['genres'] as $genre) {
-            if (!in_array($genre, $allGenres)) {
-                $allGenres[] = $genre;
+// Wczytanie danych z JSON
+$booksFile = 'data/books.json';
+$booksData = loadJsonFile($booksFile);
+
+if (!isset($booksData['books']) || !is_array($booksData['books'])) {
+    die("Błąd: Nieprawidłowa struktura pliku JSON.");
+}
+
+$books = $booksData['books'];
+
+// Data i godzina generowania strony
+$generationTime = date('Y-m-d H:i:s');
+
+// Przygotowanie kodu PHP do wygenerowanego pliku
+$booksJson = json_encode($books, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+$indexContent = <<<PHP
+<?php
+
+// Dane książek
+\$books = json_decode('{$booksJson}', true);
+
+// Dynamiczne pobieranie domeny
+\$protocol = (!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+\$domain = \$protocol . "://" . \$_SERVER['HTTP_HOST'];
+
+// Parametry URL
+\$sort = \$_GET['sort'] ?? null;
+\$filterGenre = \$_GET['genre'] ?? null;
+\$filterAuthor = \$_GET['author'] ?? null;
+\$filterSeries = \$_GET['series'] ?? null;
+
+// Filtry i sortowanie
+\$filteredBooks = \$books;
+
+if (\$filterGenre) {
+    \$filteredBooks = array_filter(\$filteredBooks, function (\$book) use (\$filterGenre) {
+        return in_array(\$filterGenre, \$book['genres']);
+    });
+}
+
+if (\$filterAuthor) {
+    \$filteredBooks = array_filter(\$filteredBooks, function (\$book) use (\$filterAuthor) {
+        foreach (\$book['authors'] as \$author) {
+            \$authorFullName = \$author['first_name'] . ' ' . \$author['last_name'];
+            if (\$authorFullName === \$filterAuthor) {
+                return true;
             }
         }
+
         if (!empty($book['series']) && !in_array($book['series'], $allSeries)) {
             $allSeries[] = $book['series'];
         }
@@ -120,14 +170,30 @@ function buildUrl($params = []) {
     $merged = array_merge($current, $params);
     $query = http_build_query(array_filter($merged, function($v) { return $v !== ""; }));
     return "?" . $query;
-}
-?>' . "\n";
 
-    $html .= <<<HTML
+}
+
+// Generowanie informacji o filtrze
+\$filterDescription = "Wszystkie książki";
+if (\$filterGenre) {
+    \$filterDescription = "Książki z gatunku: " . htmlspecialchars(\$filterGenre);
+}
+if (\$filterAuthor) {
+    \$filterDescription .= " autora: " . htmlspecialchars(\$filterAuthor);
+}
+if (\$filterSeries) {
+    \$filterDescription = "Książki z serii: " . htmlspecialchars(\$filterSeries);
+}
+
+if (empty(\$filteredBooks)) {
+    \$filterDescription .= " (Brak wyników)";
+}
+?>
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generation-time" content="{$generationTime}">
     <title>Moja Biblioteka</title>
@@ -309,10 +375,12 @@ function buildUrl($params = []) {
         .series-link:hover {
             background: #006600;
             color: #ffffff;
+
         }
     </style>
 </head>
 <body>
+
     <div class="container">
         <h1>Moja Biblioteka</h1>
         
@@ -334,17 +402,20 @@ function buildUrl($params = []) {
                     <label for="genre">Gatunek:</label>
                     <select id="genre" name="genre">
                         <option value="">Wszystkie</option>
+
 HTML;
 
     foreach ($allGenres as $g) {
         $html .= '<option value="' . htmlspecialchars($g) . '"<?php echo $genre === "' . htmlspecialchars($g) . '" ? " selected" : ""; ?>>' . htmlspecialchars($g) . '</option>' . "\n";
     }
 
+
     $html .= <<<HTML
                     </select>
                     <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
                     <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
                     <input type="submit" value="Filtruj">
+
                 </div>
             </form>
             
@@ -366,6 +437,7 @@ HTML;
             <div class="clear-filters">
                 <a href="?" style="color: #cc0000; font-weight: bold;">Wyczyść wszystkie filtry</a>
             </div>
+
             <?php endif; ?>
         </div>
         
@@ -449,10 +521,13 @@ HTML;
             Strona wygenerowana: <?php echo htmlspecialchars($generationTime); ?>
             <br>Całkowita liczba książek: <?php echo count($processedBooks); ?>
         </div>
+
     </div>
+</div>
 </body>
 </html>
-HTML;
+PHP;
+
 
     debug_log("HTML generation completed");
     
@@ -468,3 +543,4 @@ HTML;
     header('Content-Type: application/json');
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
+
