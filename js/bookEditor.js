@@ -45,9 +45,11 @@ function initializeAuthors(rowId) {
 function initializeAutocomplete(rowId) {
     // Initialize series typeahead
     const seriesInput = document.getElementById('series-' + rowId);
+    if (!seriesInput || $(seriesInput).data('ttTypeahead')) return; // Skip if already initialized
+    
     const availableSeries = JSON.parse(document.getElementById('available-series-' + rowId).value || '[]');
     
-    if (seriesInput && availableSeries.length > 0) {
+    if (availableSeries.length > 0) {
         const seriesBloodhound = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.whitespace,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -87,13 +89,7 @@ function editBook(fileName, title, genres, series, seriesPosition, comment) {
     }
 }
 
-function handleAuthorSelect(select) {
-    const container = select.closest('.author-entry');
-    const [firstName, lastName] = select.value ? select.value.split('|') : ['', ''];
-    const inputs = container.querySelector('.author-inputs');
-    inputs.querySelector('input[name$="[first_name]"]').value = firstName;
-    inputs.querySelector('input[name$="[last_name]"]').value = lastName;
-}
+
 
 let currentRowId = null;
 
@@ -175,7 +171,7 @@ function updateAuthorIndices(rowId) {
 
 function initializeAuthorAutocomplete(authorEntry, rowId) {
     const authorInput = authorEntry.querySelector('.author-input');
-    if (!authorInput) return;
+    if (!authorInput || $(authorInput).data('ttTypeahead')) return; // Skip if already initialized
     
     const availableAuthorsElement = document.getElementById('available-authors-' + rowId);
     const authors = availableAuthorsElement ? JSON.parse(availableAuthorsElement.value || '[]') : [];
@@ -190,11 +186,6 @@ function initializeAuthorAutocomplete(authorEntry, rowId) {
     }).filter(name => name && name.trim());
     
     if (authorNames.length > 0) {
-        // Destroy existing typeahead if present
-        if ($(authorInput).data('ttTypeahead')) {
-            $(authorInput).typeahead('destroy');
-        }
-        
         const authorsBloodhound = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.whitespace,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -211,23 +202,6 @@ function initializeAuthorAutocomplete(authorEntry, rowId) {
             source: authorsBloodhound,
             limit: 10
         });
-    }
-}
-
-function handleAuthorSelect(selectElement, rowId) {
-    const selectedValue = selectElement.value;
-    if (selectedValue) {
-        const [firstName, lastName] = selectedValue.split('|');
-        const authorEntry = selectElement.closest('.author-entry');
-        
-        const firstNameInput = authorEntry.querySelector('input[name*="[first_name]"]');
-        const lastNameInput = authorEntry.querySelector('input[name*="[last_name]"]');
-        
-        if (firstNameInput) firstNameInput.value = firstName || '';
-        if (lastNameInput) lastNameInput.value = lastName || '';
-        
-        // Reset select to default
-        selectElement.value = '';
     }
 }
 

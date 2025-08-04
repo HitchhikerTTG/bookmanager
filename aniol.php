@@ -14,19 +14,6 @@ $manager = new BookManager();
 <!DOCTYPE html>
 
     <style>
-        .bootstrap-tagsinput {
-            width: 100%;
-            padding: 8px;
-            border-radius: 4px;
-        }
-        .bootstrap-tagsinput .tag {
-            margin-right: 4px;
-            padding: 4px 8px;
-            color: white !important;
-            background-color: #0d6efd;
-            border-radius: 3px;
-            display: inline-block;
-        }
         .tt-menu {
             width: 100%;
             padding: 8px;
@@ -156,21 +143,16 @@ $manager = new BookManager();
                 initializeAutocomplete(rowId);
             });
         });
+        
+        function generatePublicPage() {
+            fetch('generate_public.php')
+                .then(response => response.json())
+                .then(data => {
+                    if(data.success) {
+                        alert('Strona została wygenerowana pomyślnie');
+                    }
+                });
+        }
     </script>
 </body>
-
-        <script>
-            function generatePublicPage() {
-                fetch('generate_public.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.success) {
-                            alert('Strona została wygenerowana pomyślnie');
-                        }
-                    });
-            }
-        </script>
-    </body>
-</html>
-
 </html>
