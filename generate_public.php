@@ -1,81 +1,61 @@
 
 <?php
 
-// Funkcja do wczytywania danych z pliku JSON
-function loadJsonFile($filePath) {
-    if (!file_exists($filePath)) {
-        die("Błąd: Plik $filePath nie istnieje.");
+function debug_log($message) {
+    error_log("[GENERATE_PUBLIC] " . $message);
+}
+
+try {
+    debug_log("Starting HTML generation");
+    
+    // Load books data
+    if (!file_exists('data/books.json')) {
+        throw new Exception("books.json not found");
     }
-
-    $jsonData = file_get_contents($filePath);
-
-    if ($jsonData === false) {
-        die("Błąd: Nie można odczytać pliku $filePath. Sprawdź uprawnienia.");
-    }
-
-    $data = json_decode($jsonData, true);
-
+    
+    $jsonContent = file_get_contents('data/books.json');
+    $booksData = json_decode($jsonContent, true);
+    
     if (json_last_error() !== JSON_ERROR_NONE) {
-        die("Błąd: Nie można zdekodować JSON z pliku $filePath. " . json_last_error_msg());
+        throw new Exception("Invalid JSON in books.json: " . json_last_error_msg());
     }
-
-    return $data;
-}
-
-// Wczytanie danych z JSON
-$booksFile = 'data/books.json';
-$booksData = loadJsonFile($booksFile);
-
-if (!isset($booksData['books']) || !is_array($booksData['books'])) {
-    die("Błąd: Nieprawidłowa struktura pliku JSON.");
-}
-
-$books = $booksData['books'];
-
-// Data i godzina generowania strony
-$generationTime = date('Y-m-d H:i:s');
-
-// Przygotowanie kodu PHP do wygenerowanego pliku
-$booksJson = json_encode($books, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-
-$indexContent = <<<PHP
-<?php
-
-// Dane książek
-\$books = json_decode('{$booksJson}', true);
-
-// Dynamiczne pobieranie domeny
-\$protocol = (!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-\$domain = \$protocol . "://" . \$_SERVER['HTTP_HOST'];
-
-// Parametry URL
-\$sort = \$_GET['sort'] ?? null;
-\$filterGenre = \$_GET['genre'] ?? null;
-\$filterAuthor = \$_GET['author'] ?? null;
-\$filterSeries = \$_GET['series'] ?? null;
-
-// Filtry i sortowanie
-\$filteredBooks = \$books;
-
-if (\$filterGenre) {
-    \$filteredBooks = array_filter(\$filteredBooks, function (\$book) use (\$filterGenre) {
-        return in_array(\$filterGenre, \$book['genres']);
+    
+    if (!isset($booksData['books']) || !is_array($booksData['books'])) {
+        throw new Exception("Invalid structure in books.json");
+    }
+    
+    $rawBooks = $booksData['books'];
+    debug_log("Loaded " . count($rawBooks) . " books from JSON");
+    
+    // Process books - filter only complete ones
+    $processedBooks = array_filter($rawBooks, function($book) {
+        return !empty($book['title']) && 
+               !empty($book['authors']) && 
+               count($book['authors']) > 0 &&
+               !empty($book['authors'][0]['first_name']) && 
+               !empty($book['authors'][0]['last_name']);
     });
-}
-
-if (\$filterAuthor) {
-    \$filteredBooks = array_filter(\$filteredBooks, function (\$book) use (\$filterAuthor) {
-        foreach (\$book['authors'] as \$author) {
-            \$authorFullName = \$author['first_name'] . ' ' . \$author['last_name'];
-            if (\$authorFullName === \$filterAuthor) {
-                return true;
+    
+    debug_log("Filtered to " . count($processedBooks) . " complete books");
+    
+    // Gather all unique genres and series
+    $allGenres = [];
+    $allSeries = [];
+    
+    foreach ($processedBooks as $book) {
+        if (!empty($book['genres'])) {
+            foreach ($book['genres'] as $genre) {
+                if (!in_array($genre, $allGenres)) {
+                    $allGenres[] = $genre;
+                }
             }
         }
-
+        
         if (!empty($book['series']) && !in_array($book['series'], $allSeries)) {
             $allSeries[] = $book['series'];
         }
     }
+    
     sort($allGenres);
     sort($allSeries);
     debug_log("Found " . count($allGenres) . " unique genres and " . count($allSeries) . " series");
@@ -170,32 +150,14 @@ function buildUrl($params = []) {
     $merged = array_merge($current, $params);
     $query = http_build_query(array_filter($merged, function($v) { return $v !== ""; }));
     return "?" . $query;
-
-}
-
-// Generowanie informacji o filtrze
-\$filterDescription = "Wszystkie książki";
-if (\$filterGenre) {
-    \$filterDescription = "Książki z gatunku: " . htmlspecialchars(\$filterGenre);
-}
-if (\$filterAuthor) {
-    \$filterDescription .= " autora: " . htmlspecialchars(\$filterAuthor);
-}
-if (\$filterSeries) {
-    \$filterDescription = "Książki z serii: " . htmlspecialchars(\$filterSeries);
-}
-
-if (empty(\$filteredBooks)) {
-    \$filterDescription .= " (Brak wyników)";
 }
 ?>
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generation-time" content="{$generationTime}">
+    <meta name="generation-time" content="' . date('Y-m-d H:i:s') . '">
     <title>Moja Biblioteka</title>
     <style>
         body {
@@ -375,12 +337,10 @@ if (empty(\$filteredBooks)) {
         .series-link:hover {
             background: #006600;
             color: #ffffff;
-
         }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>Moja Biblioteka</h1>
         
@@ -401,21 +361,16 @@ if (empty(\$filteredBooks)) {
                 <div class="control-row">
                     <label for="genre">Gatunek:</label>
                     <select id="genre" name="genre">
-                        <option value="">Wszystkie</option>
-
-HTML;
+                        <option value="">Wszystkie</option>';
 
     foreach ($allGenres as $g) {
         $html .= '<option value="' . htmlspecialchars($g) . '"<?php echo $genre === "' . htmlspecialchars($g) . '" ? " selected" : ""; ?>>' . htmlspecialchars($g) . '</option>' . "\n";
     }
 
-
-    $html .= <<<HTML
-                    </select>
+    $html .= '                    </select>
                     <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
                     <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
                     <input type="submit" value="Filtruj">
-
                 </div>
             </form>
             
@@ -437,14 +392,13 @@ HTML;
             <div class="clear-filters">
                 <a href="?" style="color: #cc0000; font-weight: bold;">Wyczyść wszystkie filtry</a>
             </div>
-
             <?php endif; ?>
         </div>
         
         <?php if ($series): ?>
         <div style="text-align: center; margin: 10px 0; padding: 10px; border: 1px solid #006600; background: #f0f8f0;">
             <strong>Seria: <?php echo htmlspecialchars($series); ?></strong>
-            <br><a href="<?php echo buildUrl(['series' => '', 'page' => 1]); ?>">← Powrót do wszystkich książek</a>
+            <br><a href="<?php echo buildUrl([\'series\' => \'\', \'page\' => 1]); ?>">← Powrót do wszystkich książek</a>
         </div>
         <?php endif; ?>
         
@@ -462,24 +416,24 @@ HTML;
             
             <?php foreach ($booksForPage as $book): ?>
             <div class="book-row">
-                <div class="book-title"><?php echo htmlspecialchars($book['title']); ?></div>
+                <div class="book-title"><?php echo htmlspecialchars($book[\'title\']); ?></div>
                 <div class="book-author">
-                    <?php echo implode(', ', array_map(function($author) {
-                        return htmlspecialchars($author['first_name'] . ' ' . $author['last_name']);
-                    }, $book['authors'])); ?>
+                    <?php echo implode(\', \', array_map(function($author) {
+                        return htmlspecialchars($author[\'first_name\'] . \' \' . $author[\'last_name\']);
+                    }, $book[\'authors\'])); ?>
                 </div>
-                <div class="book-genres"><?php echo htmlspecialchars(implode(', ', $book['genres'])); ?></div>
-                <?php if (!empty($book['series'])): ?>
+                <div class="book-genres"><?php echo htmlspecialchars(implode(\', \', $book[\'genres\'])); ?></div>
+                <?php if (!empty($book[\'series\'])): ?>
                 <div class="book-series">
-                    <a href="<?php echo buildUrl(['series' => $book['series'], 'page' => 1]); ?>" class="series-link">
-                        <?php echo htmlspecialchars($book['series']); ?>
-                        <?php echo !empty($book['series_position']) ? ' #' . htmlspecialchars($book['series_position']) : ''; ?>
+                    <a href="<?php echo buildUrl([\'series\' => $book[\'series\'], \'page\' => 1]); ?>" class="series-link">
+                        <?php echo htmlspecialchars($book[\'series\']); ?>
+                        <?php echo !empty($book[\'series_position\']) ? \' #\' . htmlspecialchars($book[\'series_position\']) : \'\'; ?>
                     </a>
                 </div>
                 <?php endif; ?>
                 <div class="download-links">
-                    <a href="https://<?php echo $_SERVER['HTTP_HOST']; ?>/_ksiazki/<?php echo htmlspecialchars($book['file_name']); ?>">HTTPS</a>
-                    <a href="http://<?php echo $_SERVER['HTTP_HOST']; ?>/_ksiazki/<?php echo htmlspecialchars($book['file_name']); ?>">HTTP</a>
+                    <a href="https://<?php echo $_SERVER[\'HTTP_HOST\']; ?>/_ksiazki/<?php echo htmlspecialchars($book[\'file_name\']); ?>">HTTPS</a>
+                    <a href="http://<?php echo $_SERVER[\'HTTP_HOST\']; ?>/_ksiazki/<?php echo htmlspecialchars($book[\'file_name\']); ?>">HTTP</a>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -494,8 +448,8 @@ HTML;
         <?php if ($totalPages > 1): ?>
         <div class="pagination">
             <?php if ($page > 1): ?>
-                <a href="<?php echo buildUrl(['page' => 1]); ?>">Pierwsza</a>
-                <a href="<?php echo buildUrl(['page' => $page - 1]); ?>">Poprzednia</a>
+                <a href="<?php echo buildUrl([\'page\' => 1]); ?>">Pierwsza</a>
+                <a href="<?php echo buildUrl([\'page\' => $page - 1]); ?>">Poprzednia</a>
             <?php endif; ?>
             
             <?php
@@ -506,28 +460,24 @@ HTML;
                 if ($i == $page): ?>
                     <span class="current"><?php echo $i; ?></span>
                 <?php else: ?>
-                    <a href="<?php echo buildUrl(['page' => $i]); ?>"><?php echo $i; ?></a>
+                    <a href="<?php echo buildUrl([\'page\' => $i]); ?>"><?php echo $i; ?></a>
                 <?php endif;
             endfor; ?>
             
             <?php if ($page < $totalPages): ?>
-                <a href="<?php echo buildUrl(['page' => $page + 1]); ?>">Następna</a>
-                <a href="<?php echo buildUrl(['page' => $totalPages]); ?>">Ostatnia</a>
+                <a href="<?php echo buildUrl([\'page\' => $page + 1]); ?>">Następna</a>
+                <a href="<?php echo buildUrl([\'page\' => $totalPages]); ?>">Ostatnia</a>
             <?php endif; ?>
         </div>
         <?php endif; ?>
         
         <div class="footer">
-            Strona wygenerowana: <?php echo htmlspecialchars($generationTime); ?>
+            Strona wygenerowana: ' . date('Y-m-d H:i:s') . '
             <br>Całkowita liczba książek: <?php echo count($processedBooks); ?>
         </div>
-
     </div>
-</div>
 </body>
-</html>
-PHP;
-
+</html>';
 
     debug_log("HTML generation completed");
     
@@ -543,4 +493,4 @@ PHP;
     header('Content-Type: application/json');
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
-
+?>
