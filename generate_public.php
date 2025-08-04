@@ -534,13 +534,13 @@ function buildUrl($params = []) {
     <div class="container">
         <h1 class="main-title"><?php 
             if ($series) {
-                echo "Seria: " . htmlspecialchars($series);
+                echo "Seria: " . htmlspecialchars($series) . " (" . $totalBooks . " książek)";
             } elseif ($genre && $genre !== "all") {
-                echo "Gatunek: " . htmlspecialchars($genre);
+                echo "Gatunek: " . htmlspecialchars($genre) . " (" . $totalBooks . " książek)";
             } elseif ($search) {
-                echo "Wyniki wyszukiwania: \"" . htmlspecialchars($search) . "\"";
+                echo "Wyniki wyszukiwania: \"" . htmlspecialchars($search) . "\" (" . $totalBooks . " książek)";
             } else {
-                echo "Wszystkie książki";
+                echo "Wszystkie książki (" . $totalBooks . " książek)";
             }
         ?></h1>
         
@@ -617,24 +617,6 @@ function buildUrl($params = []) {
             <a href="<?php echo buildUrl([\'series\' => \'\', \'page\' => 1]); ?>" class="btn">← Powrót do wszystkich książek</a>
         </div>
         <?php endif; ?>
-        
-        <!-- Informacja o wynikach -->
-        <div class="results-info">
-            <strong>Znaleziono <?php echo $totalBooks; ?> książek</strong>
-            <?php if (!empty($search) || !empty($genre)): ?>
-            <div class="active-filters">
-                Aktywne filtry:
-                <?php if (!empty($search)): ?>
-                    Szukane: "<?php echo htmlspecialchars($search); ?>"
-                <?php endif; ?>
-                <?php if (!empty($genre)): ?>
-                    Gatunek: <?php echo htmlspecialchars($genre); ?>
-                <?php endif; ?>
-            </div>
-            <?php endif; ?>
-        </div>
-        
-        
         
         <!-- Lista książek -->
         <div class="books-list">
