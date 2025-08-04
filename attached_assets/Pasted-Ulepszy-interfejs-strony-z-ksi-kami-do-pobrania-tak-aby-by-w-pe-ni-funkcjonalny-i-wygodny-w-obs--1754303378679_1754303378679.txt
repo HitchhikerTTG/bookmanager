@@ -1,0 +1,65 @@
+Ulepszyć interfejs strony z książkami do pobrania, tak aby był w pełni funkcjonalny i wygodny w obsłudze na urządzeniach e-czytnikowych, które mają ograniczoną wydajność, często nie wspierają JavaScriptu i źle radzą sobie z dużą ilością detali graficznych.
+
+Strona powinna być szybka, maksymalnie uproszczona wizualnie, i umożliwiać łatwe filtrowanie oraz pobieranie książek.
+
+⸻
+
+📌 Zakres prac
+
+1. Filtrowanie książek
+	•	Zamiast obecnych klikanych tagów, wprowadź możliwość filtrowania książek według kategorii za pomocą prostego formularza.
+	•	Formularz powinien zawierać wybór kategorii (np. kryminał, biografia), działający również bez JavaScriptu.
+	•	Po wybraniu kategorii i zatwierdzeniu, użytkownik widzi tylko książki z tej kategorii.
+
+2. Sortowanie
+	•	Dodaj możliwość sortowania książek:
+	•	alfabetycznie po tytule
+	•	alfabetycznie po autorze
+	•	według daty dodania (najnowsze pierwsze)
+
+3. Wyszukiwanie
+	•	Dodaj prostą wyszukiwarkę, która pozwala użytkownikowi wpisać tytuł lub autora i wyświetli tylko dopasowane książki.
+	•	Wyszukiwanie ma działać bez JavaScriptu — może być obsługiwane przez parametr GET w URL.
+
+4. Stronicowanie
+	•	Jeśli książek jest więcej niż np. 30, nie pokazuj ich wszystkich na jednej stronie.
+	•	Zastosuj stronicowanie w klasycznym stylu (np. „1 2 3 Następna”), aby uniknąć długiego przewijania.
+	•	Nawigacja między stronami musi być możliwa przy pomocy prostych linków tekstowych.
+
+5. Kompaktowy widok listy
+	•	Zmień układ prezentacji książek z obecnych dużych bloków na bardziej kompaktowy – każda książka powinna być prezentowana jako jedna linijka: tytuł, autor, linki do pobrania.
+	•	Na jednej stronie powinno mieścić się nawet kilkadziesiąt pozycji, czytelnie i bez nadmiaru białej przestrzeni.
+
+6. Linki do pobierania – HTTPS i HTTP
+	•	Dla każdej książki powinny być dostępne dwa linki do pobrania:
+	•	jeden działający przez HTTPS (dla większości urządzeń),
+	•	drugi przez HTTP (dla starszych czytników Kindle).
+	•	Użytkownik musi od razu wiedzieć, który link jest który — oznaczenia muszą być jasne.
+
+7. Styl minimalistyczny, kontrastowy
+	•	Styl strony powinien być maksymalnie uproszczony:
+	•	czarne litery na białym tle,
+	•	bez animacji, gradientów, ikon SVG itp.,
+	•	duży kontrast tekstu i linków,
+	•	wygodna czytelność nawet na ekranach o słabym kontraście.
+
+⸻
+
+🧪 Testowanie
+
+Prosimy o przetestowanie rozwiązania:
+	•	na przeglądarce w trybie “bez CSS” lub z wyłączonym JS,
+	•	na emulatorze Kindle lub na fizycznym czytniku e-ink (np. Kindle, Boox),
+	•	przy użyciu wolnego połączenia (symulacja).
+
+⸻
+
+📄 Efekt końcowy
+
+Użytkownik korzystający z e-czytnika powinien móc:
+	•	łatwo przefiltrować listę książek,
+	•	wyszukać konkretny tytuł lub autora,
+	•	posortować wyniki,
+	•	bez problemu pobrać plik (nawet jeśli jego Kindle obsługuje tylko HTTP),
+	•	nawigować po kolejnych stronach listy,
+	•	cieszyć się prostym, lekkim interfejsem.
