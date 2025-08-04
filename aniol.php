@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-// Define script version
-define('SCRIPT_VERSION', '1.0.0');
+// Include central version definition
+require_once 'includes/version.php';
 
 function debug_log($message) {
     echo "<div style='background: #f8f9fa; border: 1px solid #ddd; margin: 2px; padding: 5px;'>DEBUG: " . htmlspecialchars($message) . "</div>";
