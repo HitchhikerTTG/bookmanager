@@ -1,6 +1,8 @@
-
 <?php
 session_start();
+
+// Define script version
+define('SCRIPT_VERSION', '1.0.0');
 
 function debug_log($message) {
     echo "<div style='background: #f8f9fa; border: 1px solid #ddd; margin: 2px; padding: 5px;'>DEBUG: " . htmlspecialchars($message) . "</div>";
@@ -35,18 +37,18 @@ $manager = new BookManager();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Book Manager</title>
+    <title>Book Manager v<?php echo SCRIPT_VERSION; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    
-    
+    <!-- Cache busting meta tag -->
+    <meta name="cache-version" content="<?php echo SCRIPT_VERSION; ?>-<?php echo filemtime(__FILE__); ?>">
 </head>
 <body>
     <div class="container mt-4">
         <h1>Book Manager</h1>
         <button onclick="generatePublicPage()" class="btn btn-primary mb-3">Generuj stronę publiczną</button>
         <?php include 'templates/library.php'; ?>
-        
+
         <div class="row mt-4">
             <div class="col-md-6">
                 <h3>Authors Statistics</h3>
@@ -76,7 +78,7 @@ $manager = new BookManager();
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="col-md-6">
                 <h3>Genres Statistics</h3>
                 <table class="table table-striped">
@@ -105,7 +107,7 @@ $manager = new BookManager();
                 </table>
             </div>
         </div>
-        
+
         <div class="row mt-4">
             <div class="col-12">
                 <h3>Available Genre Predictions</h3>
@@ -127,13 +129,13 @@ $manager = new BookManager();
             </div>
         </div>
     </div>
-    
+
     <?php include 'templates/modals.php'; ?>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    
+
+
     <script src="js/bookEditor.js"></script>
     <script>
         $(document).ready(function() {
@@ -143,7 +145,7 @@ $manager = new BookManager();
                 initializeAutocomplete(rowId);
             });
         });
-        
+
         function generatePublicPage() {
             fetch('generate_public.php')
                 .then(response => response.json())
@@ -154,5 +156,8 @@ $manager = new BookManager();
                 });
         }
     </script>
+    <footer class="text-center mt-4">
+        <p>&copy; Book Manager <?php echo date('Y'); ?> | Version: <?php echo SCRIPT_VERSION; ?></p>
+    </footer>
 </body>
 </html>
