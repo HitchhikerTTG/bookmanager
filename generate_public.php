@@ -195,12 +195,12 @@ function buildUrl($params = []) {
             color: #ffffff;
         }
         
+        /* Domyślnie filtry ukryte */
         .filters-container {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
+            display: none;
         }
         
+        /* Pokazywanie/ukrywanie tekstu na przycisku */
         .filters-checkbox:checked + .filters-toggle-btn .show-text {
             display: none;
         }
@@ -209,9 +209,9 @@ function buildUrl($params = []) {
             display: none;
         }
         
+        /* Pokazywanie filtrów gdy checkbox zaznaczony */
         .filters-checkbox:checked ~ .filters-container {
-            max-height: 1000px;
-            transition: max-height 0.5s ease-in;
+            display: block;
         }
         
         body {
