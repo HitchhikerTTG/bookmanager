@@ -317,15 +317,22 @@ function buildUrl($params = []) {
         }
         
         .book-item {
-            margin-bottom: 24px;
-            padding: 16px;
+            margin-bottom: 32px;
+            padding: 20px;
             border: 1px solid #cccccc;
+            border-bottom: 3px solid #dddddd;
             background: #ffffff;
             line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .book-item:nth-child(even) {
             background: #f9f9f9;
+        }
+        
+        .book-item:last-child {
+            margin-bottom: 16px;
+            border-bottom: 1px solid #cccccc;
         }
         
         /* Linia 1: Tytuł ↔ Autor */
