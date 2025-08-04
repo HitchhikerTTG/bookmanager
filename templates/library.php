@@ -118,7 +118,7 @@
                             </div>
                         </div>
                         <div id="authors-container-<?php echo $rowId; ?>"></div>
-                        <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="addAuthor()">Add Author</button>
+                        <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="addAuthor('<?php echo $rowId; ?>')">Dodaj autora</button>
                         <div class="row g-3 mt-3">
                             <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Series</label>

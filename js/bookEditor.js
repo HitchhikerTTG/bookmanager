@@ -10,16 +10,27 @@ function toggleEditForm(rowId) {
 }
 
 function initializeAuthors(rowId) {
+    currentRowId = rowId;
     const container = document.getElementById('authors-container-' + rowId);
     if (container) {
         container.innerHTML = '';
         const form = document.getElementById('editBookForm-' + rowId);
-        const authorData = form.getAttribute('data-authors');
+        const authorData = form ? form.getAttribute('data-authors') : null;
+        
         if (authorData) {
-            const authors = JSON.parse(authorData);
-            authors.forEach(author => {
-                addAuthorEntry(author.first_name, author.last_name, rowId);
-            });
+            try {
+                const authors = JSON.parse(authorData);
+                if (authors && authors.length > 0) {
+                    authors.forEach(author => {
+                        addAuthorEntry(author.first_name || '', author.last_name || '', rowId);
+                    });
+                } else {
+                    addAuthorEntry('', '', rowId);
+                }
+            } catch (e) {
+                console.error('Error parsing author data:', e);
+                addAuthorEntry('', '', rowId);
+            }
         } else {
             addAuthorEntry('', '', rowId);
         }
@@ -104,30 +115,110 @@ function handleAuthorSelect(select) {
     inputs.querySelector('input[name$="[last_name]"]').value = lastName;
 }
 
+let currentRowId = null;
+
 function addAuthorEntry(firstName = '', lastName = '', rowId) {
+    if (!rowId && currentRowId) {
+        rowId = currentRowId;
+    }
+    
     const container = document.getElementById('authors-container-' + rowId);
+    if (!container) {
+        console.error('Authors container not found for rowId:', rowId);
+        return;
+    }
+    
     const index = container.children.length;
     const authorEntry = document.createElement('div');
-    authorEntry.className = 'author-entry mb-2';
-    const authors = JSON.parse(document.getElementById('available-authors-' + rowId).value || '[]');
+    authorEntry.className = 'author-entry mb-2 border p-2 rounded';
+    authorEntry.setAttribute('data-author-index', index);
+    
+    const availableAuthorsElement = document.getElementById('available-authors-' + rowId);
+    const authors = availableAuthorsElement ? JSON.parse(availableAuthorsElement.value || '[]') : [];
     const authorOptions = authors.map(author => `<option value="${author}">${author.replace('|', ' ')}</option>`).join('\n');
     
     authorEntry.innerHTML = `
-        <select class="form-select mb-2 author-select" onchange="handleAuthorSelect(this)">
-            <option value="">Add new author</option>
-            ${authorOptions}
-        </select>
-        <div class="author-inputs">
-            <input type="text" class="form-control mb-2" name="authors[${index}][first_name]" value="${firstName}" placeholder="First Name" required>
-            <input type="text" class="form-control" name="authors[${index}][last_name]" value="${lastName}" placeholder="Last Name" required>
+        <div class="row g-2">
+            <div class="col-12">
+                <select class="form-select mb-2 author-select" onchange="handleAuthorSelect(this, '${rowId}')">
+                    <option value="">Wybierz istniejącego autora lub dodaj nowego</option>
+                    ${authorOptions}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <input type="text" class="form-control" name="authors[${index}][first_name]" 
+                       value="${firstName}" placeholder="Imię" required>
+            </div>
+            <div class="col-md-6">
+                <input type="text" class="form-control" name="authors[${index}][last_name]" 
+                       value="${lastName}" placeholder="Nazwisko" required>
+            </div>
+            <div class="col-12 text-end">
+                ${index > 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeAuthor(this, '${rowId}')">Usuń autora</button>` : ''}
+            </div>
         </div>
-        ${index > 0 ? '<button type="button" class="btn btn-danger btn-sm mt-1" onclick="this.parentElement.remove()">Remove</button>' : ''}
     `;
+    
     container.appendChild(authorEntry);
+    updateAuthorIndices(rowId);
 }
 
-function addAuthor() {
-    addAuthorEntry();
+function addAuthor(rowId) {
+    if (rowId) {
+        currentRowId = rowId;
+    }
+    addAuthorEntry('', '', rowId || currentRowId);
+}
+
+function removeAuthor(button, rowId) {
+    const authorEntry = button.closest('.author-entry');
+    if (authorEntry) {
+        authorEntry.remove();
+        updateAuthorIndices(rowId);
+    }
+}
+
+function updateAuthorIndices(rowId) {
+    const container = document.getElementById('authors-container-' + rowId);
+    if (!container) return;
+    
+    const entries = container.querySelectorAll('.author-entry');
+    entries.forEach((entry, index) => {
+        entry.setAttribute('data-author-index', index);
+        
+        const firstNameInput = entry.querySelector('input[name*="[first_name]"]');
+        const lastNameInput = entry.querySelector('input[name*="[last_name]"]');
+        
+        if (firstNameInput) firstNameInput.name = `authors[${index}][first_name]`;
+        if (lastNameInput) lastNameInput.name = `authors[${index}][last_name]`;
+        
+        // Update remove button visibility
+        const removeButton = entry.querySelector('.btn-danger');
+        if (removeButton) {
+            if (index === 0) {
+                removeButton.style.display = 'none';
+            } else {
+                removeButton.style.display = 'inline-block';
+            }
+        }
+    });
+}
+
+function handleAuthorSelect(selectElement, rowId) {
+    const selectedValue = selectElement.value;
+    if (selectedValue) {
+        const [firstName, lastName] = selectedValue.split('|');
+        const authorEntry = selectElement.closest('.author-entry');
+        
+        const firstNameInput = authorEntry.querySelector('input[name*="[first_name]"]');
+        const lastNameInput = authorEntry.querySelector('input[name*="[last_name]"]');
+        
+        if (firstNameInput) firstNameInput.value = firstName || '';
+        if (lastNameInput) lastNameInput.value = lastName || '';
+        
+        // Reset select to default
+        selectElement.value = '';
+    }
 }
 
 function submitBookForm(form) {
