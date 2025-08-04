@@ -37,7 +37,7 @@ function initializeAuthors(rowId) {
         
         // Initialize autocomplete for all existing author entries
         container.querySelectorAll('.author-entry').forEach(entry => {
-            initializeAuthorAutocomplete(entry, rowId);
+            initializeSimpleAuthorAutocomplete(entry, rowId);
         });
     }
 }
@@ -106,29 +106,37 @@ function addAuthorEntry(firstName = '', lastName = '', rowId) {
     
     const index = container.children.length;
     const authorEntry = document.createElement('div');
-    authorEntry.className = 'author-entry mb-2 border p-2 rounded';
+    authorEntry.className = 'author-entry mb-3 border p-3 rounded';
     authorEntry.setAttribute('data-author-index', index);
-    
-    const fullName = firstName && lastName ? `${firstName} ${lastName}` : '';
     
     authorEntry.innerHTML = `
         <div class="row g-2">
-            <div class="col-md-8">
-                <input type="text" class="form-control author-input" 
-                       name="authors[${index}][full_name]"
-                       value="${fullName}" 
-                       placeholder="Imię Nazwisko" 
+            <div class="col-md-5">
+                <label class="form-label small">Imię</label>
+                <input type="text" class="form-control author-first-name" 
+                       name="authors[${index}][first_name]"
+                       value="${firstName}" 
+                       placeholder="Imię autora" 
                        required>
             </div>
-            <div class="col-md-4 text-end">
-                ${index > 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeAuthor(this, '${rowId}')">Usuń autora</button>` : ''}
+            <div class="col-md-5">
+                <label class="form-label small">Nazwisko</label>
+                <input type="text" class="form-control author-last-name" 
+                       name="authors[${index}][last_name]"
+                       value="${lastName}" 
+                       placeholder="Nazwisko autora" 
+                       required>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                ${index > 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeAuthor(this, '${rowId}')">
+                    <i class="bi bi-trash"></i>
+                </button>` : ''}
             </div>
         </div>
     `;
     
     container.appendChild(authorEntry);
-    initializeAuthorAutocomplete(authorEntry, rowId);
-    updateAuthorIndices(rowId);
+    initializeSimpleAuthorAutocomplete(authorEntry, rowId);
 }
 
 function addAuthor(rowId) {
@@ -154,54 +162,57 @@ function updateAuthorIndices(rowId) {
     entries.forEach((entry, index) => {
         entry.setAttribute('data-author-index', index);
         
-        const authorInput = entry.querySelector('input[name*="[full_name]"]');
-        if (authorInput) authorInput.name = `authors[${index}][full_name]`;
+        const firstNameInput = entry.querySelector('input[name*="[first_name]"]');
+        const lastNameInput = entry.querySelector('input[name*="[last_name]"]');
         
-        // Update remove button visibility
-        const removeButton = entry.querySelector('.btn-danger');
-        if (removeButton) {
-            if (index === 0) {
-                removeButton.style.display = 'none';
-            } else {
-                removeButton.style.display = 'inline-block';
-            }
-        }
+        if (firstNameInput) firstNameInput.name = `authors[${index}][first_name]`;
+        if (lastNameInput) lastNameInput.name = `authors[${index}][last_name]`;
     });
 }
 
-function initializeAuthorAutocomplete(authorEntry, rowId) {
-    const authorInput = authorEntry.querySelector('.author-input');
-    if (!authorInput || $(authorInput).data('ttTypeahead')) return; // Skip if already initialized
+function initializeSimpleAuthorAutocomplete(authorEntry, rowId) {
+    const firstNameInput = authorEntry.querySelector('.author-first-name');
+    const lastNameInput = authorEntry.querySelector('.author-last-name');
     
     const availableAuthorsElement = document.getElementById('available-authors-' + rowId);
     const authors = availableAuthorsElement ? JSON.parse(availableAuthorsElement.value || '[]') : [];
     
-    // Convert authors from "firstName|lastName" format to "firstName lastName" format
-    const authorNames = authors.map(author => {
-        if (typeof author === 'string' && author.includes('|')) {
-            const [firstName, lastName] = author.split('|');
-            return `${firstName.trim()} ${lastName.trim()}`;
-        }
-        return author;
-    }).filter(name => name && name.trim());
-    
-    if (authorNames.length > 0) {
-        const authorsBloodhound = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            local: authorNames
+    if (authors.length > 0) {
+        // Create datalists for first names and last names
+        const firstNames = new Set();
+        const lastNames = new Set();
+        
+        authors.forEach(author => {
+            if (typeof author === 'string' && author.includes('|')) {
+                const [firstName, lastName] = author.split('|');
+                if (firstName.trim()) firstNames.add(firstName.trim());
+                if (lastName.trim()) lastNames.add(lastName.trim());
+            }
         });
-
-        $(authorInput).typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-            name: 'authors',
-            source: authorsBloodhound,
-            limit: 10
+        
+        // Create and attach datalist for first names
+        const firstNameDatalistId = `firstnames-${rowId}-${Date.now()}`;
+        const firstNameDatalist = document.createElement('datalist');
+        firstNameDatalist.id = firstNameDatalistId;
+        firstNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            firstNameDatalist.appendChild(option);
         });
+        document.body.appendChild(firstNameDatalist);
+        firstNameInput.setAttribute('list', firstNameDatalistId);
+        
+        // Create and attach datalist for last names
+        const lastNameDatalistId = `lastnames-${rowId}-${Date.now()}`;
+        const lastNameDatalist = document.createElement('datalist');
+        lastNameDatalist.id = lastNameDatalistId;
+        lastNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            lastNameDatalist.appendChild(option);
+        });
+        document.body.appendChild(lastNameDatalist);
+        lastNameInput.setAttribute('list', lastNameDatalistId);
     }
 }
 
@@ -220,14 +231,15 @@ function submitBookForm(form) {
     const authorEntries = form.querySelectorAll('.author-entry');
     let hasValidAuthor = false;
     authorEntries.forEach((entry, index) => {
-        const fullName = entry.querySelector(`input[name="authors[${index}][full_name]"]`).value.trim();
-        if (fullName && fullName.includes(' ')) {
+        const firstName = entry.querySelector(`input[name="authors[${index}][first_name]"]`).value.trim();
+        const lastName = entry.querySelector(`input[name="authors[${index}][last_name]"]`).value.trim();
+        if (firstName && lastName) {
             hasValidAuthor = true;
         }
     });
     
     if (!hasValidAuthor) {
-        alert('At least one author with full name (first and last name) is required');
+        alert('Przynajmniej jeden autor z imieniem i nazwiskiem jest wymagany');
         return false;
     }
     
