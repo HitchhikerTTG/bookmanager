@@ -21,19 +21,27 @@ try {
     ];
 
     // Process authors
-    if (isset($_POST['authors'])) {
+    $authors = [];
+    if (isset($_POST['authors']) && is_array($_POST['authors'])) {
         foreach ($_POST['authors'] as $author) {
-            if (!empty($author['full_name'])) {
-                $nameParts = explode(' ', trim($author['full_name']), 2);
-                if (count($nameParts) >= 2) {
-                    $data['authors'][] = [
-                        'first_name' => trim($nameParts[0]),
-                        'last_name' => trim($nameParts[1])
+            $fullName = trim($author['full_name'] ?? '');
+
+            if (!empty($fullName) && strpos($fullName, ',') !== false) {
+                $parts = explode(',', $fullName, 2);
+                $firstName = trim($parts[0]);
+                $lastName = trim($parts[1]);
+
+                if (!empty($firstName) && !empty($lastName)) {
+                    $authors[] = [
+                        'first_name' => $firstName,
+                        'last_name' => $lastName
                     ];
                 }
             }
         }
     }
+    $data['authors'] = $authors;
+
 
     // Check if book exists and update or add accordingly
     $existingBooks = $manager->getProcessedBooks();

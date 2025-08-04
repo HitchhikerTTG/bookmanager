@@ -109,23 +109,19 @@ function addAuthorEntry(firstName = '', lastName = '', rowId) {
     authorEntry.className = 'author-entry mb-3 border p-3 rounded';
     authorEntry.setAttribute('data-author-index', index);
     
+    // Format: "firstName, lastName" or just existing values
+    const fullName = (firstName && lastName) ? `${firstName}, ${lastName}` : '';
+    
     authorEntry.innerHTML = `
         <div class="row g-2">
-            <div class="col-md-5">
-                <label class="form-label small">Imię</label>
-                <input type="text" class="form-control author-first-name" 
-                       name="authors[${index}][first_name]"
-                       value="${firstName}" 
-                       placeholder="Imię autora" 
+            <div class="col-md-10">
+                <label class="form-label small">Autor (Imię, Nazwisko)</label>
+                <input type="text" class="form-control author-full-name" 
+                       name="authors[${index}][full_name]"
+                       value="${fullName}" 
+                       placeholder="np. Jan, Kowalski" 
                        required>
-            </div>
-            <div class="col-md-5">
-                <label class="form-label small">Nazwisko</label>
-                <input type="text" class="form-control author-last-name" 
-                       name="authors[${index}][last_name]"
-                       value="${lastName}" 
-                       placeholder="Nazwisko autora" 
-                       required>
+                <small class="text-muted">Wpisz imię i nazwisko oddzielone przecinkiem</small>
             </div>
             <div class="col-md-2 d-flex align-items-end">
                 ${index > 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeAuthor(this, '${rowId}')">
@@ -136,7 +132,7 @@ function addAuthorEntry(firstName = '', lastName = '', rowId) {
     `;
     
     container.appendChild(authorEntry);
-    initializeSimpleAuthorAutocomplete(authorEntry, rowId);
+    initializeAuthorAutocomplete(authorEntry, rowId);
 }
 
 function addAuthor(rowId) {
@@ -162,57 +158,42 @@ function updateAuthorIndices(rowId) {
     entries.forEach((entry, index) => {
         entry.setAttribute('data-author-index', index);
         
-        const firstNameInput = entry.querySelector('input[name*="[first_name]"]');
-        const lastNameInput = entry.querySelector('input[name*="[last_name]"]');
-        
-        if (firstNameInput) firstNameInput.name = `authors[${index}][first_name]`;
-        if (lastNameInput) lastNameInput.name = `authors[${index}][last_name]`;
+        const fullNameInput = entry.querySelector('input[name*="[full_name]"]');
+        if (fullNameInput) fullNameInput.name = `authors[${index}][full_name]`;
     });
 }
 
-function initializeSimpleAuthorAutocomplete(authorEntry, rowId) {
-    const firstNameInput = authorEntry.querySelector('.author-first-name');
-    const lastNameInput = authorEntry.querySelector('.author-last-name');
+function initializeAuthorAutocomplete(authorEntry, rowId) {
+    const authorInput = authorEntry.querySelector('.author-full-name');
     
     const availableAuthorsElement = document.getElementById('available-authors-' + rowId);
     const authors = availableAuthorsElement ? JSON.parse(availableAuthorsElement.value || '[]') : [];
     
     if (authors.length > 0) {
-        // Create datalists for first names and last names
-        const firstNames = new Set();
-        const lastNames = new Set();
+        const authorSuggestions = [];
         
         authors.forEach(author => {
             if (typeof author === 'string' && author.includes('|')) {
                 const [firstName, lastName] = author.split('|');
-                if (firstName.trim()) firstNames.add(firstName.trim());
-                if (lastName.trim()) lastNames.add(lastName.trim());
+                if (firstName.trim() && lastName.trim()) {
+                    authorSuggestions.push(`${firstName.trim()}, ${lastName.trim()}`);
+                }
             }
         });
         
-        // Create and attach datalist for first names
-        const firstNameDatalistId = `firstnames-${rowId}-${Date.now()}`;
-        const firstNameDatalist = document.createElement('datalist');
-        firstNameDatalist.id = firstNameDatalistId;
-        firstNames.forEach(name => {
-            const option = document.createElement('option');
-            option.value = name;
-            firstNameDatalist.appendChild(option);
-        });
-        document.body.appendChild(firstNameDatalist);
-        firstNameInput.setAttribute('list', firstNameDatalistId);
+        // Create datalist for full author names
+        const datalistId = `authors-${rowId}-${Date.now()}`;
+        const datalist = document.createElement('datalist');
+        datalist.id = datalistId;
         
-        // Create and attach datalist for last names
-        const lastNameDatalistId = `lastnames-${rowId}-${Date.now()}`;
-        const lastNameDatalist = document.createElement('datalist');
-        lastNameDatalist.id = lastNameDatalistId;
-        lastNames.forEach(name => {
+        authorSuggestions.forEach(authorName => {
             const option = document.createElement('option');
-            option.value = name;
-            lastNameDatalist.appendChild(option);
+            option.value = authorName;
+            datalist.appendChild(option);
         });
-        document.body.appendChild(lastNameDatalist);
-        lastNameInput.setAttribute('list', lastNameDatalistId);
+        
+        document.body.appendChild(datalist);
+        authorInput.setAttribute('list', datalistId);
     }
 }
 
@@ -231,15 +212,17 @@ function submitBookForm(form) {
     const authorEntries = form.querySelectorAll('.author-entry');
     let hasValidAuthor = false;
     authorEntries.forEach((entry, index) => {
-        const firstName = entry.querySelector(`input[name="authors[${index}][first_name]"]`).value.trim();
-        const lastName = entry.querySelector(`input[name="authors[${index}][last_name]"]`).value.trim();
-        if (firstName && lastName) {
-            hasValidAuthor = true;
+        const fullName = entry.querySelector(`input[name="authors[${index}][full_name]"]`).value.trim();
+        if (fullName && fullName.includes(',')) {
+            const [firstName, lastName] = fullName.split(',').map(part => part.trim());
+            if (firstName && lastName) {
+                hasValidAuthor = true;
+            }
         }
     });
     
     if (!hasValidAuthor) {
-        alert('Przynajmniej jeden autor z imieniem i nazwiskiem jest wymagany');
+        alert('Przynajmniej jeden autor w formacie "Imię, Nazwisko" jest wymagany');
         return false;
     }
     
