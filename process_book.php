@@ -1,4 +1,3 @@
-
 <?php
 header('Content-Type: application/json; charset=utf-8');
 require_once 'includes/BookManager.php';
@@ -6,11 +5,11 @@ require_once 'includes/BookManager.php';
 try {
     error_log("Processing book submission");
     $manager = new BookManager();
-    
+
     if (!isset($_POST['file_name']) || !isset($_POST['title']) || !isset($_POST['genres'])) {
         throw new Exception("Missing required fields");
     }
-    
+
     $data = [
         'file_name' => trim($_POST['file_name']),
         'title' => trim($_POST['title']),
@@ -24,11 +23,14 @@ try {
     // Process authors
     if (isset($_POST['authors'])) {
         foreach ($_POST['authors'] as $author) {
-            if (!empty($author['first_name']) && !empty($author['last_name'])) {
-                $data['authors'][] = [
-                    'first_name' => $author['first_name'],
-                    'last_name' => $author['last_name']
-                ];
+            if (!empty($author['full_name'])) {
+                $nameParts = explode(' ', trim($author['full_name']), 2);
+                if (count($nameParts) >= 2) {
+                    $data['authors'][] = [
+                        'first_name' => trim($nameParts[0]),
+                        'last_name' => trim($nameParts[1])
+                    ];
+                }
             }
         }
     }

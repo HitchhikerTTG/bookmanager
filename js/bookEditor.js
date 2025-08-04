@@ -138,27 +138,18 @@ function addAuthorEntry(firstName = '', lastName = '', rowId) {
     authorEntry.className = 'author-entry mb-2 border p-2 rounded';
     authorEntry.setAttribute('data-author-index', index);
     
+    const fullName = firstName && lastName ? `${firstName} ${lastName}` : '';
+    
     authorEntry.innerHTML = `
         <div class="row g-2">
-            <div class="col-12">
-                <div class="position-relative">
-                    <input type="text" class="form-control author-search" 
-                           placeholder="Wpisz imię lub nazwisko autora..." 
-                           data-row-id="${rowId}" data-author-index="${index}"
-                           autocomplete="off">
-                    <div class="author-suggestions position-absolute w-100 bg-white border rounded shadow" 
-                         style="z-index: 1000; max-height: 200px; overflow-y: auto; display: none;"></div>
-                </div>
+            <div class="col-md-8">
+                <input type="text" class="form-control author-input" 
+                       name="authors[${index}][full_name]"
+                       value="${fullName}" 
+                       placeholder="Imię Nazwisko" 
+                       required>
             </div>
-            <div class="col-md-6">
-                <input type="text" class="form-control" name="authors[${index}][first_name]" 
-                       value="${firstName}" placeholder="Imię" required>
-            </div>
-            <div class="col-md-6">
-                <input type="text" class="form-control" name="authors[${index}][last_name]" 
-                       value="${lastName}" placeholder="Nazwisko" required>
-            </div>
-            <div class="col-12 text-end">
+            <div class="col-md-4 text-end">
                 ${index > 0 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeAuthor(this, '${rowId}')">Usuń autora</button>` : ''}
             </div>
         </div>
@@ -192,11 +183,8 @@ function updateAuthorIndices(rowId) {
     entries.forEach((entry, index) => {
         entry.setAttribute('data-author-index', index);
         
-        const firstNameInput = entry.querySelector('input[name*="[first_name]"]');
-        const lastNameInput = entry.querySelector('input[name*="[last_name]"]');
-        
-        if (firstNameInput) firstNameInput.name = `authors[${index}][first_name]`;
-        if (lastNameInput) lastNameInput.name = `authors[${index}][last_name]`;
+        const authorInput = entry.querySelector('input[name*="[full_name]"]');
+        if (authorInput) authorInput.name = `authors[${index}][full_name]`;
         
         // Update remove button visibility
         const removeButton = entry.querySelector('.btn-danger');
@@ -211,89 +199,36 @@ function updateAuthorIndices(rowId) {
 }
 
 function initializeAuthorAutocomplete(authorEntry, rowId) {
-    const searchInput = authorEntry.querySelector('.author-search');
-    const suggestionsDiv = authorEntry.querySelector('.author-suggestions');
-    const firstNameInput = authorEntry.querySelector('input[name*="[first_name]"]');
-    const lastNameInput = authorEntry.querySelector('input[name*="[last_name]"]');
-    
-    if (!searchInput || !suggestionsDiv) return;
+    const authorInput = authorEntry.querySelector('.author-input');
+    if (!authorInput) return;
     
     const availableAuthorsElement = document.getElementById('available-authors-' + rowId);
     const authors = availableAuthorsElement ? JSON.parse(availableAuthorsElement.value || '[]') : [];
     
-    let hideTimeout;
+    // Convert authors from "firstName|lastName" format to "firstName lastName" format
+    const authorNames = authors.map(author => {
+        const [firstName, lastName] = author.split('|');
+        return `${firstName} ${lastName}`;
+    });
     
-    searchInput.addEventListener('input', function() {
-        const query = this.value.toLowerCase().trim();
-        
-        if (query.length < 1) {
-            suggestionsDiv.style.display = 'none';
-            return;
-        }
-        
-        const filteredAuthors = authors.filter(author => {
-            const [firstName, lastName] = author.split('|');
-            return firstName.toLowerCase().includes(query) || 
-                   lastName.toLowerCase().includes(query) ||
-                   (firstName + ' ' + lastName).toLowerCase().includes(query);
+    if (authorNames.length > 0) {
+        const authorsBloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            local: authorNames
         });
-        
-        if (filteredAuthors.length > 0) {
-            suggestionsDiv.innerHTML = filteredAuthors.map(author => {
-                const [firstName, lastName] = author.split('|');
-                const displayName = `${firstName} ${lastName}`;
-                return `<div class="p-2 author-suggestion" 
-                            style="cursor: pointer; border-bottom: 1px solid #eee;"
-                            data-first-name="${firstName}" 
-                            data-last-name="${lastName}"
-                            onmouseover="this.style.backgroundColor='#f8f9fa'" 
-                            onmouseout="this.style.backgroundColor='white'">
-                            ${displayName}
-                        </div>`;
-            }).join('');
-            suggestionsDiv.style.display = 'block';
-            
-            // Add click handlers to suggestions
-            suggestionsDiv.querySelectorAll('.author-suggestion').forEach(suggestion => {
-                suggestion.addEventListener('click', function() {
-                    const firstName = this.getAttribute('data-first-name');
-                    const lastName = this.getAttribute('data-last-name');
-                    
-                    firstNameInput.value = firstName;
-                    lastNameInput.value = lastName;
-                    searchInput.value = `${firstName} ${lastName}`;
-                    suggestionsDiv.style.display = 'none';
-                });
-            });
-        } else {
-            suggestionsDiv.innerHTML = '<div class="p-2 text-muted">Brak pasujących autorów. Wprowadź dane nowego autora poniżej.</div>';
-            suggestionsDiv.style.display = 'block';
-        }
-    });
-    
-    // Hide suggestions when clicking outside
-    searchInput.addEventListener('blur', function() {
-        hideTimeout = setTimeout(() => {
-            suggestionsDiv.style.display = 'none';
-        }, 200);
-    });
-    
-    searchInput.addEventListener('focus', function() {
-        if (hideTimeout) {
-            clearTimeout(hideTimeout);
-        }
-    });
-    
-    // Update search input when manual entry is made
-    [firstNameInput, lastNameInput].forEach(input => {
-        input.addEventListener('input', function() {
-            const firstName = firstNameInput.value.trim();
-            const lastName = lastNameInput.value.trim();
-            if (firstName || lastName) {
-                searchInput.value = `${firstName} ${lastName}`.trim();
-            }
+
+        $(authorInput).typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'authors',
+            source: authorsBloodhound,
+            limit: 10
         });
-    });
+    }
 }
 
 function handleAuthorSelect(selectElement, rowId) {
@@ -328,15 +263,14 @@ function submitBookForm(form) {
     const authorEntries = form.querySelectorAll('.author-entry');
     let hasValidAuthor = false;
     authorEntries.forEach((entry, index) => {
-        const firstName = entry.querySelector(`input[name="authors[${index}][first_name]"]`).value.trim();
-        const lastName = entry.querySelector(`input[name="authors[${index}][last_name]"]`).value.trim();
-        if (firstName && lastName) {
+        const fullName = entry.querySelector(`input[name="authors[${index}][full_name]"]`).value.trim();
+        if (fullName && fullName.includes(' ')) {
             hasValidAuthor = true;
         }
     });
     
     if (!hasValidAuthor) {
-        alert('At least one author is required');
+        alert('At least one author with full name (first and last name) is required');
         return false;
     }
     
