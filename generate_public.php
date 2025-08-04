@@ -158,7 +158,17 @@ function buildUrl($params = []) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generation-time" content="' . date('Y-m-d H:i:s') . '">
-    <title>E-Biblioteczka - Książki do pobrania</title>
+    <title><?php 
+        if ($series) {
+            echo "Seria: " . htmlspecialchars($series) . " (" . $totalBooks . " książek)";
+        } elseif ($genre && $genre !== "all") {
+            echo "Gatunek: " . htmlspecialchars($genre) . " (" . $totalBooks . " książek)";
+        } elseif ($search) {
+            echo "Wyniki wyszukiwania: \"" . htmlspecialchars($search) . "\" (" . $totalBooks . " książek)";
+        } else {
+            echo "Wszystkie książki (" . $totalBooks . " książek)";
+        }
+    ?> - E-Biblioteczka</title>
     <style>
         /* Reset podstawowy */
         * {
@@ -522,7 +532,17 @@ function buildUrl($params = []) {
 </head>
 <body>
     <div class="container">
-        <h1 class="main-title">E-Biblioteczka - Książki do pobrania</h1>
+        <h1 class="main-title"><?php 
+            if ($series) {
+                echo "Seria: " . htmlspecialchars($series);
+            } elseif ($genre && $genre !== "all") {
+                echo "Gatunek: " . htmlspecialchars($genre);
+            } elseif ($search) {
+                echo "Wyniki wyszukiwania: \"" . htmlspecialchars($search) . "\"";
+            } else {
+                echo "Wszystkie książki";
+            }
+        ?></h1>
         
         <!-- Przycisk do pokazywania/ukrywania filtrów -->
         <details class="filters-toggle">
@@ -614,33 +634,7 @@ function buildUrl($params = []) {
             <?php endif; ?>
         </div>
         
-        <?php if ($totalPages > 1): ?>
-        <div class="pagination">
-            <div class="pagination-info">Strona <?php echo $page; ?> z <?php echo $totalPages; ?></div>
-            
-            <?php if ($page > 1): ?>
-                <a href="<?php echo buildUrl([\'page\' => 1]); ?>">1</a>
-                <?php if ($page > 2): ?>
-                    <span>...</span>
-                <?php endif; ?>
-                <a href="<?php echo buildUrl([\'page\' => $page - 1]); ?>">Poprzednia</a>
-            <?php endif; ?>
-            
-            <span class="current"><?php echo $page; ?></span>
-            
-            <?php if ($page < $totalPages): ?>
-                <a href="<?php echo buildUrl([\'page\' => $page + 1]); ?>">Następna</a>
-                <?php if ($page < $totalPages - 1): ?>
-                    <span>...</span>
-                <?php endif; ?>
-                <a href="<?php echo buildUrl([\'page\' => $totalPages]); ?>"><?php echo $totalPages; ?></a>
-            <?php endif; ?>
-        </div>
-        <?php elseif ($totalBooks > 0): ?>
-        <div class="pagination">
-            <div class="pagination-info">Strona 1 z 1</div>
-        </div>
-        <?php endif; ?>
+        
         
         <!-- Lista książek -->
         <div class="books-list">
