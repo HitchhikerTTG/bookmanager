@@ -65,7 +65,7 @@ try {
     
     $html .= '// Get parameters
 $page = max(1, intval($_GET["page"] ?? 1));
-$perPage = 30;
+$perPage = 25;
 $search = trim($_GET["search"] ?? "");
 $genre = $_GET["genre"] ?? "";
 $sort = $_GET["sort"] ?? "title";
@@ -158,147 +158,228 @@ function buildUrl($params = []) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generation-time" content="' . date('Y-m-d H:i:s') . '">
-    <title>Moja Biblioteka</title>
+    <title>E-Biblioteczka - Książki do pobrania</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Reset podstawowy */
+        * {
             margin: 0;
-            padding: 10px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, Helvetica, sans-serif;
             background: #ffffff;
             color: #000000;
-            line-height: 1.4;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            margin: 10px 0;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .controls {
-            border: 2px solid #000000;
-            padding: 10px;
-            margin: 10px 0;
-            background: #f8f8f8;
-        }
-        
-        .controls h3 {
-            margin: 0 0 10px 0;
+            line-height: 1.5;
+            padding: 16px;
             font-size: 16px;
         }
         
-        .control-row {
-            margin: 5px 0;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
         
-        label {
+        /* Nagłówek główny */
+        .main-title {
+            font-size: 1.8em;
             font-weight: bold;
-            margin-right: 10px;
+            margin-bottom: 24px;
+            text-align: left;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 8px;
         }
         
-        input[type="text"], select {
-            padding: 5px;
-            border: 1px solid #000000;
-            font-size: 14px;
-            margin-right: 10px;
-        }
-        
-        button, input[type="submit"] {
-            padding: 8px 12px;
-            border: 2px solid #000000;
-            background: #ffffff;
-            color: #000000;
-            font-size: 14px;
-            cursor: pointer;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-        
-        button:hover, input[type="submit"]:hover {
-            background: #000000;
-            color: #ffffff;
-        }
-        
-        .book-list {
-            border: 1px solid #000000;
-            margin: 10px 0;
-        }
-        
-        .book-header {
-            background: #e0e0e0;
-            padding: 8px;
-            border-bottom: 1px solid #000000;
-            font-weight: bold;
-        }
-        
-        .book-row {
-            padding: 8px;
-            border-bottom: 1px solid #cccccc;
-            display: table;
-            width: 100%;
-        }
-        
-        .book-row:nth-child(even) {
+        /* Sekcje formularzy */
+        .form-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            border: 1px solid #333333;
             background: #f8f8f8;
         }
         
-        .book-title {
+        .form-section h3 {
+            font-size: 1.1em;
             font-weight: bold;
-            margin-right: 15px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
         }
         
-        .book-author {
-            color: #333333;
-            margin-right: 15px;
+        .form-group {
+            margin-bottom: 16px;
         }
         
-        .book-genres {
-            color: #666666;
-            font-size: 12px;
-            margin-right: 15px;
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 1em;
         }
         
-        .book-series {
-            color: #006600;
-            font-style: italic;
-            margin-right: 15px;
-        }
-        
-        .download-links {
-            white-space: nowrap;
-        }
-        
-        .download-links a {
+        input[type="text"], select {
+            width: 100%;
+            max-width: 300px;
+            padding: 8px 12px;
+            border: 2px solid #000000;
+            font-size: 1em;
+            background: #ffffff;
             color: #000000;
-            text-decoration: underline;
-            margin-right: 10px;
-            font-weight: bold;
         }
         
-        .download-links a:hover {
+        .btn {
+            padding: 12px 20px;
+            border: 2px solid #000000;
+            background: #ffffff;
+            color: #000000;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
             background: #000000;
             color: #ffffff;
         }
         
+        /* Informacja o wynikach */
+        .results-info {
+            font-size: 1em;
+            font-weight: bold;
+            margin: 24px 0 16px 0;
+            padding: 12px;
+            background: #e8e8e8;
+            border: 1px solid #333333;
+        }
+        
+        .active-filters {
+            font-size: 0.9em;
+            margin-top: 8px;
+            color: #333333;
+        }
+        
+        /* Lista książek */
+        .books-list {
+            margin: 24px 0;
+        }
+        
+        .book-item {
+            margin-bottom: 24px;
+            padding: 16px;
+            border: 1px solid #cccccc;
+            background: #ffffff;
+        }
+        
+        .book-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .book-authors {
+            font-size: 1em;
+            margin-bottom: 8px;
+            color: #333333;
+            font-style: italic;
+        }
+        
+        .book-genres {
+            font-size: 1em;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #006600;
+        }
+        
+        .book-series {
+            font-size: 1em;
+            margin-bottom: 12px;
+            color: #666666;
+        }
+        
+        .book-series a {
+            color: #006600;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        
+        .book-series a:hover {
+            background: #006600;
+            color: #ffffff;
+            padding: 2px 4px;
+        }
+        
+        .download-links {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #cccccc;
+        }
+        
+        .download-link {
+            display: inline-block;
+            margin-right: 16px;
+            margin-bottom: 8px;
+            padding: 10px 16px;
+            border: 2px solid #000000;
+            background: #ffffff;
+            color: #000000;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        
+        .download-link:hover {
+            background: #000000;
+            color: #ffffff;
+        }
+        
+        .download-link.https {
+            border-color: #006600;
+            color: #006600;
+        }
+        
+        .download-link.https:hover {
+            background: #006600;
+            color: #ffffff;
+        }
+        
+        .download-link.http {
+            border-color: #cc6600;
+            color: #cc6600;
+        }
+        
+        .download-link.http:hover {
+            background: #cc6600;
+            color: #ffffff;
+        }
+        
+        /* Stronicowanie */
         .pagination {
             text-align: center;
-            margin: 20px 0;
-            padding: 10px;
+            margin: 32px 0;
+            padding: 16px;
             border: 1px solid #000000;
+            background: #f8f8f8;
+        }
+        
+        .pagination-info {
+            font-weight: bold;
+            margin-bottom: 12px;
         }
         
         .pagination a, .pagination span {
             display: inline-block;
-            padding: 5px 10px;
+            padding: 8px 12px;
             margin: 2px;
             border: 1px solid #000000;
             text-decoration: none;
             color: #000000;
+            font-weight: bold;
         }
         
         .pagination a:hover {
@@ -309,171 +390,269 @@ function buildUrl($params = []) {
         .pagination .current {
             background: #000000;
             color: #ffffff;
-            font-weight: bold;
         }
         
-        .stats {
+        /* Komunikaty specjalne */
+        .no-results {
             text-align: center;
-            margin: 10px 0;
+            padding: 32px;
             color: #666666;
-        }
-        
-        .footer {
-            text-align: center;
-            margin: 20px 0;
-            color: #666666;
-            font-size: 12px;
+            font-size: 1.1em;
+            border: 1px solid #cccccc;
+            margin: 24px 0;
         }
         
         .clear-filters {
-            margin: 10px 0;
+            margin: 16px 0;
+            text-align: center;
         }
         
-        .series-link {
-            color: #006600;
+        .clear-filters a {
+            color: #cc0000;
+            font-weight: bold;
             text-decoration: underline;
+            font-size: 1em;
         }
         
-        .series-link:hover {
-            background: #006600;
+        .clear-filters a:hover {
+            background: #cc0000;
             color: #ffffff;
+            padding: 4px 8px;
+        }
+        
+        /* Stopka */
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+            padding: 16px;
+            color: #666666;
+            font-size: 0.9em;
+            border-top: 1px solid #cccccc;
+        }
+        
+        /* Serie specjalne */
+        .series-view {
+            text-align: center;
+            margin: 16px 0;
+            padding: 16px;
+            border: 2px solid #006600;
+            background: #f0f8f0;
+        }
+        
+        .series-view h2 {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        /* Responsywność dla małych ekranów */
+        @media (max-width: 600px) {
+            body {
+                padding: 8px;
+            }
+            
+            .download-link {
+                display: block;
+                margin-right: 0;
+                margin-bottom: 8px;
+                text-align: center;
+            }
+            
+            input[type="text"], select {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Moja Biblioteka</h1>
+        <h1 class="main-title">E-Biblioteczka - Książki do pobrania</h1>
         
-        <div class="controls">
-            <h3>Wyszukiwanie i filtrowanie</h3>
-            
+        <!-- Sekcja wyszukiwania -->
+        <div class="form-section">
+            <h3>Wyszukiwanie</h3>
             <form method="GET">
-                <div class="control-row">
-                    <label for="search">Szukaj:</label>
-                    <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Tytuł lub autor">
-                    <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
-                    <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
-                    <input type="submit" value="Szukaj">
+                <div class="form-group">
+                    <label for="search">Szukaj według tytułu lub autora:</label>
+                    <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Wpisz tytuł lub nazwisko autora">
                 </div>
+                <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
+                <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+                <input type="hidden" name="series" value="<?php echo htmlspecialchars($series); ?>">
+                <button type="submit" class="btn">Szukaj</button>
             </form>
-            
+        </div>
+        
+        <!-- Sekcja filtrowania -->
+        <div class="form-section">
+            <h3>Filtrowanie według gatunku</h3>
             <form method="GET">
-                <div class="control-row">
-                    <label for="genre">Gatunek:</label>
+                <div class="form-group">
+                    <label for="genre">Wybierz gatunek:</label>
                     <select id="genre" name="genre">
-                        <option value="">Wszystkie</option>';
+                        <option value="">Wszystkie gatunki</option>';
 
     foreach ($allGenres as $g) {
         $html .= '<option value="' . htmlspecialchars($g) . '"<?php echo $genre === "' . htmlspecialchars($g) . '" ? " selected" : ""; ?>>' . htmlspecialchars($g) . '</option>' . "\n";
     }
 
     $html .= '                    </select>
-                    <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                    <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
-                    <input type="submit" value="Filtruj">
                 </div>
+                <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
+                <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+                <input type="hidden" name="series" value="<?php echo htmlspecialchars($series); ?>">
+                <button type="submit" class="btn">Filtruj</button>
             </form>
-            
-            <form method="GET">
-                <div class="control-row">
-                    <label for="sort">Sortuj:</label>
-                    <select id="sort" name="sort">
-                        <option value="title"<?php echo $sort === "title" ? " selected" : ""; ?>>Alfabetycznie (tytuł)</option>
-                        <option value="author"<?php echo $sort === "author" ? " selected" : ""; ?>>Alfabetycznie (autor)</option>
-                        <option value="date"<?php echo $sort === "date" ? " selected" : ""; ?>>Najnowsze pierwsze</option>
-                    </select>
-                    <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                    <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
-                    <input type="submit" value="Sortuj">
-                </div>
-            </form>
-            
-            <?php if (!empty($search) || !empty($genre) || !empty($series)): ?>
-            <div class="clear-filters">
-                <a href="?" style="color: #cc0000; font-weight: bold;">Wyczyść wszystkie filtry</a>
-            </div>
-            <?php endif; ?>
         </div>
         
-        <?php if ($series): ?>
-        <div style="text-align: center; margin: 10px 0; padding: 10px; border: 1px solid #006600; background: #f0f8f0;">
-            <strong>Seria: <?php echo htmlspecialchars($series); ?></strong>
-            <br><a href="<?php echo buildUrl([\'series\' => \'\', \'page\' => 1]); ?>">← Powrót do wszystkich książek</a>
+        <!-- Sekcja sortowania -->
+        <div class="form-section">
+            <h3>Sortowanie</h3>
+            <form method="GET">
+                <div class="form-group">
+                    <label for="sort">Sortuj według:</label>
+                    <select id="sort" name="sort">
+                        <option value="title"<?php echo $sort === "title" ? " selected" : ""; ?>>Alfabetycznie według tytułu</option>
+                        <option value="author"<?php echo $sort === "author" ? " selected" : ""; ?>>Alfabetycznie według autora</option>
+                        <option value="date"<?php echo $sort === "date" ? " selected" : ""; ?>>Najnowsze pierwsze</option>
+                    </select>
+                </div>
+                <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
+                <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
+                <input type="hidden" name="series" value="<?php echo htmlspecialchars($series); ?>">
+                <button type="submit" class="btn">Sortuj</button>
+            </form>
+        </div>
+        
+        <?php if (!empty($search) || !empty($genre) || !empty($series)): ?>
+        <div class="clear-filters">
+            <a href="?">Wyczyść wszystkie filtry i wróć do pełnej listy</a>
         </div>
         <?php endif; ?>
         
-        <div class="stats">
-            Znaleziono <?php echo $totalBooks; ?> książek
-            <?php if ($totalPages > 1): ?>
-                | Strona <?php echo $page; ?> z <?php echo $totalPages; ?>
-            <?php endif; ?>
+        <?php if ($series): ?>
+        <div class="series-view">
+            <h2>Seria: <?php echo htmlspecialchars($series); ?></h2>
+            <a href="<?php echo buildUrl([\'series\' => \'\', \'page\' => 1]); ?>" class="btn">← Powrót do wszystkich książek</a>
         </div>
+        <?php endif; ?>
         
-        <div class="book-list">
-            <div class="book-header">
-                Tytuł | Autor | Gatunki | Seria | Pobierz
-            </div>
-            
-            <?php foreach ($booksForPage as $book): ?>
-            <div class="book-row">
-                <div class="book-title"><?php echo htmlspecialchars($book[\'title\']); ?></div>
-                <div class="book-author">
-                    <?php echo implode(\', \', array_map(function($author) {
-                        return htmlspecialchars($author[\'first_name\'] . \' \' . $author[\'last_name\']);
-                    }, $book[\'authors\'])); ?>
-                </div>
-                <div class="book-genres"><?php echo htmlspecialchars(implode(\', \', $book[\'genres\'])); ?></div>
-                <?php if (!empty($book[\'series\'])): ?>
-                <div class="book-series">
-                    <a href="<?php echo buildUrl([\'series\' => $book[\'series\'], \'page\' => 1]); ?>" class="series-link">
-                        <?php echo htmlspecialchars($book[\'series\']); ?>
-                        <?php echo !empty($book[\'series_position\']) ? \' #\' . htmlspecialchars($book[\'series_position\']) : \'\'; ?>
-                    </a>
-                </div>
+        <!-- Informacja o wynikach -->
+        <div class="results-info">
+            <strong>Znaleziono <?php echo $totalBooks; ?> książek</strong>
+            <?php if (!empty($search) || !empty($genre)): ?>
+            <div class="active-filters">
+                Aktywne filtry:
+                <?php if (!empty($search)): ?>
+                    Szukane: "<?php echo htmlspecialchars($search); ?>"
                 <?php endif; ?>
-                <div class="download-links">
-                    <a href="https://<?php echo $_SERVER[\'HTTP_HOST\']; ?>/_ksiazki/<?php echo htmlspecialchars($book[\'file_name\']); ?>">HTTPS</a>
-                    <a href="http://<?php echo $_SERVER[\'HTTP_HOST\']; ?>/_ksiazki/<?php echo htmlspecialchars($book[\'file_name\']); ?>">HTTP</a>
-                </div>
-            </div>
-            <?php endforeach; ?>
-            
-            <?php if (empty($booksForPage)): ?>
-            <div class="book-row" style="text-align: center; color: #666666;">
-                Brak książek spełniających kryteria wyszukiwania.
+                <?php if (!empty($genre)): ?>
+                    Gatunek: <?php echo htmlspecialchars($genre); ?>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
         </div>
         
         <?php if ($totalPages > 1): ?>
         <div class="pagination">
+            <div class="pagination-info">Strona <?php echo $page; ?> z <?php echo $totalPages; ?></div>
+            
             <?php if ($page > 1): ?>
-                <a href="<?php echo buildUrl([\'page\' => 1]); ?>">Pierwsza</a>
+                <a href="<?php echo buildUrl([\'page\' => 1]); ?>">1</a>
+                <?php if ($page > 2): ?>
+                    <span>...</span>
+                <?php endif; ?>
                 <a href="<?php echo buildUrl([\'page\' => $page - 1]); ?>">Poprzednia</a>
             <?php endif; ?>
             
-            <?php
-            $startPage = max(1, $page - 2);
-            $endPage = min($totalPages, $page + 2);
-            
-            for ($i = $startPage; $i <= $endPage; $i++):
-                if ($i == $page): ?>
-                    <span class="current"><?php echo $i; ?></span>
-                <?php else: ?>
-                    <a href="<?php echo buildUrl([\'page\' => $i]); ?>"><?php echo $i; ?></a>
-                <?php endif;
-            endfor; ?>
+            <span class="current"><?php echo $page; ?></span>
             
             <?php if ($page < $totalPages): ?>
                 <a href="<?php echo buildUrl([\'page\' => $page + 1]); ?>">Następna</a>
-                <a href="<?php echo buildUrl([\'page\' => $totalPages]); ?>">Ostatnia</a>
+                <?php if ($page < $totalPages - 1): ?>
+                    <span>...</span>
+                <?php endif; ?>
+                <a href="<?php echo buildUrl([\'page\' => $totalPages]); ?>"><?php echo $totalPages; ?></a>
+            <?php endif; ?>
+        </div>
+        <?php elseif ($totalBooks > 0): ?>
+        <div class="pagination">
+            <div class="pagination-info">Strona 1 z 1</div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Lista książek -->
+        <div class="books-list">
+            <?php if (empty($booksForPage)): ?>
+            <div class="no-results">
+                <strong>Brak książek spełniających kryteria wyszukiwania.</strong>
+                <br>Spróbuj zmienić parametry wyszukiwania lub wyczyść filtry.
+            </div>
+            <?php else: ?>
+                <?php foreach ($booksForPage as $book): ?>
+                <div class="book-item">
+                    <div class="book-title"><?php echo htmlspecialchars($book[\'title\']); ?></div>
+                    
+                    <div class="book-authors">
+                        <?php echo implode(\', \', array_map(function($author) {
+                            return htmlspecialchars($author[\'first_name\'] . \' \' . $author[\'last_name\']);
+                        }, $book[\'authors\'])); ?>
+                    </div>
+                    
+                    <?php if (!empty($book[\'genres\'])): ?>
+                    <div class="book-genres">
+                        <?php echo htmlspecialchars(implode(\' | \', $book[\'genres\'])); ?>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($book[\'series\'])): ?>
+                    <div class="book-series">
+                        Seria: <a href="<?php echo buildUrl([\'series\' => $book[\'series\'], \'page\' => 1]); ?>">
+                            <?php echo htmlspecialchars($book[\'series\']); ?>
+                            <?php echo !empty($book[\'series_position\']) ? \' (część \' . htmlspecialchars($book[\'series_position\']) . \')\' : \'\'; ?>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <div class="download-links">
+                        <a href="https://<?php echo $_SERVER[\'HTTP_HOST\']; ?>/_ksiazki/<?php echo htmlspecialchars($book[\'file_name\']); ?>" 
+                           class="download-link https">Pobierz HTTPS</a>
+                        <a href="http://<?php echo $_SERVER[\'HTTP_HOST\']; ?>/_ksiazki/<?php echo htmlspecialchars($book[\'file_name\']); ?>" 
+                           class="download-link http">Pobierz HTTP – dla starszych Kindle</a>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+        
+        <?php if ($totalPages > 1): ?>
+        <div class="pagination">
+            <div class="pagination-info">Strona <?php echo $page; ?> z <?php echo $totalPages; ?></div>
+            
+            <?php if ($page > 1): ?>
+                <a href="<?php echo buildUrl([\'page\' => 1]); ?>">1</a>
+                <?php if ($page > 2): ?>
+                    <span>...</span>
+                <?php endif; ?>
+                <a href="<?php echo buildUrl([\'page\' => $page - 1]); ?>">Poprzednia</a>
+            <?php endif; ?>
+            
+            <span class="current"><?php echo $page; ?></span>
+            
+            <?php if ($page < $totalPages): ?>
+                <a href="<?php echo buildUrl([\'page\' => $page + 1]); ?>">Następna</a>
+                <?php if ($page < $totalPages - 1): ?>
+                    <span>...</span>
+                <?php endif; ?>
+                <a href="<?php echo buildUrl([\'page\' => $totalPages]); ?>"><?php echo $totalPages; ?></a>
             <?php endif; ?>
         </div>
         <?php endif; ?>
         
         <div class="footer">
-            Strona wygenerowana: ' . date('Y-m-d H:i:s') . '
-            <br>Całkowita liczba książek: <?php echo count($processedBooks); ?>
+            <strong>E-Biblioteczka</strong><br>
+            Strona wygenerowana: ' . date('Y-m-d H:i:s') . '<br>
+            Całkowita liczba książek w bibliotece: <?php echo count($processedBooks); ?>
         </div>
     </div>
 </body>
@@ -484,7 +663,7 @@ function buildUrl($params = []) {
     if(file_put_contents('index.php', $html)) {
         debug_log("Successfully wrote index.php");
         header('Content-Type: application/json');
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'message' => 'Strona została wygenerowana zgodnie z wytycznymi dla e-czytników']);
     } else {
         throw new Exception("Failed to write index.php");
     }
