@@ -1,0 +1,104 @@
+
+# ✅ Checklista wdrożeniowa: E-biblioteczka przyjazna e-czytnikom
+
+## 🎯 Cel
+Stworzyć nowoczesny, minimalistyczny i czytelny interfejs dla strony z książkami do pobrania, zoptymalizowany pod przeglądarki urządzeń e-papierowych (Kindle, Boox). Unikamy stylu "web 90s", ale zachowujemy wysoką funkcjonalność przy prostocie.
+
+---
+
+## 🔠 1. Typografia i czytelność
+
+| Element               | Rozmiar czcionki | Styl                 | Uwagi |
+|-----------------------|------------------|----------------------|-------|
+| **Tytuł książki**     | 1.2em – 1.4em     | Pogrubiony           | Najbardziej widoczny element wpisu |
+| **Autor**             | 1em              | Zwykła lub kursywa   | Oddzielna linia, mniej dominujący |
+| **Gatunki/kategorie** | 0.9em – 1em       | ALL CAPS / kolorystyka | Oddzielne od autora, dobrze widoczne |
+| **Linki HTTPS/HTTP**  | 1em              | Pogrubione lub z ramką | Odstęp 12–16px między nimi |
+| **Etykiety pól**      | 1em – 1.1em       | Pogrubione            | Nad polami, nie obok |
+| **Znaleziono X**      | 1em              | Pogrubione lub szare  | Wyraźnie nad wynikami |
+
+---
+
+## 📚 2. Układ elementów książki
+
+Każda książka jako osobny blok, zawierający:
+
+1. **Tytuł** (największy, pogrubiony)
+2. **Autorzy** (osobna linia)
+3. **Gatunki** (ALL CAPS, np. `BIOGRAFIA | REPORTAŻ`)
+4. **Linki do pobrania:** `Pobierz HTTPS` i `Pobierz HTTP` (osobna linia, duży odstęp)
+
+Oddziel książki pionowym odstępem 16–24px.
+
+---
+
+## 🧭 3. Rozmieszczenie komponentów
+
+- Wszystko w układzie pionowym (mobile-first).
+- Szukaj, Gatunek i Sortuj jako osobne sekcje formularza.
+- Etykiety pól zawsze nad polami.
+- Tekst i przyciski wyrównane do lewej.
+
+---
+
+## 🔍 4. Poprawa widoczności kategorii
+
+- Stosuj **duże litery (ALL CAPS)**.
+- Dopuszczalne subtelne kolory (np. ciemnozielony, szary).
+- Zawsze na osobnej linii.
+
+---
+
+## 🔗 5. Linki do pobierania
+
+- Dwa linki: **HTTPS i HTTP**.
+- Jasno opisane: `Pobierz HTTPS`, `Pobierz HTTP – dla starszych Kindle`.
+- Wyraźny odstęp między linkami (min. 12px).
+- Inny kolor niż tekst, ale wysoki kontrast.
+
+---
+
+## 🔎 6. Formularze filtrowania
+
+- Pola: Szukaj / Gatunek / Sortuj w osobnych sekcjach.
+- Każde pole z etykietą nad nim.
+- Oddzielne przyciski: „Szukaj”, „Filtruj”, „Sortuj”.
+- Przyciski wyraźne, nie za małe.
+
+---
+
+## 📄 7. Liczba wyników
+
+- Zawsze pokazuj komunikat: **„Znaleziono X książek”**.
+- Pogrubiony, nad listą wyników.
+- Jeśli aktywny filtr – pokaż także jego nazwę.
+
+---
+
+## 📄 8. Stronicowanie
+
+- Po 20–30 książek na stronę.
+- Klasyczne stronicowanie: `1 | 2 | 3 | Następna`.
+- Nawet przy jednej stronie – pokaż informację „Strona 1 z 1”.
+
+---
+
+## 🧱 9. Styl graficzny
+
+- Minimalistyczny i nowoczesny, NIE „web z lat 90”.
+- Bez ikon SVG, gradientów, animacji.
+- Font systemowy sans-serif (np. `Arial`, `Helvetica`, `Inter`).
+- Tło: białe. Tekst: czarny lub ciemnoszary.
+- Linki: kontrastujące, czytelne, podkreślone.
+
+---
+
+## ✅ Podsumowanie: lista wdrożeniowa
+
+- [ ] Czytelna struktura wpisu: Tytuł / Autor / Gatunek / Linki
+- [ ] Widoczne, rozdzielone linki HTTPS i HTTP
+- [ ] Wyróżnienie kategorii książek (typografia, styl)
+- [ ] Responsywny i pionowy układ formularzy
+- [ ] Pogrubiona informacja o liczbie wyników
+- [ ] Klasyczne, tekstowe stronicowanie
+- [ ] Styl nowoczesny, minimalistyczny, z wysokim kontrastem
