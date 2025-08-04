@@ -1,0 +1,103 @@
+# ✅ Checklista wdrożeniowa: E-biblioteczka przyjazna e-czytnikom
+
+## 🎯 Cel
+Stworzyć nowoczesny, minimalistyczny i czytelny interfejs dla strony z książkami do pobrania, zoptymalizowany pod przeglądarki urządzeń e-papierowych (Kindle, Boox). Unikamy stylu "web z lat 90", ale zachowujemy wysoką funkcjonalność przy prostocie.
+
+---
+
+## 🔠 1. Typografia i czytelność
+
+| Element               | Rozmiar czcionki | Styl                 | Uwagi |
+|-----------------------|------------------|----------------------|-------|
+| **Tytuł książki**     | 1.3em – 1.5em     | Pogrubiony           | Dominujący wizualnie, wyraźnie oddzielony od reszty |
+| **Autor**             | 1em              | Kursywa lub zwykły   | Mniejszy kontrast od tytułu |
+| **Gatunki/kategorie** | 1em              | ALL CAPS, ciemniejsze | Osobna linia, wyraźny kontrast |
+| **Seria**             | 0.9em – 1em       | Italic + etykieta    | Np. „Seria: Sebastian Bergman” |
+| **Linki HTTPS/HTTP**  | 1em              | Pogrubione w ramce   | Osobna linia, min. 12–16px odstępu |
+| **Etykiety pól**      | 1em – 1.1em       | Pogrubione            | Nad polami, nie obok |
+| **Znaleziono X**      | 1em              | Pogrubione lub z ikonką | Umieszczone pod nagłówkiem strony |
+
+---
+
+## 📚 2. Układ elementów książki
+
+Każda książka jako osobny blok, zawierający:
+
+1. **Tytuł** – największy i pogrubiony  
+2. **Autorzy** – osobna linia, lżejszy font  
+3. **Gatunki** – ALL CAPS, oddzielone `|`, osobna linia  
+4. **Seria** – osobna linia, mniejszy font, z etykietą „Seria:”  
+5. **Linki do pobrania** – dwa, na osobnej linii, dobrze od siebie oddzielone  
+
+Między książkami: jasna linia oddzielająca lub różne kolory tła co drugi wpis.
+
+---
+
+## 🧭 3. Rozmieszczenie komponentów
+
+- Wszystkie pola formularzy i przyciski w **jednej kolumnie** (wertykalnie).  
+- Przycisk „Szukaj” **blisko pola tekstowego**, a nie osobno.  
+- Formularz zwarty – **nie marnować przestrzeni pionowej**.  
+- „Znaleziono X książek” **przenieść nad listę wyników**.
+
+---
+
+## 🔍 4. Poprawa widoczności kategorii
+
+- ALL CAPS, ciemniejszy tekst, wyraźny odstęp między kategoriami.  
+- Zwiększyć rozmiar i kontrast.  
+- Dodać etykietę „Gatunek:” lub ikonkę 📚 (widoczną na e-ink).
+
+---
+
+## 🔗 5. Linki do pobierania
+
+- Wyraźnie rozdzielone przyciski: `Pobierz HTTPS` i `Pobierz HTTP – dla starszych Kindle`.  
+- Zwiększony padding, widoczna ramka, ciemniejszy obrys.  
+- Ikonka 📥 opcjonalnie (jeśli widoczna na urządzeniu).
+
+---
+
+## 🔎 6. Formularze filtrowania
+
+- Pola i etykiety w jednej kolumnie.  
+- Zmniejszone odstępy między etykietą a przyciskiem.  
+- Przyciski powinny znajdować się **bezpośrednio pod polami**.  
+- Tekstowe, proste przyciski – ale z wyraźnym obramowaniem.
+
+---
+
+## 📄 7. Liczba wyników
+
+- Widoczna tuż pod nagłówkiem strony.  
+- Wyróżniona pogrubieniem lub ikonką: `📚 Znaleziono 8 książek`.
+
+---
+
+## 📄 8. Stronicowanie
+
+- Po 20–30 książek na stronę.  
+- Linki stronicowania: `1 | 2 | 3 | Następna`.  
+- Zawsze pokazuj aktualną stronę nawet jeśli jest tylko jedna („Strona 1 z 1”).
+
+---
+
+## 🧱 9. Styl graficzny
+
+- Styl **nowoczesny, minimalistyczny**, ale **nie surowy**.  
+- Font sans-serif (Arial, Helvetica, Inter).  
+- Bez gradientów, SVG, animacji.  
+- Tło białe, tekst czarny lub ciemnoszary.  
+- Linki i przyciski podkreślone, dobrze kontrastujące.
+
+---
+
+## ✅ Finalna lista zadań do wdrożenia
+
+- [ ] Czytelna struktura wpisu: Tytuł / Autor / Gatunek / Seria / Linki  
+- [ ] Wyróżnienie tytułów i kategorii  
+- [ ] Osobna linia i styl dla serii  
+- [ ] Kompaktowy formularz z przyciskami bliżej pól  
+- [ ] Informacja o liczbie wyników widoczna na górze  
+- [ ] Klasyczne, tekstowe stronicowanie  
+- [ ] Styl nowoczesny, kontrastowy, dopasowany do e-czytników
