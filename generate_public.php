@@ -185,16 +185,16 @@ function buildUrl($params = []) {
         .main-title {
             font-size: 1.8em;
             font-weight: bold;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             text-align: left;
             border-bottom: 2px solid #000000;
             padding-bottom: 8px;
         }
         
-        /* Sekcje formularzy */
+        /* Sekcje formularzy - kompaktowe */
         .form-section {
-            margin-bottom: 24px;
-            padding: 16px;
+            margin-bottom: 16px;
+            padding: 12px;
             border: 1px solid #333333;
             background: #f8f8f8;
         }
@@ -202,18 +202,18 @@ function buildUrl($params = []) {
         .form-section h3 {
             font-size: 1.1em;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             text-transform: uppercase;
         }
         
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 8px;
         }
         
         label {
             display: block;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-size: 1em;
         }
         
@@ -225,17 +225,18 @@ function buildUrl($params = []) {
             font-size: 1em;
             background: #ffffff;
             color: #000000;
+            margin-bottom: 6px;
         }
         
         .btn {
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: 2px solid #000000;
             background: #ffffff;
             color: #000000;
             font-size: 1em;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 4px;
             text-decoration: none;
             display: inline-block;
         }
@@ -249,10 +250,15 @@ function buildUrl($params = []) {
         .results-info {
             font-size: 1em;
             font-weight: bold;
-            margin: 24px 0 16px 0;
+            margin: 16px 0 12px 0;
             padding: 12px;
             background: #e8e8e8;
             border: 1px solid #333333;
+        }
+        
+        .results-info::before {
+            content: "📚 ";
+            margin-right: 4px;
         }
         
         .active-filters {
@@ -263,21 +269,26 @@ function buildUrl($params = []) {
         
         /* Lista książek */
         .books-list {
-            margin: 24px 0;
+            margin: 16px 0;
         }
         
         .book-item {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             padding: 16px;
             border: 1px solid #cccccc;
             background: #ffffff;
         }
         
+        .book-item:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
         .book-title {
-            font-size: 1.3em;
+            font-size: 1.4em;
             font-weight: bold;
             margin-bottom: 8px;
             line-height: 1.3;
+            color: #000000;
         }
         
         .book-authors {
@@ -289,17 +300,29 @@ function buildUrl($params = []) {
         
         .book-genres {
             font-size: 1em;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #006600;
+            color: #222222;
+        }
+        
+        .book-genres::before {
+            content: "📚 ";
+            margin-right: 4px;
         }
         
         .book-series {
-            font-size: 1em;
+            font-size: 0.95em;
             margin-bottom: 12px;
-            color: #666666;
+            color: #555555;
+            font-style: italic;
+        }
+        
+        .book-series::before {
+            content: "Seria: ";
+            font-weight: bold;
+            font-style: normal;
         }
         
         .book-series a {
@@ -324,13 +347,18 @@ function buildUrl($params = []) {
             display: inline-block;
             margin-right: 16px;
             margin-bottom: 8px;
-            padding: 10px 16px;
+            padding: 12px 20px;
             border: 2px solid #000000;
             background: #ffffff;
             color: #000000;
             text-decoration: none;
             font-weight: bold;
             font-size: 1em;
+        }
+        
+        .download-link::before {
+            content: "📥 ";
+            margin-right: 4px;
         }
         
         .download-link:hover {
@@ -607,7 +635,7 @@ function buildUrl($params = []) {
                     
                     <?php if (!empty($book[\'series\'])): ?>
                     <div class="book-series">
-                        Seria: <a href="<?php echo buildUrl([\'series\' => $book[\'series\'], \'page\' => 1]); ?>">
+                        <a href="<?php echo buildUrl([\'series\' => $book[\'series\'], \'page\' => 1]); ?>">
                             <?php echo htmlspecialchars($book[\'series\']); ?>
                             <?php echo !empty($book[\'series_position\']) ? \' (część \' . htmlspecialchars($book[\'series_position\']) . \')\' : \'\'; ?>
                         </a>
