@@ -317,7 +317,7 @@ function buildUrl($params = []) {
         }
         
         .book-item {
-            margin-bottom: 32px;
+            margin-bottom: 16px;
             padding: 20px;
             border: 1px solid #cccccc;
             border-bottom: 3px solid #dddddd;
