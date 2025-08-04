@@ -34,6 +34,11 @@ function initializeAuthors(rowId) {
         } else {
             addAuthorEntry('', '', rowId);
         }
+        
+        // Initialize autocomplete for all existing author entries
+        container.querySelectorAll('.author-entry').forEach(entry => {
+            initializeAuthorAutocomplete(entry, rowId);
+        });
     }
 }
 
@@ -133,17 +138,17 @@ function addAuthorEntry(firstName = '', lastName = '', rowId) {
     authorEntry.className = 'author-entry mb-2 border p-2 rounded';
     authorEntry.setAttribute('data-author-index', index);
     
-    const availableAuthorsElement = document.getElementById('available-authors-' + rowId);
-    const authors = availableAuthorsElement ? JSON.parse(availableAuthorsElement.value || '[]') : [];
-    const authorOptions = authors.map(author => `<option value="${author}">${author.replace('|', ' ')}</option>`).join('\n');
-    
     authorEntry.innerHTML = `
         <div class="row g-2">
             <div class="col-12">
-                <select class="form-select mb-2 author-select" onchange="handleAuthorSelect(this, '${rowId}')">
-                    <option value="">Wybierz istniejącego autora lub dodaj nowego</option>
-                    ${authorOptions}
-                </select>
+                <div class="position-relative">
+                    <input type="text" class="form-control author-search" 
+                           placeholder="Wpisz imię lub nazwisko autora..." 
+                           data-row-id="${rowId}" data-author-index="${index}"
+                           autocomplete="off">
+                    <div class="author-suggestions position-absolute w-100 bg-white border rounded shadow" 
+                         style="z-index: 1000; max-height: 200px; overflow-y: auto; display: none;"></div>
+                </div>
             </div>
             <div class="col-md-6">
                 <input type="text" class="form-control" name="authors[${index}][first_name]" 
@@ -160,6 +165,7 @@ function addAuthorEntry(firstName = '', lastName = '', rowId) {
     `;
     
     container.appendChild(authorEntry);
+    initializeAuthorAutocomplete(authorEntry, rowId);
     updateAuthorIndices(rowId);
 }
 
@@ -201,6 +207,92 @@ function updateAuthorIndices(rowId) {
                 removeButton.style.display = 'inline-block';
             }
         }
+    });
+}
+
+function initializeAuthorAutocomplete(authorEntry, rowId) {
+    const searchInput = authorEntry.querySelector('.author-search');
+    const suggestionsDiv = authorEntry.querySelector('.author-suggestions');
+    const firstNameInput = authorEntry.querySelector('input[name*="[first_name]"]');
+    const lastNameInput = authorEntry.querySelector('input[name*="[last_name]"]');
+    
+    if (!searchInput || !suggestionsDiv) return;
+    
+    const availableAuthorsElement = document.getElementById('available-authors-' + rowId);
+    const authors = availableAuthorsElement ? JSON.parse(availableAuthorsElement.value || '[]') : [];
+    
+    let hideTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        if (query.length < 1) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        const filteredAuthors = authors.filter(author => {
+            const [firstName, lastName] = author.split('|');
+            return firstName.toLowerCase().includes(query) || 
+                   lastName.toLowerCase().includes(query) ||
+                   (firstName + ' ' + lastName).toLowerCase().includes(query);
+        });
+        
+        if (filteredAuthors.length > 0) {
+            suggestionsDiv.innerHTML = filteredAuthors.map(author => {
+                const [firstName, lastName] = author.split('|');
+                const displayName = `${firstName} ${lastName}`;
+                return `<div class="p-2 author-suggestion" 
+                            style="cursor: pointer; border-bottom: 1px solid #eee;"
+                            data-first-name="${firstName}" 
+                            data-last-name="${lastName}"
+                            onmouseover="this.style.backgroundColor='#f8f9fa'" 
+                            onmouseout="this.style.backgroundColor='white'">
+                            ${displayName}
+                        </div>`;
+            }).join('');
+            suggestionsDiv.style.display = 'block';
+            
+            // Add click handlers to suggestions
+            suggestionsDiv.querySelectorAll('.author-suggestion').forEach(suggestion => {
+                suggestion.addEventListener('click', function() {
+                    const firstName = this.getAttribute('data-first-name');
+                    const lastName = this.getAttribute('data-last-name');
+                    
+                    firstNameInput.value = firstName;
+                    lastNameInput.value = lastName;
+                    searchInput.value = `${firstName} ${lastName}`;
+                    suggestionsDiv.style.display = 'none';
+                });
+            });
+        } else {
+            suggestionsDiv.innerHTML = '<div class="p-2 text-muted">Brak pasujących autorów. Wprowadź dane nowego autora poniżej.</div>';
+            suggestionsDiv.style.display = 'block';
+        }
+    });
+    
+    // Hide suggestions when clicking outside
+    searchInput.addEventListener('blur', function() {
+        hideTimeout = setTimeout(() => {
+            suggestionsDiv.style.display = 'none';
+        }, 200);
+    });
+    
+    searchInput.addEventListener('focus', function() {
+        if (hideTimeout) {
+            clearTimeout(hideTimeout);
+        }
+    });
+    
+    // Update search input when manual entry is made
+    [firstNameInput, lastNameInput].forEach(input => {
+        input.addEventListener('input', function() {
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            if (firstName || lastName) {
+                searchInput.value = `${firstName} ${lastName}`.trim();
+            }
+        });
     });
 }
 
