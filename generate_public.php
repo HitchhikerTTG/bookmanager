@@ -311,56 +311,64 @@ function buildUrl($params = []) {
         }
         
         .book-item {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             padding: 16px;
             border: 1px solid #cccccc;
             background: #ffffff;
+            line-height: 1.4;
         }
         
         .book-item:nth-child(even) {
             background: #f9f9f9;
         }
         
+        /* Linia 1: Tytuł ↔ Autor */
+        .book-line-1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
         .book-title {
             font-size: 1.4em;
             font-weight: bold;
-            margin-bottom: 8px;
-            line-height: 1.3;
             color: #000000;
+            line-height: 1.3;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .book-title::before {
+            content: "📖 ";
+            margin-right: 4px;
         }
         
         .book-authors {
             font-size: 1em;
-            margin-bottom: 8px;
             color: #333333;
-            font-style: italic;
+            text-align: right;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
-        .book-genres {
-            font-size: 1em;
-            margin-bottom: 8px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #222222;
-        }
-        
-        .book-genres::before {
-            content: "📚 ";
-            margin-right: 4px;
+        /* Linia 2: Seria ↔ Gatunek */
+        .book-line-2 {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         
         .book-series {
-            font-size: 0.95em;
-            margin-bottom: 12px;
+            font-size: 1em;
             color: #555555;
-            font-style: italic;
-        }
-        
-        .book-series::before {
-            content: "Seria: ";
-            font-weight: bold;
-            font-style: normal;
+            flex: 1;
+            min-width: 0;
         }
         
         .book-series a {
@@ -373,6 +381,29 @@ function buildUrl($params = []) {
             background: #006600;
             color: #ffffff;
             padding: 2px 4px;
+        }
+        
+        .book-genres {
+            font-size: 1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #222222;
+            text-align: right;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        /* Fallback dla starszych urządzeń bez flex */
+        .no-flex .book-line-1,
+        .no-flex .book-line-2 {
+            display: block;
+        }
+        
+        .no-flex .book-authors,
+        .no-flex .book-genres {
+            text-align: left;
+            margin-top: 4px;
         }
         
         .download-links {
@@ -628,28 +659,32 @@ function buildUrl($params = []) {
             <?php else: ?>
                 <?php foreach ($booksForPage as $book): ?>
                 <div class="book-item">
-                    <div class="book-title"><?php echo htmlspecialchars($book[\'title\']); ?></div>
-                    
-                    <div class="book-authors">
-                        <?php echo implode(\', \', array_map(function($author) {
-                            return htmlspecialchars($author[\'first_name\'] . \' \' . $author[\'last_name\']);
-                        }, $book[\'authors\'])); ?>
+                    <!-- Linia 1: Tytuł ↔ Autor -->
+                    <div class="book-line-1">
+                        <div class="book-title"><?php echo htmlspecialchars($book[\'title\']); ?></div>
+                        <div class="book-authors">
+                            <?php echo implode(\', \', array_map(function($author) {
+                                return htmlspecialchars($author[\'first_name\'] . \' \' . $author[\'last_name\']);
+                            }, $book[\'authors\'])); ?>
+                        </div>
                     </div>
                     
-                    <?php if (!empty($book[\'genres\'])): ?>
-                    <div class="book-genres">
-                        <?php echo htmlspecialchars(implode(\' | \', $book[\'genres\'])); ?>
+                    <!-- Linia 2: Seria ↔ Gatunek -->
+                    <div class="book-line-2">
+                        <div class="book-series">
+                            <?php if (!empty($book[\'series\'])): ?>
+                                Seria: <a href="<?php echo buildUrl([\'series\' => $book[\'series\'], \'page\' => 1]); ?>">
+                                    <?php echo htmlspecialchars($book[\'series\']); ?>
+                                    <?php echo !empty($book[\'series_position\']) ? \' (część \' . htmlspecialchars($book[\'series_position\']) . \')\' : \'\'; ?>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                        <div class="book-genres">
+                            <?php if (!empty($book[\'genres\'])): ?>
+                                <?php echo htmlspecialchars(implode(\' | \', $book[\'genres\'])); ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($book[\'series\'])): ?>
-                    <div class="book-series">
-                        <a href="<?php echo buildUrl([\'series\' => $book[\'series\'], \'page\' => 1]); ?>">
-                            <?php echo htmlspecialchars($book[\'series\']); ?>
-                            <?php echo !empty($book[\'series_position\']) ? \' (część \' . htmlspecialchars($book[\'series_position\']) . \')\' : \'\'; ?>
-                        </a>
-                    </div>
-                    <?php endif; ?>
                     
                     <div class="download-links">
                         <a href="https://<?php echo $_SERVER[\'HTTP_HOST\']; ?>/_ksiazki/<?php echo htmlspecialchars($book[\'file_name\']); ?>" 
