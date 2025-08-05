@@ -41,14 +41,9 @@ function initializeAuthors(rowId) {
 }
 
 function initializeAutocomplete(rowId) {
-    // Initialize series typeahead
+    // Initialize series datalist (same pattern as authors)
     const seriesInput = document.getElementById('series-' + rowId);
     if (!seriesInput) return;
-    
-    // Check if already initialized and destroy if needed
-    if ($(seriesInput).data('ttTypeahead')) {
-        $(seriesInput).typeahead('destroy');
-    }
     
     const availableSeriesElement = document.getElementById('available-series-' + rowId);
     if (!availableSeriesElement) {
@@ -58,22 +53,19 @@ function initializeAutocomplete(rowId) {
     const availableSeries = JSON.parse(availableSeriesElement.value || '[]');
     
     if (availableSeries.length > 0) {
-        const seriesBloodhound = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            local: availableSeries
+        // Create datalist for series
+        const datalistId = `series-${rowId}-${Date.now()}`;
+        const datalist = document.createElement('datalist');
+        datalist.id = datalistId;
+        
+        availableSeries.forEach(series => {
+            const option = document.createElement('option');
+            option.value = series;
+            datalist.appendChild(option);
         });
-
-        $(seriesInput).typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-            name: 'series',
-            source: seriesBloodhound,
-            limit: 10
-        });
+        
+        document.body.appendChild(datalist);
+        seriesInput.setAttribute('list', datalistId);
     }
 }
 

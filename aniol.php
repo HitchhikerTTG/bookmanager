@@ -30,23 +30,7 @@ $manager = new BookManager();
 ?>
 <!DOCTYPE html>
 
-    <style>
-        .tt-menu {
-            width: 100%;
-            padding: 8px;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .tt-suggestion {
-            padding: 4px 8px;
-            cursor: pointer;
-        }
-        .tt-suggestion:hover {
-            background-color: #f8f9fa;
-        }
-    </style>
+    
 
 <html lang="en">
 <head>
@@ -158,7 +142,6 @@ $manager = new BookManager();
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
 
 
     
