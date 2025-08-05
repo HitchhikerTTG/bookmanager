@@ -214,17 +214,31 @@ function buildUrl($params = []) {
             display: flex;
             flex-wrap: wrap;
             align-items: end;
-            gap: 16px;
+            gap: 8px;
             margin-bottom: 8px;
         }
         
         .search-group {
             flex: 1;
             min-width: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .search-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: end;
+        }
+        
+        .search-input-row input[type="text"] {
+            flex: 1;
+            margin-bottom: 0;
         }
         
         .sort-buttons {
             flex-shrink: 0;
+            margin-left: 16px;
         }
         
         .sort-buttons label {
@@ -240,9 +254,9 @@ function buildUrl($params = []) {
         }
         
         .search-btn {
-            align-self: end;
             height: 44px;
-            padding: 10px 20px;
+            padding: 10px 16px;
+            flex-shrink: 0;
         }
         
         /* Przyciski gatunków */
@@ -660,8 +674,18 @@ function buildUrl($params = []) {
                 min-width: 100%;
             }
             
+            .search-input-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .search-input-row input[type="text"] {
+                margin-bottom: 8px;
+            }
+            
             .sort-buttons {
                 text-align: center;
+                margin-left: 0;
             }
             
             .button-group {
@@ -669,8 +693,8 @@ function buildUrl($params = []) {
             }
             
             .search-btn {
-                align-self: stretch;
                 height: auto;
+                padding: 12px;
             }
             
             .genre-btn, .sort-btn {
@@ -705,7 +729,10 @@ function buildUrl($params = []) {
                     <div class="search-sort-row">
                         <div class="search-group">
                             <label for="search">Szukaj według tytułu lub autora:</label>
-                            <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Wpisz tytuł lub nazwisko autora">
+                            <div class="search-input-row">
+                                <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Wpisz tytuł lub nazwisko autora">
+                                <button type="submit" class="btn search-btn">🔍 Szukaj</button>
+                            </div>
                         </div>
                         <div class="sort-buttons">
                             <label>Sortowanie:</label>
@@ -718,7 +745,6 @@ function buildUrl($params = []) {
                                    class="btn sort-btn<?php echo $sort === \'date\' ? \' active\' : \'\'; ?>">Najnowsze</a>
                             </div>
                         </div>
-                        <button type="submit" class="btn search-btn">Szukaj</button>
                     </div>
                     <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
                     <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
