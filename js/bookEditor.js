@@ -93,7 +93,7 @@ function editBook(fileName, title, genres, series, seriesPosition, comment) {
         if (genresInput) {
             // Set genres value and update visual display
             genresInput.value = genres || '';
-            // Update the visual genre badges
+            // Update the visual genre badges using our existing system
             updateGenreDisplay(rowId, genres);
         }
         if (seriesInput) seriesInput.value = series || '';
