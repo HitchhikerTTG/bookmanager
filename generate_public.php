@@ -3,6 +3,10 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
+ini_set('error_log', '/tmp/php_error.log');
+
+// Add output buffering to catch any output before JSON response
+ob_start();
 
 function debug_log($message) {
     error_log("[GENERATE_PUBLIC] " . $message);
@@ -429,9 +433,37 @@ $allGenres = ' . var_export($allGenres, true) . ';
         throw new Exception("Failed to write index.php");
     }
 } catch (Exception $e) {
+    // Clean any output buffer
+    if (ob_get_length()) ob_clean();
+    
     debug_log("Error: " . $e->getMessage());
+    debug_log("Stack trace: " . $e->getTraceAsString());
+    
     header('Content-Type: application/json; charset=utf-8');
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    echo json_encode([
+        'success' => false, 
+        'error' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ], JSON_UNESCAPED_UNICODE);
+} catch (Error $e) {
+    // Clean any output buffer
+    if (ob_get_length()) ob_clean();
+    
+    debug_log("Fatal Error: " . $e->getMessage());
+    debug_log("Stack trace: " . $e->getTraceAsString());
+    
+    header('Content-Type: application/json; charset=utf-8');
+    http_response_code(500);
+    echo json_encode([
+        'success' => false, 
+        'error' => 'Fatal error: ' . $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ], JSON_UNESCAPED_UNICODE);
 }
+
+// Clean output buffer before sending response
+if (ob_get_length()) ob_end_clean();
 ?>
