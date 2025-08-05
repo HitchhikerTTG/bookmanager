@@ -161,61 +161,15 @@ $manager = new BookManager();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
 
 
-    <script>
-        // Debug - sprawdź czy jQuery jest załadowane
-        console.log('jQuery loaded:', typeof $ !== 'undefined');
-        console.log('Current path:', window.location.pathname);
-        console.log('Script directory:', '<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>');
-    </script>
+    
     <script src="js/bookEditor.js"></script>
     <script>
         $(document).ready(function() {
-            console.log('Document ready, initializing...');
-            // Initialize autocomplete for existing forms when the document is ready
             $('.edit-form:not(.d-none)').each(function() {
                 const rowId = this.id.replace('edit-form-', '');
-                console.log('Initializing rowId:', rowId);
-                initializeAuthors(rowId); // This initializes authors datalist autocomplete
-                initializeAutocomplete(rowId); // This initializes series typeahead
+                initializeAuthors(rowId);
+                initializeAutocomplete(rowId);
             });
-
-            // Function to initialize datalist autocomplete for authors
-            function initializeAuthors(rowId) {
-                const authorInput = $('#' + rowId + ' #author_name');
-                if (authorInput.length && authorInput.data('datalist-initialized') !== true) {
-                    const authorNames = $('#' + rowId).data('author-names') || [];
-                    // Simple datalist-based autocomplete for authors
-                    // Bootstrap Typeahead is not used here for authors based on the original logic
-                    console.log('Initializing datalist for author_name in row:', rowId);
-                    authorInput.data('datalist-initialized', true); // Mark as initialized
-                }
-            }
-
-            // Function to initialize Bootstrap Typeahead for series
-            function initializeAutocomplete(rowId) {
-                const seriesInput = $('#' + rowId + ' #series_name');
-                if (seriesInput.length && !seriesInput.hasClass('tt-input')) { // Check if Typeahead is already initialized
-                    const seriesData = $('#' + seriesInput.closest('.edit-form')[0].id).data('series-data') || [];
-                    const engine = new Bloodhound({
-                        datumTokenizer: Bloodhound.tokenizers.whitespace,
-                        queryTokenizer: Bloodhound.tokenizers.whitespace,
-                        local: seriesData.map(function(item) { return { value: item }; })
-                    });
-
-                    seriesInput.typeahead({
-                        hint: true,
-                        highlight: true,
-                        minLength: 1
-                    }, {
-                        name: 'series',
-                        source: engine,
-                        displayKey: 'value'
-                    });
-                    console.log('Initialized Typeahead for series_name in row:', rowId);
-                } else if (seriesInput.hasClass('tt-input')) {
-                    console.log('Typeahead already initialized for series_name in row:', rowId);
-                }
-            }
         });
 
         function generatePublicPage() {

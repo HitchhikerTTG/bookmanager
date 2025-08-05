@@ -28,16 +28,14 @@ function initializeAuthors(rowId) {
                     addAuthorEntry('', '', rowId);
                 }
             } catch (e) {
-                console.error('Error parsing author data:', e);
                 addAuthorEntry('', '', rowId);
             }
         } else {
             addAuthorEntry('', '', rowId);
         }
         
-        // Initialize autocomplete for all existing author entries
         container.querySelectorAll('.author-entry').forEach(entry => {
-            initializeSimpleAuthorAutocomplete(entry, rowId);
+            initializeAuthorAutocomplete(entry, rowId);
         });
     }
 }
@@ -54,12 +52,10 @@ function initializeAutocomplete(rowId) {
     
     const availableSeriesElement = document.getElementById('available-series-' + rowId);
     if (!availableSeriesElement) {
-        console.log('Available series element not found for rowId:', rowId);
         return;
     }
     
     const availableSeries = JSON.parse(availableSeriesElement.value || '[]');
-    console.log('Available series for rowId', rowId, ':', availableSeries);
     
     if (availableSeries.length > 0) {
         const seriesBloodhound = new Bloodhound({
@@ -78,22 +74,13 @@ function initializeAutocomplete(rowId) {
             source: seriesBloodhound,
             limit: 10
         });
-        
-        console.log('Typeahead initialized for series input:', rowId);
-    } else {
-        console.log('No available series data for rowId:', rowId);
     }
 }
 
 function editBook(fileName, title, genres, series, seriesPosition, comment) {
-    console.log('editBook called with:', { fileName, title, genres, series, seriesPosition, comment });
     const rowId = fileName.replace(/[^a-zA-Z0-9]/g, '');
-    console.log('Generated rowId:', rowId);
-    
     toggleEditForm(rowId);
-    
     const form = document.getElementById('editBookForm-' + rowId);
-    console.log('Form found:', form);
     if (form) {
         const titleInput = form.querySelector('input[name="title"]');
         const genresInput = document.getElementById('genres-' + rowId);
@@ -223,9 +210,7 @@ function initializeAuthorAutocomplete(authorEntry, rowId) {
 }
 
 function submitBookForm(form) {
-    console.log('Starting form submission');
     const formData = new FormData(form);
-    console.log('Form data created:', Object.fromEntries(formData));
     
     // Sanitize genres input
     const genres = formData.get('genres');
@@ -259,23 +244,19 @@ function submitBookForm(form) {
         }
     })
     .then(response => {
-        console.log('Response received:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
-        console.log('Response data:', data);
         if (data.success) {
             window.location.href = 'aniol.php';
         } else if (data.error) {
-            console.error('Server error:', data.error);
             alert(data.error);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         if (error.name === 'SyntaxError') {
             alert('Invalid response from server');
         } else {

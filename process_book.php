@@ -14,7 +14,6 @@ if (file_exists($includesPath . 'BookManager.php')) {
 }
 
 try {
-    error_log("Processing book submission");
     $manager = new BookManager();
 
     if (!isset($_POST['file_name']) || !isset($_POST['title']) || !isset($_POST['genres'])) {
@@ -71,8 +70,6 @@ try {
     }
 
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-        // Ajax request - return JSON
-        error_log("Sending success response");
         echo json_encode(['success' => true]);
     } else {
         // Regular form submit - redirect
@@ -80,7 +77,6 @@ try {
         exit();
     }
 } catch (Exception $e) {
-    error_log("Error processing book: " . $e->getMessage());
     http_response_code(500);
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
         echo json_encode(['success' => false, 'error' => $e->getMessage()]);
