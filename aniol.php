@@ -145,7 +145,7 @@ $manager = new BookManager();
 
 
     
-    <script src="js/bookEditor.js"></script>
+    <script src="js/bookEditor.js?v=<?php echo SCRIPT_VERSION; ?>-<?php echo filemtime('js/bookEditor.js'); ?>"></script>
     <script>
         $(document).ready(function() {
             $('.edit-form:not(.d-none)').each(function() {

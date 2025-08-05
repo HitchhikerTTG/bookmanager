@@ -1,4 +1,4 @@
 
 <?php
-define('SCRIPT_VERSION', '1.0.7');
+define('SCRIPT_VERSION', '1.0.8');
 ?>
