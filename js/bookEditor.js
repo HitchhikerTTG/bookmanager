@@ -45,6 +45,15 @@ function initializeAutocomplete(rowId) {
     const seriesInput = document.getElementById('series-' + rowId);
     if (!seriesInput) return;
     
+    // Clean up existing datalist if any
+    const existingDatalistId = seriesInput.getAttribute('list');
+    if (existingDatalistId) {
+        const existingDatalist = document.getElementById(existingDatalistId);
+        if (existingDatalist) {
+            existingDatalist.remove();
+        }
+    }
+    
     const availableSeriesElement = document.getElementById('available-series-' + rowId);
     if (!availableSeriesElement) {
         return;
@@ -53,8 +62,8 @@ function initializeAutocomplete(rowId) {
     const availableSeries = JSON.parse(availableSeriesElement.value || '[]');
     
     if (availableSeries.length > 0) {
-        // Create datalist for series
-        const datalistId = `series-${rowId}-${Date.now()}`;
+        // Create datalist for series with consistent ID
+        const datalistId = `series-datalist-${rowId}`;
         const datalist = document.createElement('datalist');
         datalist.id = datalistId;
         
@@ -87,9 +96,7 @@ function editBook(fileName, title, genres, series, seriesPosition, comment) {
         if (commentInput) commentInput.value = comment || '';
         
         // Initialize autocomplete for series after form is visible
-        setTimeout(() => {
-            initializeAutocomplete(rowId);
-        }, 100);
+        initializeAutocomplete(rowId);
     }
 }
 
