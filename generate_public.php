@@ -393,14 +393,16 @@ $allGenres = ' . var_export($allGenres, true) . ';
 
     if(file_put_contents('index.php', $html)) {
         debug_log("Successfully wrote index.php");
-        header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'message' => 'Strona została wygenerowana - kod został uproszony i zoptymalizowany']);
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code(200);
+        echo json_encode(['success' => true, 'message' => 'Strona została wygenerowana - kod został uproszony i zoptymalizowany'], JSON_UNESCAPED_UNICODE);
     } else {
         throw new Exception("Failed to write index.php");
     }
 } catch (Exception $e) {
     debug_log("Error: " . $e->getMessage());
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    header('Content-Type: application/json; charset=utf-8');
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
 }
 ?>
