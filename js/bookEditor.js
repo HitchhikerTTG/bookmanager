@@ -79,9 +79,12 @@ function initializeAutocomplete(rowId) {
 }
 
 function editBook(fileName, title, genres, series, seriesPosition, comment) {
+    console.log('editBook called with:', {fileName, title, genres, series, seriesPosition, comment});
+    
     const rowId = fileName.replace(/[^a-zA-Z0-9]/g, '');
     toggleEditForm(rowId);
     const form = document.getElementById('editBookForm-' + rowId);
+    
     if (form) {
         const titleInput = form.querySelector('input[name="title"]');
         const genresInput = document.getElementById('genres-' + rowId);
@@ -89,10 +92,14 @@ function editBook(fileName, title, genres, series, seriesPosition, comment) {
         const seriesPosInput = form.querySelector('input[name="series_position"]');
         const commentInput = form.querySelector('textarea[name="comment"]');
         
+        console.log('Found inputs:', {titleInput, genresInput, seriesInput});
+        
         if (titleInput) titleInput.value = title || '';
         if (genresInput) {
-            // Set genres value and update visual display
+            // Set genres value and update visual display - NO tagsinput here!
             genresInput.value = genres || '';
+            console.log('Setting genres value to:', genres);
+            
             // Update the visual genre badges using our existing system
             updateGenreDisplay(rowId, genres);
         }
