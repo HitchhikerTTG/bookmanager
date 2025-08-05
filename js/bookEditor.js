@@ -45,9 +45,21 @@ function initializeAuthors(rowId) {
 function initializeAutocomplete(rowId) {
     // Initialize series typeahead
     const seriesInput = document.getElementById('series-' + rowId);
-    if (!seriesInput || $(seriesInput).data('ttTypeahead')) return; // Skip if already initialized
+    if (!seriesInput) return;
     
-    const availableSeries = JSON.parse(document.getElementById('available-series-' + rowId).value || '[]');
+    // Check if already initialized and destroy if needed
+    if ($(seriesInput).data('ttTypeahead')) {
+        $(seriesInput).typeahead('destroy');
+    }
+    
+    const availableSeriesElement = document.getElementById('available-series-' + rowId);
+    if (!availableSeriesElement) {
+        console.log('Available series element not found for rowId:', rowId);
+        return;
+    }
+    
+    const availableSeries = JSON.parse(availableSeriesElement.value || '[]');
+    console.log('Available series for rowId', rowId, ':', availableSeries);
     
     if (availableSeries.length > 0) {
         const seriesBloodhound = new Bloodhound({
@@ -66,6 +78,10 @@ function initializeAutocomplete(rowId) {
             source: seriesBloodhound,
             limit: 10
         });
+        
+        console.log('Typeahead initialized for series input:', rowId);
+    } else {
+        console.log('No available series data for rowId:', rowId);
     }
 }
 
@@ -90,6 +106,11 @@ function editBook(fileName, title, genres, series, seriesPosition, comment) {
         if (seriesInput) seriesInput.value = series || '';
         if (seriesPosInput) seriesPosInput.value = seriesPosition || '';
         if (commentInput) commentInput.value = comment || '';
+        
+        // Initialize autocomplete for series after form is visible
+        setTimeout(() => {
+            initializeAutocomplete(rowId);
+        }, 100);
     }
 }
 
