@@ -90,7 +90,10 @@ function editBook(fileName, title, genres, series, seriesPosition, comment) {
         const commentInput = form.querySelector('textarea[name="comment"]');
         
         if (titleInput) titleInput.value = title || '';
-        if (genresInput) $(genresInput).tagsinput('add', genres);
+        if (genresInput) {
+            // Set genres value directly (your existing system handles display)
+            genresInput.value = genres || '';
+        }
         if (seriesInput) seriesInput.value = series || '';
         if (seriesPosInput) seriesPosInput.value = seriesPosition || '';
         if (commentInput) commentInput.value = comment || '';
