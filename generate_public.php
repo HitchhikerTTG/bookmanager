@@ -205,6 +205,84 @@ function buildUrl($params = []) {
             display: none;
         }
         
+        /* Wyszukiwanie i sortowanie w jednej linii */
+        .search-sort-form {
+            margin-bottom: 0;
+        }
+        
+        .search-sort-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .search-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .sort-buttons {
+            flex-shrink: 0;
+        }
+        
+        .sort-buttons label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .search-btn {
+            align-self: end;
+            height: 44px;
+            padding: 10px 20px;
+        }
+        
+        /* Przyciski gatunków */
+        .genre-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .genre-btn, .sort-btn {
+            padding: 8px 16px;
+            border: 2px solid #333333;
+            background: #ffffff;
+            color: #333333;
+            text-decoration: none;
+            font-weight: normal;
+            font-size: 0.95em;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .genre-btn:hover, .sort-btn:hover {
+            background: #333333;
+            color: #ffffff;
+            text-decoration: none;
+        }
+        
+        .genre-btn.active, .sort-btn.active {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+            font-weight: bold;
+        }
+        
+        .genre-btn.active:hover, .sort-btn.active:hover {
+            background: #333333;
+            border-color: #333333;
+        }
+        
         body {
             font-family: Arial, Helvetica, sans-serif;
             background: #ffffff;
@@ -571,6 +649,34 @@ function buildUrl($params = []) {
             input[type="text"], select {
                 max-width: 100%;
             }
+            
+            .search-sort-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            
+            .search-group {
+                min-width: 100%;
+            }
+            
+            .sort-buttons {
+                text-align: center;
+            }
+            
+            .button-group {
+                justify-content: center;
+            }
+            
+            .search-btn {
+                align-self: stretch;
+                height: auto;
+            }
+            
+            .genre-btn, .sort-btn {
+                padding: 10px 12px;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
@@ -591,61 +697,51 @@ function buildUrl($params = []) {
         <!-- Przycisk do pokazywania/ukrywania filtrów -->
         <details class="filters-toggle">
             <summary>📋 Pokaż/Ukryj filtry</summary>
-            <!-- Sekcja wyszukiwania -->
+            
+            <!-- Sekcja wyszukiwania i sortowania w jednej linii -->
             <div class="form-section">
-                <h3>Wyszukiwanie</h3>
-            <form method="GET">
-                <div class="form-group">
-                    <label for="search">Szukaj według tytułu lub autora:</label>
-                    <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Wpisz tytuł lub nazwisko autora">
-                </div>
-                <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
-                <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
-                <input type="hidden" name="series" value="<?php echo htmlspecialchars($series); ?>">
-                <button type="submit" class="btn">Szukaj</button>
-            </form>
-        </div>
-        
-        <!-- Sekcja filtrowania -->
-        <div class="form-section">
-            <h3>Filtrowanie według gatunku</h3>
-            <form method="GET">
-                <div class="form-group">
-                    <label for="genre">Wybierz gatunek:</label>
-                    <select id="genre" name="genre">
-                        <option value="">Wszystkie gatunki</option>';
+                <h3>Wyszukiwanie i sortowanie</h3>
+                <form method="GET" class="search-sort-form">
+                    <div class="search-sort-row">
+                        <div class="search-group">
+                            <label for="search">Szukaj według tytułu lub autora:</label>
+                            <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Wpisz tytuł lub nazwisko autora">
+                        </div>
+                        <div class="sort-buttons">
+                            <label>Sortowanie:</label>
+                            <div class="button-group">
+                                <a href="<?php echo buildUrl([\'sort\' => \'title\', \'page\' => 1]); ?>" 
+                                   class="btn sort-btn<?php echo $sort === \'title\' ? \' active\' : \'\'; ?>">A-Z Tytuł</a>
+                                <a href="<?php echo buildUrl([\'sort\' => \'author\', \'page\' => 1]); ?>" 
+                                   class="btn sort-btn<?php echo $sort === \'author\' ? \' active\' : \'\'; ?>">A-Z Autor</a>
+                                <a href="<?php echo buildUrl([\'sort\' => \'date\', \'page\' => 1]); ?>" 
+                                   class="btn sort-btn<?php echo $sort === \'date\' ? \' active\' : \'\'; ?>">Najnowsze</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn search-btn">Szukaj</button>
+                    </div>
+                    <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
+                    <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+                    <input type="hidden" name="series" value="<?php echo htmlspecialchars($series); ?>">
+                </form>
+            </div>
+            
+            <!-- Sekcja filtrowania gatunków przyciskami -->
+            <div class="form-section">
+                <h3>Filtrowanie według gatunku</h3>
+                <div class="genre-buttons">
+                    <a href="<?php echo buildUrl([\'genre\' => \'\', \'page\' => 1]); ?>" 
+                       class="btn genre-btn<?php echo empty($genre) ? \' active\' : \'\'; ?>">Wszystkie gatunki</a>';
 
     foreach ($allGenres as $g) {
-        $html .= '<option value="' . htmlspecialchars($g) . '"<?php echo $genre === "' . htmlspecialchars($g) . '" ? " selected" : ""; ?>>' . htmlspecialchars($g) . '</option>' . "\n";
+        $html .= '
+                    <a href="<?php echo buildUrl([\'genre\' => \'' . htmlspecialchars($g) . '\', \'page\' => 1]); ?>" 
+                       class="btn genre-btn<?php echo $genre === \'' . htmlspecialchars($g) . '\' ? \' active\' : \'\'; ?>">' . htmlspecialchars($g) . '</a>';
     }
 
-    $html .= '                    </select>
+    $html .= '
                 </div>
-                <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
-                <input type="hidden" name="series" value="<?php echo htmlspecialchars($series); ?>">
-                <button type="submit" class="btn">Filtruj</button>
-            </form>
-        </div>
-        
-        <!-- Sekcja sortowania -->
-        <div class="form-section">
-            <h3>Sortowanie</h3>
-            <form method="GET">
-                <div class="form-group">
-                    <label for="sort">Sortuj według:</label>
-                    <select id="sort" name="sort">
-                        <option value="title"<?php echo $sort === "title" ? " selected" : ""; ?>>Alfabetycznie według tytułu</option>
-                        <option value="author"<?php echo $sort === "author" ? " selected" : ""; ?>>Alfabetycznie według autora</option>
-                        <option value="date"<?php echo $sort === "date" ? " selected" : ""; ?>>Najnowsze pierwsze</option>
-                    </select>
-                </div>
-                <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                <input type="hidden" name="genre" value="<?php echo htmlspecialchars($genre); ?>">
-                <input type="hidden" name="series" value="<?php echo htmlspecialchars($series); ?>">
-                <button type="submit" class="btn">Sortuj</button>
-            </form>
-        </div>
+            </div>
         </details>
         <!-- Koniec kontenera z filtrami -->
         
