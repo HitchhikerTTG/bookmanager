@@ -1,16 +1,31 @@
 <?php
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
 
 function debug_log($message) {
     error_log("[GENERATE_PUBLIC] " . $message);
+    // Also output to response for debugging
+    if (!headers_sent()) {
+        echo "<!-- DEBUG: " . htmlspecialchars($message) . " -->\n";
+    }
 }
 
 try {
     debug_log("Starting HTML generation");
+    debug_log("Current working directory: " . getcwd());
+    debug_log("Script file: " . __FILE__);
 
     // Load books data
+    debug_log("Checking for data/books.json...");
     if (!file_exists('data/books.json')) {
-        throw new Exception("books.json not found");
+        debug_log("books.json not found, checking alternative paths");
+        if (!file_exists('./data/books.json')) {
+            throw new Exception("books.json not found in data/ directory. Current dir: " . getcwd());
+        }
     }
+    debug_log("books.json found");
 
     $jsonContent = file_get_contents('data/books.json');
     $booksData = json_decode($jsonContent, true);
@@ -131,7 +146,10 @@ try {
         }
     ';
 
+    debug_log("Preparing to generate HTML with " . count($processedBooks) . " processed books");
+    
     $html = '<?php' . "\n";
+    $html .= '// Generated on ' . date('Y-m-d H:i:s') . "\n";
     $html .= '$processedBooks = ' . var_export($processedBooks, true) . ';' . "\n\n";
 
     // Helper functions
@@ -389,10 +407,21 @@ $allGenres = ' . var_export($allGenres, true) . ';
 </body>
 </html>';
 
-    debug_log("HTML generation completed");
-
+    debug_log("HTML generation completed, content length: " . strlen($html));
+    
+    // Validate generated content
+    if (strlen($html) < 1000) {
+        throw new Exception("Generated HTML seems too short: " . strlen($html) . " characters");
+    }
+    
+    if (strpos($html, '<?php') === false) {
+        throw new Exception("Generated content doesn't contain PHP opening tag");
+    }
+    
+    debug_log("Content validation passed, writing to index.php");
+    
     if(file_put_contents('index.php', $html)) {
-        debug_log("Successfully wrote index.php");
+        debug_log("Successfully wrote index.php (" . strlen($html) . " bytes)");
         header('Content-Type: application/json; charset=utf-8');
         http_response_code(200);
         echo json_encode(['success' => true, 'message' => 'Strona została wygenerowana - kod został uproszony i zoptymalizowany'], JSON_UNESCAPED_UNICODE);
