@@ -91,8 +91,10 @@ function editBook(fileName, title, genres, series, seriesPosition, comment) {
         
         if (titleInput) titleInput.value = title || '';
         if (genresInput) {
-            // Set genres value directly (your existing system handles display)
+            // Set genres value and update visual display
             genresInput.value = genres || '';
+            // Update the visual genre badges
+            updateGenreDisplay(rowId, genres);
         }
         if (seriesInput) seriesInput.value = series || '';
         if (seriesPosInput) seriesPosInput.value = seriesPosition || '';
@@ -101,6 +103,24 @@ function editBook(fileName, title, genres, series, seriesPosition, comment) {
         // Initialize autocomplete for series after form is visible
         initializeAutocomplete(rowId);
     }
+}
+
+function updateGenreDisplay(rowId, genres) {
+    const container = document.getElementById(`selected-genres-${rowId}`);
+    if (!container || !genres) return;
+    
+    // Clear existing badges
+    container.innerHTML = '';
+    
+    // Add badges for each genre
+    const genreList = genres.split(',').map(g => g.trim()).filter(g => g);
+    genreList.forEach(genre => {
+        const badge = document.createElement('span');
+        badge.className = 'badge bg-primary genre-badge';
+        badge.style.margin = '2px';
+        badge.innerHTML = `${genre} <i class="bi bi-x" onclick="removeGenre('${rowId}', '${genre}')" style="cursor: pointer;"></i>`;
+        container.appendChild(badge);
+    });
 }
 
 
